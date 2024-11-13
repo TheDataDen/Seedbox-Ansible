@@ -8,6 +8,32 @@
   tags:
     - seedbox
 
+- name: Create links directory for media shares
+  file:
+    path: "/links"
+    state: directory
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: 0755
+  tags:
+    - seedbox
+
+- name: Create torrent download link
+  file:
+    src: "/data/downloads/Torrents"
+    dest: "/links/Torrents"
+    state: link
+  tags:
+    - seedbox
+
+- name: Create usenet download link
+  file:
+    src: "/data/downloads/Usenet"
+    dest: "/links/Usenet"
+    state: link
+  tags:
+    - seedbox
+
 - name: Create dockers directory for seedbox stack
   file:
     path: "/home/{{ docker_user }}/dockers/seedbox"
