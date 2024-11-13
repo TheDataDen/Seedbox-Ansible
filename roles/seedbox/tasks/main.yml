@@ -16,7 +16,7 @@
 
 - name: Resolve NFS media shares paths
   set_fact:
-    nfs_media_shares: "{{ nfs.media_shares | map('combine', {'nfs_path': nfs.base_path + '/' + item.nfs_path}) | list }}"
+    nfs_media_shares: "{{ nfs.media_shares | map('lambda item: item | combine({'nfs_path': nfs.base_path + '/' + item.nfs_path})') | list }}"
 
 - name: Mount NFS shares
   mount:
