@@ -1,6 +1,5 @@
-packages:
+common_packages:
   - curl
   - vim
   - git
   - htop
-  - virtiofsd

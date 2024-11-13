@@ -1,7 +1,7 @@
 ---
 - name: Update and Upgrade apt packages
   apt:
-    update_cache: yes
+    update_cache: true
     upgrade: dist
   tags:
     - packages
@@ -11,24 +11,7 @@
   apt:
     name: "{{ item }}"
     state: present
-  loop: "{{ packages }}"
+  loop: "{{ common_packages }}"
   tags:
     - packages
-
-- name: Create mountpoint for UNRAID shares
-  file:
-    path: "/mnt/{{ unraid_mount_tag }}"
-    state: directory
-    owner: root
-    group: root
-    mode: 0755
-  tags:
-    - share
-
-- name: Mount UNRAID shares
-  mount:
-    path: "/mnt/{{ unraid_mount_tag }}"
-    src: "{{ unraid_mount_tag }}"
-    fstype: virtiofs
-    state: mounted
-  become: true
+    

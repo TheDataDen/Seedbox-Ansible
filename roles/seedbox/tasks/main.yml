@@ -1,36 +1,26 @@
 ---
-- name: Create symlinks for media shares
+- name: Ensure the /data directory exists
   file:
-    src: "/mnt/{{ unraid_mount_tag }}/{{ item.sharePath }}"
-    dest: "/data/{{ item.mediaType }}"
-    state: link
-  loop: "{{ media_shares }}"
-  tags:
-    - seedbox
-
-- name: Create links directory for media shares
-  file:
-    path: "/links"
+    path: /data
     state: directory
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
-    mode: 0755
+    mode: "0755"
+
+- name: Install nfs-common
+  apt:
+    name: nfs-common
+    state: present
   tags:
     - seedbox
 
-- name: Create torrent download link
-  file:
-    src: "/data/downloads/Torrents"
-    dest: "/links/Torrents"
-    state: link
-  tags:
-    - seedbox
-
-- name: Create usenet download link
-  file:
-    src: "/data/downloads/Usenet"
-    dest: "/links/Usenet"
-    state: link
+- name: Mount NFS shares
+  mount:
+    path: "{{ item.data_dir_name }}"
+    src: "{{ nfs.host }}:{{ item.nfs_path }}"
+    fstype: nfs
+    state: mounted
+  loop: "{{ nfs.media_shares }}"
   tags:
     - seedbox
 
@@ -40,7 +30,7 @@
     state: directory
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
-    mode: 0755
+    mode: "0755"
   tags:
     - seedbox
 
@@ -50,7 +40,7 @@
     dest: "/home/{{ docker_user }}/dockers/seedbox/docker-compose.yml"
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
-    mode: 0644
+    mode: "0644"
   tags:
     - seedbox
 
@@ -60,7 +50,7 @@
     dest: "/home/{{ docker_user }}/dockers/seedbox/.env"
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
-    mode: 0644
+    mode: "0644"
   tags:
     - seedbox
 
