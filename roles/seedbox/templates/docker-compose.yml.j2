@@ -20,6 +20,7 @@ services:
       - NET_ADMIN
       - SYS_MODULE
     environment:
+      - LOCAL_NETWORK=${PIA_LOCAL_NETWORK}
 {% if pia.server_loc is defined %}
       - LOC=${PIA_SERVER_LOC}
 {% else %}

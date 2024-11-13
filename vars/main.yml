@@ -6,6 +6,7 @@ PGID: 1000
 unraid_mount_tag: shares
 
 pia:
+  local_network: 10.1.10.0/24
   username: REPLACEME
   password: REPLACEME
   # Remove if using Dedicated IP
