@@ -1,0 +1,328 @@
+services:
+  vpn:
+    image: thrnz/docker-wireguard-pia
+    container_name: pia_vpn
+    restart: unless-stopped
+    volumes:
+      - pia-dat:/pia
+      - ./pia:/pia-port
+    ports:
+      - ${PROWLARR_PORT}:9696
+      - ${FLARESOLVERR_PORT}:8191
+      - ${BAZARR_PORT}:6767
+      - ${QBITTORRENT_PORT}:${QBITTORRENT_PORT}
+      - ${SABNZBD_PORT}:8080
+      - ${RADARR_PORT}:7878
+      - ${SONARR_PORT}:8989
+      - ${READARR_AUDIOBOOKS_PORT}:8787
+      - ${READARR_EBOOKS_PORT}:8788
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      {% if pia.server_loc is defined %}
+      - LOC=${PIA_SERVER_LOC}
+      {% else %}
+      - PIA_DIP_TOKEN=${PIA_DIP_TOKEN}
+      {% endif %}
+      - USER=${PIA_USERNAME}
+      - PASS=${PIA_PASSWORD}
+      - PORT_FORWARDING=1
+      - PORT_FILE=/pia-port/port.dat
+      - FIREWALL=1
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.default.disable_ipv6=1
+      - net.ipv6.conf.all.disable_ipv6=1
+      - net.ipv6.conf.lo.disable_ipv6=1
+    healthcheck:
+      test: ping -c 1 www.google.com || exit 1
+      interval: 300s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+      start_interval: 3s
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    network_mode: "service:vpn"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./radarr/config:/config
+      - /data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:7878 || exit 1"]
+      interval: ${HEALTH_CHECK_INTERVAL}
+      timeout: ${HEALTH_CHECK_TIMEOUT}
+      retries: ${HEALTH_CHECK_RETRIES}
+      start_period: ${HEALTH_CHECK_START_PERIOD}
+    depends_on:
+      vpn:
+        condition: service_healthy
+      qbittorrent:
+        condition: service_started
+      sabnzbd:
+        condition: service_started
+      prowlarr:
+        condition: service_started
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    network_mode: "service:vpn"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./sonarr/config:/config
+      - /data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8989 || exit 1"]
+      interval: ${HEALTH_CHECK_INTERVAL}
+      timeout: ${HEALTH_CHECK_TIMEOUT}
+      retries: ${HEALTH_CHECK_RETRIES}
+      start_period: ${HEALTH_CHECK_START_PERIOD}
+    depends_on:
+      vpn:
+        condition: service_healthy
+      qbittorrent:
+        condition: service_started
+      sabnzbd:
+        condition: service_started
+      prowlarr:
+        condition: service_started
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    network_mode: "service:vpn"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./prowlarr/config:/config
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9696 || exit 1"]
+      interval: ${HEALTH_CHECK_INTERVAL}
+      timeout: ${HEALTH_CHECK_TIMEOUT}
+      retries: ${HEALTH_CHECK_RETRIES}
+      start_period: ${HEALTH_CHECK_START_PERIOD}
+    depends_on:
+      vpn:
+        condition: service_healthy
+      qbittorrent:
+        condition: service_started
+      sabnzbd:
+        condition: service_started
+      flaresolverr:
+        condition: service_started
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    restart: unless-stopped
+    network_mode: "service:vpn"
+    environment:
+      - LOG_LEVEL=info
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8191 || exit 1"]
+      interval: ${HEALTH_CHECK_INTERVAL}
+      timeout: ${HEALTH_CHECK_TIMEOUT}
+      retries: ${HEALTH_CHECK_RETRIES}
+      start_period: ${HEALTH_CHECK_START_PERIOD}
+    depends_on:
+      vpn:
+        condition: service_healthy
+  # Commented out until the ebooks version is up and the internal port is changed
+  # readarr-audiobooks:
+  #   image: lscr.io/linuxserver/readarr:develop
+  #   container_name: readarr-audiobooks
+  #   restart: unless-stopped
+  #   network_mode: "service:vpn"
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TIMEZONE}
+  #   volumes:
+  #     - ./readarr-audiobooks/config:/config
+  #     - /data:/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl -f http://localhost:8787 || exit 1"]
+  #     interval: ${HEALTH_CHECK_INTERVAL}
+  #     timeout: ${HEALTH_CHECK_TIMEOUT}
+  #     retries: ${HEALTH_CHECK_RETRIES}
+  #     start_period: ${HEALTH_CHECK_START_PERIOD}
+  #   depends_on:
+  #     vpn:
+  #       condition: service_healthy
+  #     qbittorrent:
+  #       condition: service_started
+  #     sabnzbd:
+  #       condition: service_started
+  #     prowlarr:
+  #       condition: service_started
+  readarr-ebooks:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: readarr-ebooks
+    restart: unless-stopped
+    network_mode: "service:vpn"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./readarr-ebooks/config:/config
+      - /data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8787 || exit 1"]
+      interval: ${HEALTH_CHECK_INTERVAL}
+      timeout: ${HEALTH_CHECK_TIMEOUT}
+      retries: ${HEALTH_CHECK_RETRIES}
+      start_period: ${HEALTH_CHECK_START_PERIOD}
+    depends_on:
+      vpn:
+        condition: service_healthy
+      qbittorrent:
+        condition: service_started
+      sabnzbd:
+        condition: service_started
+      prowlarr:
+        condition: service_started
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    restart: unless-stopped
+    network_mode: "service:vpn"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./bazarr/config:/config
+      - /data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:6767 || exit 1"]
+      interval: ${HEALTH_CHECK_INTERVAL}
+      timeout: ${HEALTH_CHECK_TIMEOUT}
+      retries: ${HEALTH_CHECK_RETRIES}
+      start_period: ${HEALTH_CHECK_START_PERIOD}
+    depends_on:
+      vpn:
+        condition: service_healthy
+      sonarr:
+        condition: service_started
+      radarr:
+        condition: service_started
+  qbittorrent:
+    image: qbittorrentofficial/qbittorrent-nox:latest
+    container_name: qbittorrent
+    restart: unless-stopped
+    network_mode: "service:vpn"
+    environment:
+      - QBT_LEGAL_NOTICE=confirm
+      - QBT_VERSION=latest
+      - QBT_WEBUI_PORT=${QBITTORRENT_PORT}
+      - TZ=${TIMEZONE}
+    read_only: true
+    stop_grace_period: 30m
+    tmpfs:
+      - /tmp
+    tty: true
+    volumes:
+      - ./qbittorrent/config:/config
+      - /data/Downloads/Torrents:/data/Downloads/Torrents
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:${QBITTORRENT_PORT} || exit 1"]
+      interval: ${HEALTH_CHECK_INTERVAL}
+      timeout: ${HEALTH_CHECK_TIMEOUT}
+      retries: ${HEALTH_CHECK_RETRIES}
+      start_period: ${HEALTH_CHECK_START_PERIOD}
+    depends_on:
+      vpn:
+        condition: service_healthy
+  qbittorrent-porthelper:
+    image: scotte/qbittorrent-porthelper:latest
+    container_name: qbittorrent-porthelper
+    restart: unless-stopped
+    environment:
+      - HOST=${QBITTORRENT_HOST}
+      - USERNAME=${QBITTORRENT_USERNAME}
+      - PASSWORD=${QBITTORRENT_PASSWORD}
+    volumes:
+      - ./pia:/piashared:ro
+    depends_on:
+      qbittorrent:
+        condition: service_healthy
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    restart: unless-stopped
+    network_mode: "service:vpn"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./sabnzbd/config:/config
+      - /data/Downloads/Usenet:/data/Downloads/Usenet
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080 || exit 1"]
+      interval: ${HEALTH_CHECK_INTERVAL}
+      timeout: ${HEALTH_CHECK_TIMEOUT}
+      retries: ${HEALTH_CHECK_RETRIES}
+      start_period: ${HEALTH_CHECK_START_PERIOD}
+    depends_on:
+      vpn:
+        condition: service_healthy
+  portainer:
+    image: portainer/portainer-ce:alpine
+    container_name: portainer
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    ports:
+      - 8000:8000
+      - 9443:9443
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--no-check-certificate", "-q", "https://localhost:9443/api/status"]
+      interval: ${HEALTH_CHECK_INTERVAL}
+      timeout: ${HEALTH_CHECK_TIMEOUT}
+      retries: ${HEALTH_CHECK_RETRIES}
+      start_period: ${HEALTH_CHECK_START_PERIOD}
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --schedule "0 5 * * *"
+  autoheal:
+    image: willfarrell/autoheal
+    container_name: autoheal
+    restart: unless-stopped
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=all
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  syncthing:
+    image: syncthing/syncthing:latest
+    container_name: syncthing
+    restart: unless-stopped
+    ports:
+      - 8384:8384
+      - 22000:22000/tcp
+      - 22000:22000/udp
+      - 21027:21027/udp
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      
+volumes:
+  portainer_data:
+  pia-dat:

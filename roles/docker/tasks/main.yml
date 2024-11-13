@@ -1,0 +1,82 @@
+---
+- name: Update apt package index
+  apt:
+    update_cache: yes
+  tags:
+    - docker
+
+- name: Install prerequisite packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - ca-certificates
+    - curl
+  tags:
+    - docker
+
+- name: Add Docker GPG apt Key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  tags:
+    - docker
+
+- name: Add Docker Repository
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+  tags:
+    - docker
+
+- name: Update apt package index again after adding Docker repo
+  apt:
+    update_cache: yes
+  tags:
+    - docker
+
+- name: Install Docker and related packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-buildx-plugin
+    - docker-compose-plugin
+  tags:
+    - docker
+
+- name: Ensure Docker service is running and enabled
+  service:
+    name: docker
+    state: started
+    enabled: yes
+  tags:
+    - docker
+
+- name: Ensure docker group exists
+  group:
+    name: docker
+    state: present
+  tags:
+    - docker
+
+- name: Add user to the docker group
+  user:
+    name: "{{ docker_user }}"
+    groups: docker
+    append: yes
+  tags:
+    - docker
+
+- name: Create the dockers directory
+  file:
+    path: /home/{{ docker_user }}/dockers
+    state: directory
+    owner: {{ docker_user }}
+    group: {{ docker_user }}
+    mode: 0755
+  tags:
+    - docker

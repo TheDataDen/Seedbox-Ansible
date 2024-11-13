@@ -1,0 +1,51 @@
+docker_user: REPLACEME
+host_ip: 10.1.10.26
+timezone: America/New_York
+PUID: 1000
+PGID: 1000
+unraid_mount_tag: shares
+
+pia:
+  username: REPLACEME
+  password: REPLACEME
+  # Remove if using Dedicated IP
+  server_loc: ca_montreal
+  # Remove if not using Dedicated IP
+  dip_token: REPLACEME
+
+ports:
+  radarr: 7878
+  sonarr: 8989
+  prowlarr: 9696
+  flaresolverr: 8191
+  readarr_audiobooks: 8787
+  readarr_ebooks: 8788
+  bazarr: 6767
+  qbittorrent: 8081
+  sabnzbd: 8181
+
+health_check:
+  interval: 60s
+  timeout: 10s
+  retries: 3
+  start_period: 60s
+
+qbittorrent:
+  host: "{{ host_ip }}:{{ ports.qbittorrent }}"
+  username: REPLACEME
+  password: REPLACEME
+
+media_shares:
+  - mediaType: tv
+    sharePath: TV Shows
+  - mediaType: movies
+    sharePath: Movies
+  - mediaType: anime
+    sharePath: Anime
+  - mediaType: audiobooks
+    sharePath: Audiobooks
+  - mediaType: books
+    sharePath: Books
+  - mediaType: downloads
+    sharePath: Downloads
+
