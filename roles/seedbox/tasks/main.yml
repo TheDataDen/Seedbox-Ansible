@@ -40,7 +40,6 @@
 
 - name: Create Seedbox Docker stack
   community.docker.docker_compose:
-    project_src: /home/{{ docker_user }}/dockers/seedbox
     definition: /home/{{ docker_user }}/dockers/seedbox/docker-compose.yml
     state: present
   tags:
