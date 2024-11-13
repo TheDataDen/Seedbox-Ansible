@@ -1,7 +1,7 @@
 ---
 - hosts: localhost
   become: true
-  tasks:
+  roles:
     - common
     - docker
     - seedbox
