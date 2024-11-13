@@ -17,7 +17,7 @@
 
 - name: Create mountpoint for UNRAID shares
   file:
-    path: /mnt/{{ unraid_mount_tag }}
+    path: "/mnt/{{ unraid_mount_tag }}"
     state: directory
     owner: root
     group: root
@@ -27,8 +27,8 @@
 
 - name: Mount UNRAID shares
   mount:
-    path: /mnt/{{ unraid_mount_tag }}
-    src: {{ unraid_mount_tag }}
+    path: "/mnt/{{ unraid_mount_tag }}"
+    src: "{{ unraid_mount_tag }}"
     fstype: virtiofs
     state: mounted
   become: true
