@@ -107,13 +107,6 @@
   tags:
     - docker
 
-- name: Ensure python3-docker is installed
-  apt:
-    name: python3-docker
-    state: present
-  tags:
-    - docker
-
 - name: Create the dockers directory
   file:
     path: "/home/{{ docker_user }}/dockers"
