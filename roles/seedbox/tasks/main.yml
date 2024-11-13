@@ -7,31 +7,12 @@
     group: "{{ docker_user }}"
     mode: "0755"
 
-- name: Install nfs-common
-  apt:
-    name: nfs-common
-    state: present
-  tags:
-    - seedbox
-
-- name: Initialize nfs_media_shares as an empty list
-  set_fact:
-    nfs_media_shares: []
-
-- name: Resolve NFS media shares paths
-  set_fact:
-    nfs_media_shares: "{{ nfs_media_shares + [ item | combine({'nfs_path': nfs.base_path + '/' + item.nfs_path}) ] }}"
-  with_items: "{{ nfs.media_shares }}"
-
-
-- name: Mount NFS shares
-  mount:
-    path: "/data/{{ item.data_dir_name }}"
-    src: "{{ nfs.host }}:{{ item.nfs_path }}"
-    fstype: nfs
-    opts: "rw,sync"
-    state: mounted
-  loop: "{{ nfs_media_shares }}"
+- name: Create symlinks for media shares
+  file:
+    src: "/mnt/{{ unraid_mount_tag }}/{{ item.sharePath }}"
+    dest: "/data/{{ item.mediaType }}"
+    state: link
+  loop: "{{ media_shares }}"
   tags:
     - seedbox
 

@@ -36,20 +36,17 @@ qbittorrent:
   username: REPLACEME
   password: REPLACEME
 
-nfs:
-  host: 10.1.10.2
-  base_path: /mnt/user
-  media_shares:
-    - data_dir_name: tv
-      nfs_path: "TV Shows"
-    - data_dir_name: movies
-      nfs_path: Movies
-    - data_dir_name: anime
-      nfs_path: Anime
-    - data_dir_name: audiobooks
-      nfs_path: Audiobooks
-    - data_dir_name: books
-      nfs_path: Books
-    - data_dir_name: downloads
-      nfs_path: Downloads
+media_shares:
+  - mediaType: tv
+    sharePath: TV Shows
+  - mediaType: movies
+    sharePath: Movies
+  - mediaType: anime
+    sharePath: Anime
+  - mediaType: audiobooks
+    sharePath: Audiobooks
+  - mediaType: books
+    sharePath: Books
+  - mediaType: downloads
+    sharePath: Downloads
 

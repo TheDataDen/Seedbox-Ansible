@@ -3,3 +3,4 @@ common_packages:
   - vim
   - git
   - htop
+  - virtiofsd
