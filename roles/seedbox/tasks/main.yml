@@ -14,9 +14,15 @@
   tags:
     - seedbox
 
+- name: Initialize nfs_media_shares as an empty list
+  set_fact:
+    nfs_media_shares: []
+
 - name: Resolve NFS media shares paths
   set_fact:
-    nfs_media_shares: "{{ nfs.media_shares | map('lambda item: item | combine({\"nfs_path\": nfs.base_path + \"/\" + item.nfs_path})') | list }}"
+    nfs_media_shares: "{{ nfs_media_shares + [ item | combine({'nfs_path': nfs.base_path + '/' + item.nfs_path}) ] }}"
+  with_items: "{{ nfs.media_shares }}"
+
 
 - name: Mount NFS shares
   mount:
