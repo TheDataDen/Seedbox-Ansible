@@ -20,11 +20,11 @@ services:
       - NET_ADMIN
       - SYS_MODULE
     environment:
-      {% if pia.server_loc is defined %}
+{% if pia.server_loc is defined %}
       - LOC=${PIA_SERVER_LOC}
-      {% else %}
+{% else %}
       - PIA_DIP_TOKEN=${PIA_DIP_TOKEN}
-      {% endif %}
+{% endif %}
       - USER=${PIA_USERNAME}
       - PASS=${PIA_PASSWORD}
       - PORT_FORWARDING=1
