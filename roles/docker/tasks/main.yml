@@ -107,6 +107,13 @@
   tags:
     - docker
 
+- name: Ensure pip3 is installed
+  apt:
+    name: python3-pip
+    state: present
+  tags:
+    - docker
+
 - name: Install Docker SDK for Python
   pip:
     name: docker
