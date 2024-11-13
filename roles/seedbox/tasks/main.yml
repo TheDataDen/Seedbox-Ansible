@@ -39,9 +39,8 @@
     - seedbox
 
 - name: Create Seedbox Docker stack
-  community.general.docker_compose:
-    project_src: "/home/{{ docker_user }}/dockers/seedbox"
-    state: present
+  command:
+    cmd: docker compose -f /home/{{ docker_user }}/dockers/seedbox/docker-compose.yml up -d
   tags:
     - seedbox
 
