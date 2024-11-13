@@ -1,7 +1,17 @@
 ---
+- name: Check if docker command exists
+  command: which docker
+  register: docker_exists
+  ignore_errors: true
+
+- name: Set a fact to skip Docker installation if it exists
+  set_fact:
+    skip_docker_install: "{{ docker_exists.rc == 0 }}"
+
 - name: Update apt package index
   apt:
     update_cache: yes
+  when: not skip_docker_install
   tags:
     - docker
 
@@ -12,6 +22,7 @@
   loop:
     - ca-certificates
     - curl
+  when: not skip_docker_install
   tags:
     - docker
 
@@ -19,6 +30,7 @@
   stat:
     path: /etc/apt/keyrings/docker.asc
   register: docker_key_exists
+  when: not skip_docker_install
   tags:
     - docker
 
@@ -27,12 +39,14 @@
     path: /etc/apt/trusted.gpg.d/
     state: directory
     mode: '0755'
+  when: not skip_docker_install
 
 - name: Download Docker GPG key to the trusted.gpg.d directory
   get_url:
     url: https://download.docker.com/linux/ubuntu/gpg
     dest: /etc/apt/trusted.gpg.d/docker.gpg
     mode: '0644'
+  when: not skip_docker_install
   tags:
     - docker
 
@@ -40,13 +54,16 @@
   apt_repository:
     repo: "deb https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
     state: present
-  when: not docker_key_exists.stat.exists
+  when: 
+    - not skip_docker_install
+    - not docker_key_exists.stat.exists
   tags:
     - docker
 
 - name: Update apt package index again after adding Docker repo
   apt:
     update_cache: yes
+  when: not skip_docker_install
   tags:
     - docker
 
@@ -60,6 +77,7 @@
     - containerd.io
     - docker-buildx-plugin
     - docker-compose-plugin
+  when: not skip_docker_install
   tags:
     - docker
 
@@ -68,6 +86,7 @@
     name: docker
     state: started
     enabled: yes
+  when: not skip_docker_install
   tags:
     - docker
 
@@ -75,6 +94,7 @@
   group:
     name: docker
     state: present
+  when: not skip_docker_install
   tags:
     - docker
 
@@ -83,6 +103,7 @@
     name: "{{ docker_user }}"
     groups: docker
     append: yes
+  when: not skip_docker_install
   tags:
     - docker
 
