@@ -14,13 +14,17 @@
   tags:
     - seedbox
 
+- name: Resolve NFS media shares paths
+  set_fact:
+    nfs_media_shares: "{{ nfs.media_shares | map('combine', {'nfs_path': nfs.base_path + '/' + item.nfs_path}) | list }}"
+
 - name: Mount NFS shares
   mount:
     path: "{{ item.data_dir_name }}"
     src: "{{ nfs.host }}:{{ item.nfs_path }}"
     fstype: nfs
     state: mounted
-  loop: "{{ nfs.media_shares }}"
+  loop: "{{ nfs_media_shares }}"
   tags:
     - seedbox
 

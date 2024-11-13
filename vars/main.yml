@@ -41,15 +41,15 @@ nfs:
   base_path: /mnt/user
   media_shares:
     - data_dir_name: tv
-      nfs_path: "{{ nfs.base_path }}/TV Shows"
+      nfs_path: "TV Shows"
     - data_dir_name: movies
-      nfs_path: "{{ nfs.base_path }}/Movies"
+      nfs_path: Movies
     - data_dir_name: anime
-      nfs_path: "{{ nfs.base_path }}/Anime"
+      nfs_path: Anime
     - data_dir_name: audiobooks
-      nfs_path: "{{ nfs.base_path }}/Audiobooks"
+      nfs_path: Audiobooks
     - data_dir_name: books
-      nfs_path: "{{ nfs.base_path }}/Books"
+      nfs_path: Books
     - data_dir_name: downloads
-      nfs_path: "{{ nfs.base_path }}/Downloads"
+      nfs_path: Downloads
 
