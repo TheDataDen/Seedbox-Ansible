@@ -22,12 +22,17 @@
   tags:
     - docker
 
-- name: Add Docker GPG apt Key
-  apt_key:
+- name: Ensure the keyring directory exists
+  file:
+    path: /etc/apt/trusted.gpg.d/
+    state: directory
+    mode: '0755'
+
+- name: Download Docker GPG key to the trusted.gpg.d directory
+  get_url:
     url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
-    keyring: /etc/apt/keyrings/docker.asc
-  when: not docker_key_exists.stat.exists
+    dest: /etc/apt/trusted.gpg.d/docker.gpg
+    mode: '0644'
   tags:
     - docker
 
