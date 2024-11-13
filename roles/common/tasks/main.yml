@@ -15,6 +15,14 @@
   tags:
     - packages
 
+- name: Restart SSH service
+  service:
+    name: sshd
+    state: restarted
+    enabled: true
+  tags:
+    - ssh
+
 - name: Create mountpoint for UNRAID shares
   file:
     path: "/mnt/{{ unraid_mount_tag }}"

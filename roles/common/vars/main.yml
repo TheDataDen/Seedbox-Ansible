@@ -3,4 +3,5 @@ common_packages:
   - vim
   - git
   - htop
+  - openssh-server
   - virtiofsd
