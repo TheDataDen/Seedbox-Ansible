@@ -26,7 +26,7 @@
 
 - name: Mount NFS shares
   mount:
-    path: "{{ item.data_dir_name }}"
+    path: "/data/{{ item.data_dir_name }}"
     src: "{{ nfs.host }}:{{ item.nfs_path }}"
     fstype: nfs
     opts: "rw,sync"
