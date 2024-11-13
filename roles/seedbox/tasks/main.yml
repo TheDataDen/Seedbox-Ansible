@@ -29,6 +29,7 @@
     path: "{{ item.data_dir_name }}"
     src: "{{ nfs.host }}:{{ item.nfs_path }}"
     fstype: nfs
+    opts: "rw,sync"
     state: mounted
   loop: "{{ nfs_media_shares }}"
   tags:

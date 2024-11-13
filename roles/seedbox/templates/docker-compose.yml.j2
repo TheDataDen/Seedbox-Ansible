@@ -236,7 +236,7 @@ services:
     tty: true
     volumes:
       - ./qbittorrent/config:/config
-      - /links/Torrents:/data/downloads/Torrents
+      - /data/downloads/Torrents:/data/downloads/Torrents
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:${QBITTORRENT_PORT} || exit 1"]
       interval: ${HEALTH_CHECK_INTERVAL}
@@ -270,7 +270,7 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ./sabnzbd/config:/config
-      - /links/Usenet:/data/downloads/Usenet
+      - /data/downloads/Usenet:/data/downloads/Usenet
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080 || exit 1"]
       interval: ${HEALTH_CHECK_INTERVAL}
