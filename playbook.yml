@@ -5,3 +5,5 @@
     - common
     - docker
     - seedbox
+  vars_files:
+    - vars/main.yml
