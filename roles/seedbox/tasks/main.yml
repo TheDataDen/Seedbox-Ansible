@@ -39,7 +39,7 @@
     - seedbox
 
 - name: Create Seedbox Docker stack
-  community.docker.docker_compose:
+  community.general.docker_compose:
     project_src: "/home/{{ docker_user }}/dockers/seedbox"
     state: present
   tags:
