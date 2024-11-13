@@ -15,12 +15,19 @@
   tags:
     - docker
 
+- name: Check if Docker GPG key already exists
+  stat:
+    path: /etc/apt/keyrings/docker.asc
+  register: docker_key_exists
+  tags:
+    - docker
+
 - name: Add Docker GPG apt Key
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
     keyring: /etc/apt/keyrings/docker.asc
-  ignore_errors: true
+  when: not docker_key_exists.stat.exists
   tags:
     - docker
 
@@ -28,7 +35,7 @@
   apt_repository:
     repo: "deb https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
     state: present
-  ignore_errors: true
+  when: not docker_key_exists.stat.exists
   tags:
     - docker
 
