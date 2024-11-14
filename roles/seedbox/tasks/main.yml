@@ -1,21 +1,4 @@
 ---
-- name: Ensure the /data directory exists
-  file:
-    path: /data
-    state: directory
-    owner: "{{ docker_user }}"
-    group: "{{ docker_user }}"
-    mode: "0755"
-
-- name: Create symlinks for media shares
-  file:
-    src: "/mnt/{{ unraid_mount_tag }}/{{ item.sharePath }}"
-    dest: "/data/{{ item.mediaType }}"
-    state: hard
-  loop: "{{ media_shares }}"
-  tags:
-    - seedbox
-
 - name: Create dockers directory for seedbox stack
   file:
     path: "/home/{{ docker_user }}/dockers/seedbox"
@@ -51,4 +34,3 @@
     cmd: "docker compose -f /home/{{ docker_user }}/dockers/seedbox/docker-compose.yml up -d"
   tags:
     - seedbox
-

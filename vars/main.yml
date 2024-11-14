@@ -38,15 +38,15 @@ qbittorrent:
 
 media_shares:
   - mediaType: tv
-    sharePath: TV Shows
+    shareName: TV Shows
   - mediaType: movies
-    sharePath: Movies
+    shareName: Movies
   - mediaType: anime
-    sharePath: Anime
+    shareName: Anime
   - mediaType: audiobooks
-    sharePath: Audiobooks
+    shareName: Audiobooks
   - mediaType: books
-    sharePath: Books
+    shareName: Books
   - mediaType: downloads
-    sharePath: Downloads
+    shareName: Downloads
 

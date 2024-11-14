@@ -25,17 +25,21 @@
 
 - name: Create mountpoint for UNRAID shares
   file:
-    path: "/mnt/{{ unraid_mount_tag }}"
+    path: "/data"
     state: directory
-    owner: root
-    group: root
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
     mode: "0755"
   tags:
     - share
+
 - name: Mount UNRAID shares
   mount:
-    path: "/mnt/{{ unraid_mount_tag }}"
-    src: "{{ unraid_mount_tag }}"
+    path: "/data/{{ item.mediaType }}"
+    src: "{{ item.shareName }}"
     fstype: virtiofs
     state: mounted
   become: true
+  loop: "{{ media_shares }}"
+  tags:
+    - share
