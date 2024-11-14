@@ -324,7 +324,7 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
     volumes:
-      - ./:/dockers
+      - ./:/dockers:ro
       
 volumes:
   portainer_data:
