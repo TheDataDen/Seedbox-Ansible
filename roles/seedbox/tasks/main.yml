@@ -11,7 +11,7 @@
   file:
     src: "/mnt/{{ unraid_mount_tag }}/{{ item.sharePath }}"
     dest: "/data/{{ item.mediaType }}"
-    state: link
+    state: hard
   loop: "{{ media_shares }}"
   tags:
     - seedbox
