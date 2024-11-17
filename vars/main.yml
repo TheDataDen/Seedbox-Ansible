@@ -32,7 +32,8 @@ health_check:
   start_period: 60s
 
 qbittorrent:
-  host: "{{ host_ip }}:{{ ports.qbittorrent }}"
+  host: "{{ host_ip }}"
+  port: "{{ ports.qbittorrent }}"
   username: REPLACEME
   password: REPLACEME
 

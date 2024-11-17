@@ -247,15 +247,18 @@ services:
       vpn:
         condition: service_healthy
   qbittorrent-porthelper:
-    image: scotte/qbittorrent-porthelper:latest
+    image: strenkml/qbittorrent-porthelper
     container_name: qbittorrent-porthelper
     restart: unless-stopped
     environment:
-      - HOST=${QBITTORRENT_HOST}
-      - USERNAME=${QBITTORRENT_USERNAME}
-      - PASSWORD=${QBITTORRENT_PASSWORD}
+      - QBITTORRENT_HOST=${QBITTORRENT_HOST}
+      - QBITTORRENT_PORT=${QBITTORRENT_PORT}
+      - QBITTORRENT_USERNAME=${QBITTORRENT_USERNAME}
+      - QBITTORRENT_PASSWORD=${QBITTORRENT_PASSWORD}
+      - QBITTORRENT_UPDATE_TIME_SECONDS=60
+      - PIA_PORT_FILE_NAME=port.dat
     volumes:
-      - ./pia:/piashared:ro
+      - ./pia:/pia_port:ro
     depends_on:
       qbittorrent:
         condition: service_healthy
