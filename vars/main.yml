@@ -68,14 +68,14 @@ qbittorrent_managetorrents:
 sabnzbd:
   port: 8181
 
+portainer:
+    port: 9443
+
 watchtower:
   cron_schedule: "0 5 * * *"
 
 syncthing:
   gui_port: 8384
-
-portainer:
-  port: 9443
 
 # Used for all of the health checks except for the pia_vpn health check
 health_check:
