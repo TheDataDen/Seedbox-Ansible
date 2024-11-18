@@ -1,4 +1,5 @@
 services:
+{% if containers.pia_vpn %}
   vpn:
     image: thrnz/docker-wireguard-pia
     container_name: pia_vpn
@@ -7,27 +8,45 @@ services:
       - pia-dat:/pia
       - ./pia:/pia-port
     ports:
-      - ${PROWLARR_PORT}:9696
-      - ${FLARESOLVERR_PORT}:8191
-      - ${BAZARR_PORT}:6767
-      - ${QBITTORRENT_PORT}:${QBITTORRENT_PORT}
-      - ${SABNZBD_PORT}:8080
-      - ${RADARR_PORT}:7878
-      - ${SONARR_PORT}:8989
-      - ${READARR_AUDIOBOOKS_PORT}:8787
-      - ${READARR_EBOOKS_PORT}:8788
+{% if containers.prowlarr %}
+      - {{ prowlarr.port }}:9696
+{% endif %}
+{% if containers.flaresolverr %}
+      - {{ flaresolverr.port }}:8191
+{% endif %}
+{% if containers.bazarr %}
+      - {{ bazarr.port }}:6767
+{% endif %}
+{% if containers.qbittorrent %}
+      - {{ qbittorrent.port }}:{{ qbittorrent.port }}
+{% endif %}
+{% if containers.sabnzbd %}
+      - {{ sabnzbd.port }}:8080
+{% endif %}
+{% if containers.radarr %}
+      - {{ radarr.port }}:7878
+{% endif %}
+{% if containers.sonarr %}
+      - {{ sonarr.port }}:8989
+{% endif %}
+{% if containers.readarr_audiobooks %}
+      - {{ readarr_audiobooks.port }}:8787
+{% endif %}
+{% if containers.readarr_ebooks %}
+      - {{ readarr_ebooks.port }}:8788
+{% endif %}
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
     environment:
-      - LOCAL_NETWORK=${PIA_LOCAL_NETWORK}
-{% if pia.server_loc is defined %}
-      - LOC=${PIA_SERVER_LOC}
+      - LOCAL_NETWORK={{ pia_vpn.local_network }}
+{% if pia_vpn.server_loc is defined %}
+      - LOC={{ pia_vpn.server_loc }}
 {% else %}
-      - PIA_DIP_TOKEN=${PIA_DIP_TOKEN}
+      - PIA_DIP_TOKEN={{ pia_vpn.dip_token }}
 {% endif %}
-      - USER=${PIA_USERNAME}
-      - PASS=${PIA_PASSWORD}
+      - USER={{ pia_vpn.username }}
+      - PASS={{ pia_vpn.password }}
       - PORT_FORWARDING=1
       - PORT_FILE=/pia-port/port.dat
       - FIREWALL=1
@@ -43,192 +62,299 @@ services:
       retries: 3
       start_period: 30s
       start_interval: 3s
+{% endif %}
+{% if containers.radarr %}
   radarr:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     restart: unless-stopped
+{% if containers.pia_vpn %}
     network_mode: "service:vpn"
+{% endif %}
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TIMEZONE}
+      - PUID={{ PUID }}
+      - PGID={{ PGID }}
+      - TZ={{ timezone }}
     volumes:
       - ./radarr/config:/config
       - /data:/data
+{% if not containers.pia_vpn %}
+    ports:
+      - {{ radarr.port }}:7878
+{% endif %}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:7878 || exit 1"]
-      interval: ${HEALTH_CHECK_INTERVAL}
-      timeout: ${HEALTH_CHECK_TIMEOUT}
-      retries: ${HEALTH_CHECK_RETRIES}
-      start_period: ${HEALTH_CHECK_START_PERIOD}
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
     depends_on:
+{% if containers.pia_vpn %}
       vpn:
         condition: service_healthy
+{% endif %}
+{% if containers.qbittorrent %}
       qbittorrent:
         condition: service_started
+{% endif %}
+{% if containers.sabnzbd %}
       sabnzbd:
         condition: service_started
+{% endif %}
+{% if containers.prowlarr %}
       prowlarr:
         condition: service_started
+{% endif %}
+{% endif %}
+{% if containers.sonarr %}
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
     restart: unless-stopped
+{% if containers.pia_vpn %}
     network_mode: "service:vpn"
+{% endif %}
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TIMEZONE}
+      - PUID={{ PUID }}
+      - PGID={{ PGID }}
+      - TZ={{ timezone }}
     volumes:
       - ./sonarr/config:/config
       - /data:/data
+{% if not containers.pia_vpn %}
+    ports:
+      - {{ sonarr.port }}:8989
+{% endif %}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8989 || exit 1"]
-      interval: ${HEALTH_CHECK_INTERVAL}
-      timeout: ${HEALTH_CHECK_TIMEOUT}
-      retries: ${HEALTH_CHECK_RETRIES}
-      start_period: ${HEALTH_CHECK_START_PERIOD}
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
     depends_on:
+{% if containers.pia_vpn %}
       vpn:
         condition: service_healthy
+{% endif %}
+{% if containers.qbittorrent %}
       qbittorrent:
         condition: service_started
+{% endif %}
+{% if containers.sabnzbd %}
       sabnzbd:
         condition: service_started
+{% endif %}
+{% if containers.prowlarr %}
       prowlarr:
         condition: service_started
+{% endif %}
+{% endif %}
+{% if containers.prowlarr %}
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
     restart: unless-stopped
+{% if containers.pia_vpn %}
     network_mode: "service:vpn"
+{% endif %}
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TIMEZONE}
+      - PUID={{ PUID }}
+      - PGID={{ PGID }}
+      - TZ={{ timezone }}
     volumes:
       - ./prowlarr/config:/config
+{% if not containers.pia_vpn %}
+    ports:
+      - {{ prowlarr.port }}:9696
+{% endif %}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:9696 || exit 1"]
-      interval: ${HEALTH_CHECK_INTERVAL}
-      timeout: ${HEALTH_CHECK_TIMEOUT}
-      retries: ${HEALTH_CHECK_RETRIES}
-      start_period: ${HEALTH_CHECK_START_PERIOD}
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
     depends_on:
+{% if containers.pia_vpn %}
       vpn:
         condition: service_healthy
+{% endif %}
+{% if containers.qbittorrent %}
       qbittorrent:
         condition: service_started
+{% endif %}
+{% if containers.sabnzbd %}
       sabnzbd:
         condition: service_started
+{% endif %}
+{% if containers.flaresolverr %}
       flaresolverr:
         condition: service_started
+{% endif %}
+{% endif %}
+{% if containers.flaresolverr %}
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
     restart: unless-stopped
+{% if containers.pia_vpn %}
     network_mode: "service:vpn"
+{% endif %}
     environment:
       - LOG_LEVEL=info
+{% if not containers.pia_vpn %}
+    ports:
+      - {{ flaresolverr.port }}:8191
+{% endif %}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8191 || exit 1"]
-      interval: ${HEALTH_CHECK_INTERVAL}
-      timeout: ${HEALTH_CHECK_TIMEOUT}
-      retries: ${HEALTH_CHECK_RETRIES}
-      start_period: ${HEALTH_CHECK_START_PERIOD}
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
     depends_on:
+{% if containers.pia_vpn %}
       vpn:
         condition: service_healthy
-  # Commented out until the ebooks version is up and the internal port is changed
-  # readarr-audiobooks:
-  #   image: lscr.io/linuxserver/readarr:develop
-  #   container_name: readarr-audiobooks
-  #   restart: unless-stopped
-  #   network_mode: "service:vpn"
-  #   environment:
-  #     - PUID=${PUID}
-  #     - PGID=${PGID}
-  #     - TZ=${TIMEZONE}
-  #   volumes:
-  #     - ./readarr-audiobooks/config:/config
-  #     - /data:/data
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "curl -f http://localhost:8787 || exit 1"]
-  #     interval: ${HEALTH_CHECK_INTERVAL}
-  #     timeout: ${HEALTH_CHECK_TIMEOUT}
-  #     retries: ${HEALTH_CHECK_RETRIES}
-  #     start_period: ${HEALTH_CHECK_START_PERIOD}
-  #   depends_on:
-  #     vpn:
-  #       condition: service_healthy
-  #     qbittorrent:
-  #       condition: service_started
-  #     sabnzbd:
-  #       condition: service_started
-  #     prowlarr:
-  #       condition: service_started
+{% endif %}
+{% endif %}
+{% if containers.readarr_audiobooks %}
+  readarr-audiobooks:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: readarr-audiobooks
+    restart: unless-stopped
+{% if containers.pia_vpn %}
+    network_mode: "service:vpn"
+{% endif %}
+    environment:
+      - PUID={{ PUID }}
+      - PGID={{ PGID }}
+      - TZ={{ timezone }}
+    volumes:
+      - ./readarr-audiobooks/config:/config
+      - /data:/data
+{% if not containers.pia_vpn %}
+    ports:
+      - {{ readarr_audiobooks.port }}:8787
+{% endif %}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8787 || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+{% if containers.pia_vpn %}
+      vpn:
+        condition: service_healthy
+{% endif %}
+{% if containers.qbittorrent %}
+      qbittorrent:
+        condition: service_started
+{% endif %}
+{% if containers.sabnzbd %}
+      sabnzbd:
+        condition: service_started
+{% endif %}
+{% if containers.prowlarr %}
+      prowlarr:
+        condition: service_started
+{% endif %}
+{% endif %}
+{% if containers.readarr_ebooks %}
   readarr-ebooks:
     image: lscr.io/linuxserver/readarr:develop
     container_name: readarr-ebooks
     restart: unless-stopped
+{% if containers.pia_vpn %}
     network_mode: "service:vpn"
+{% endif %}
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TIMEZONE}
+      - PUID={{ PUID }}
+      - PGID={{ PGID }}
+      - TZ={{ timezone }}
     volumes:
       - ./readarr-ebooks/config:/config
       - /data:/data
+{% if not containers.pia_vpn %}
+    ports:
+      - {{ readarr_ebooks.port }}:8788      
+{% endif %}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8787 || exit 1"]
-      interval: ${HEALTH_CHECK_INTERVAL}
-      timeout: ${HEALTH_CHECK_TIMEOUT}
-      retries: ${HEALTH_CHECK_RETRIES}
-      start_period: ${HEALTH_CHECK_START_PERIOD}
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
     depends_on:
+{% if containers.pia_vpn %}
       vpn:
         condition: service_healthy
+{% endif %}
+{% if containers.qbittorrent %}
       qbittorrent:
         condition: service_started
+{% endif %}
+{% if containers.sabnzbd %}
       sabnzbd:
         condition: service_started
+{% endif %}
+{% if containers.prowlarr %}
       prowlarr:
         condition: service_started
+{% endif %}
+{% endif %}
+{% if containers.bazarr %}
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
     restart: unless-stopped
+{% if containers.pia_vpn %}
     network_mode: "service:vpn"
+{% endif %}
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TIMEZONE}
+      - PUID={{ PUID }}
+      - PGID={{ PGID }}
+      - TZ={{ timezone }}
     volumes:
       - ./bazarr/config:/config
       - /data:/data
+{% if not containers.pia_vpn %}
+    ports:
+      - {{ bazarr.port }}:6767
+{% endif %}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:6767 || exit 1"]
-      interval: ${HEALTH_CHECK_INTERVAL}
-      timeout: ${HEALTH_CHECK_TIMEOUT}
-      retries: ${HEALTH_CHECK_RETRIES}
-      start_period: ${HEALTH_CHECK_START_PERIOD}
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
     depends_on:
+{% if containers.pia_vpn %}
       vpn:
         condition: service_healthy
+{% endif %}
+{% if containers.sonarr %}
       sonarr:
         condition: service_started
+{% endif %}
+{% if containers.radarr %}
       radarr:
         condition: service_started
+{% endif %}
+{% endif %}
+{% if containers.qbittorrent %}
   qbittorrent:
     image: qbittorrentofficial/qbittorrent-nox:latest
     container_name: qbittorrent
     restart: unless-stopped
+{% if containers.pia_vpn %}
     network_mode: "service:vpn"
+{% endif %}
     environment:
       - QBT_LEGAL_NOTICE=confirm
       - QBT_VERSION=latest
-      - QBT_WEBUI_PORT=${QBITTORRENT_PORT}
-      - TZ=${TIMEZONE}
+      - QBT_WEBUI_PORT={{ qbittorrent.port }}
+      - TZ={{ timezone }}
     read_only: true
     stop_grace_period: 30m
     tmpfs:
@@ -237,52 +363,87 @@ services:
     volumes:
       - ./qbittorrent/config:/config
       - /data/downloads/Torrents:/data/downloads/Torrents
+{% if not containers.pia_vpn %}
+    ports:
+      - {{ qbittorrent.port }}:{{ qbittorrent.port }}
+{% endif %}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:${QBITTORRENT_PORT} || exit 1"]
-      interval: ${HEALTH_CHECK_INTERVAL}
-      timeout: ${HEALTH_CHECK_TIMEOUT}
-      retries: ${HEALTH_CHECK_RETRIES}
-      start_period: ${HEALTH_CHECK_START_PERIOD}
+      test: ["CMD-SHELL", "curl -f http://localhost:{{ qbittorrent.port }} || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
     depends_on:
+{% if containers.pia_vpn %}
       vpn:
         condition: service_healthy
+{% endif %}
+{% if containers.pia_vpn %}
   qbittorrent-porthelper:
     image: strenkml/qbittorrent-porthelper
     container_name: qbittorrent-porthelper
     restart: unless-stopped
     environment:
-      - QBITTORRENT_HOST=${QBITTORRENT_HOST}
-      - QBITTORRENT_PORT=${QBITTORRENT_PORT}
-      - QBITTORRENT_USERNAME=${QBITTORRENT_USERNAME}
-      - QBITTORRENT_PASSWORD=${QBITTORRENT_PASSWORD}
-      - QBITTORRENT_UPDATE_TIME_SECONDS=60
+      - QBITTORRENT_HOST={{ qbittorrent.host }}
+      - QBITTORRENT_PORT={{ qbittorrent.port }}
+      - QBITTORRENT_USERNAME={{ qbittorrent.username }}
+      - QBITTORRENT_PASSWORD={{ qbittorrent.password }}
+      - QBITTORRENT_UPDATE_TIME_SECONDS={{ qbittorrent_porthelper.update_time_seconds }}
       - PIA_PORT_FILE_NAME=port.dat
     volumes:
       - ./pia:/pia_port:ro
     depends_on:
       qbittorrent:
         condition: service_healthy
+{% endif %}
+{% if containers.qbittorrent_managetorrents %}
+  qbittorrent-managetorrents:
+    image: strenkml/qbittorrent-manage-torrents
+    container_name: qbittorrent-managetorrents
+    restart: unless-stopped
+    environment:
+      - QBITTORRENT_HOST={{ qbittorrent.host }}
+      - QBITTORRENT_PORT={{ qbittorrent.port }}
+      - QBITTORRENT_USERNAME={{ qbittorrent.username }}
+      - QBITTORRENT_PASSWORD={{ qbittorrent.password }}
+      - QBITTORRENT_UPDATE_TIME_SECONDS={{ qbittorrent_managetorrents.update_time_seconds }}
+    depends_on:
+      qbittorrent:
+        condition: service_healthy
+{% endif %}
+{% endif %}
+{% if containers.sabnzbd %}
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
     restart: unless-stopped
+{% if containers.pia_vpn %}
     network_mode: "service:vpn"
+{% endif %}
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TIMEZONE}
+      - PUID={{ PUID }}
+      - PGID={{ PGID }}
+      - TZ={{ timezone }}
     volumes:
       - ./sabnzbd/config:/config
       - /data/downloads/Usenet:/data/downloads/Usenet
+{% if not containers.pia_vpn %}
+    ports:
+      - {{ sabnzbd.port }}:8080
+{% endif %}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080 || exit 1"]
-      interval: ${HEALTH_CHECK_INTERVAL}
-      timeout: ${HEALTH_CHECK_TIMEOUT}
-      retries: ${HEALTH_CHECK_RETRIES}
-      start_period: ${HEALTH_CHECK_START_PERIOD}
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
     depends_on:
+{% if containers.pia_vpn %}
       vpn:
         condition: service_healthy
+{% endif %}
+{% endif %}
+{% if containers.portainer %}
   portainer:
     image: portainer/portainer-ce:alpine
     container_name: portainer
@@ -292,20 +453,24 @@ services:
       - portainer_data:/data
     ports:
       - 8000:8000
-      - 9443:9443
+      - {{ portainer.port }}:9443
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-check-certificate", "-q", "https://localhost:9443/api/status"]
-      interval: ${HEALTH_CHECK_INTERVAL}
-      timeout: ${HEALTH_CHECK_TIMEOUT}
-      retries: ${HEALTH_CHECK_RETRIES}
-      start_period: ${HEALTH_CHECK_START_PERIOD}
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+{% endif %}
+{% if containers.watchtower %}
   watchtower:
     image: containrrr/watchtower:latest
     container_name: watchtower
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: --schedule "0 5 * * *"
+    command: --schedule "{{ watchtower.cron_schedule }}"
+{% endif %}
+{% if containers.autoheal %}
   autoheal:
     image: willfarrell/autoheal
     container_name: autoheal
@@ -314,21 +479,30 @@ services:
       - AUTOHEAL_CONTAINER_LABEL=all
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+{% endif %}
+{% if containers.syncthing %}
   syncthing:
     image: syncthing/syncthing:latest
     container_name: syncthing
     restart: unless-stopped
     ports:
-      - 8384:8384
+      - {{ syncthing.gui_port }}:8384
       - 22000:22000/tcp
       - 22000:22000/udp
       - 21027:21027/udp
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
+      - PUID={{ PUID }}
+      - PGID={{ PGID }}
     volumes:
       - ./:/dockers
-      
+{% endif %}
+
+{% if containers.portainer or containers.pia_vpn %}
 volumes:
+{% endif %}
+{% if containers.portainer %}
   portainer_data:
+{% endif %}
+{% if containers.pia_vpn %}
   pia-dat:
+{% endif %}

@@ -19,16 +19,6 @@
   tags:
     - seedbox
 
-- name: Create .env
-  template:
-    src: .env.j2
-    dest: "/home/{{ docker_user }}/dockers/seedbox/.env"
-    owner: "{{ docker_user }}"
-    group: "{{ docker_user }}"
-    mode: "0644"
-  tags:
-    - seedbox
-
 - name: Create Seedbox Docker stack
   command:
     cmd: "docker compose -f /home/{{ docker_user }}/dockers/seedbox/docker-compose.yml up -d"
