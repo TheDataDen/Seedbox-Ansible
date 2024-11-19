@@ -34,20 +34,20 @@
   tags:
     - docker
 
-- name: Check if Docker GPG key already exists
-  stat:
-    path: /etc/apt/keyrings/docker.asc
-  register: docker_key_exists
-  when: not skip_docker_install
-  tags:
-    - docker
-
 - name: Ensure the keyring directory exists
   file:
     path: /etc/apt/keyrings
     state: directory
     mode: '0755'
   when: not skip_docker_install
+
+- name: Check if Docker GPG key already exists
+  file:
+    path: /etc/apt/keyrings/docker.gpg
+    state: absent
+  when: not skip_docker_install
+  tags:
+    - docker
 
 - name: Download Docker GPG key to the trusted.gpg.d directory
   get_url:
@@ -64,7 +64,6 @@
     state: present
   when: 
     - not skip_docker_install
-    - not docker_key_exists.stat.exists
   tags:
     - docker
 
