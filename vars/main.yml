@@ -27,7 +27,7 @@ pia_vpn:
   password: REPLACEME
   local_network: 10.1.10.0/24
   # Comment out if using Dedicated IP
-  server_loc: ca_montreal
+  server_loc: ca_ontario
   # Comment out if not using Dedicated IP
   dip_token: REPLACEME
 
