@@ -26,6 +26,14 @@
   tags:
     - docker
 
+- name: Remove any existing Docker repository
+  ansible.builtin.file:
+    path: "/etc/apt/sources.list.d/docker.list"
+    state: absent
+  become: true
+  tags:
+    - docker
+
 - name: Check if Docker GPG key already exists
   stat:
     path: /etc/apt/keyrings/docker.asc
