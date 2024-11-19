@@ -134,6 +134,8 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 #### readarr_audiobooks
 
+This container is disabled by default because there is no way to change the internal port that Readarr uses outside of the webUI. So if you want to have both instances of Readarr you will need to run the playbook once, change the internal port of the Ebooks container and then enanle this container and run the playbook again.
+
 | Variable Name | Required | Description                                                  |
 | ------------- | -------- | ------------------------------------------------------------ |
 | `port`        | Yes      | The port that readarr-audiobooks's webUI will be running on. |
