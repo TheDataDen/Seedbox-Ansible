@@ -185,9 +185,9 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 #### watchtower
 
-| Variable Name   | Required | Description                                                      |
-| --------------- | -------- | ---------------------------------------------------------------- |
-| `cron_schedule` | Yes      | The cron schedule that Watchtower will use to check for updates. |
+| Variable Name   | Required | Description                                                                                                                                               |
+| --------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cron_schedule` | Yes      | The cron schedule that Watchtower will use to check for updates. Use [Crontab.guru](https://crontab.guru/) for help creating a cron. Example: `0 5 * * *` |
 
 #### syncthing
 
