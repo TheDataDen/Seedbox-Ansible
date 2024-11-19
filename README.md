@@ -60,6 +60,9 @@ The [run.sh](run.sh) script will install Ansible and run the playbook.
 ./run.sh
 ```
 
+> [!NOTE]
+> The Create Seedbox Docker stack step may look like it is hanging. This is because the docker images need to be downloaded. If you are on a slow internet connection, this may take a while.
+
 ## Configuration
 
 The playbook is configured using the [vars/main.yml](vars/main.yml) file.
