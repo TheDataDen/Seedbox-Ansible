@@ -2,20 +2,20 @@
 
 set -e
 
-APT_UDPDATED=false
+APT_UPDATED=false
 
 # Install Ansible if not already installed
 if ! command -v ansible &> /dev/null; then
     sudo apt-get update
     sudo apt-get install -y ansible
-    APT_UDPDATED=true
+    APT_UPDATED=true
 fi
 
 # Install tmux if not already installed
 if ! command -v tmux &> /dev/null; then
     if ! $APT_UDPDATED; then
         sudo apt-get update
-        APT_UDPDATED=true
+        APT_UPDATED=true
     fi
     sudo apt-get install -y tmux
 fi
