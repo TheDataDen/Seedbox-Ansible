@@ -20,6 +20,11 @@ if ! command -v tmux &> /dev/null; then
     sudo apt-get install -y tmux
 fi
 
+if ! tmux has-session -t dummy_session 2>/dev/null; then
+    tmux new-session -d -s dummy_session
+    tmux kill-session -t dummy_session
+fi
+
 # Set up tmux
 TMUX_CONF=~/.tmux.conf
 cat <<EOF > "$TMUX_CONF"
@@ -33,9 +38,7 @@ set -g default-terminal "screen-256color"
 set -g history-limit 10000
 EOF
 
-tmux start-server
 tmux source-file ~/.tmux.conf
-
 
 SESSION_NAME="Seedbox-Ansible"
 
