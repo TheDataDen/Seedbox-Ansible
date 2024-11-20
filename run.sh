@@ -5,6 +5,15 @@ set -e
 sudo apt-get update
 sudo apt-get install -y ansible tmux
 
+# Set up tmux
+echo "set -g mouse on" > ~/.tmux.conf
+echo "set -g utf8 on" >> ~/.tmux.conf
+echo "set -g status-utf8 on" >> ~/.tmux.conf
+echo "set -g default-terminal 'screen-256color'" >> ~/.tmux.conf
+
+tmux source-file ~/.tmux.conf
+
+
 SESSION_NAME="Seedbox-Ansible"
 
 tmux new-session -d -s "$SESSION_NAME" "
