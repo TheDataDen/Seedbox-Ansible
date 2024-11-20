@@ -4,7 +4,6 @@ set -e
 
 PLAYBOOK_CMD="ansible-playbook playbook.yml -vvv"
 
-
 APT_UPDATED=false
 
 # Install Ansible if not already installed
