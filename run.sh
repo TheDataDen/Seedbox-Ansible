@@ -2,6 +2,9 @@
 
 set -e
 
+PLAYBOOK_CMD="ansible-playbook playbook.yml -vvv"
+
+
 APT_UPDATED=false
 
 # Install Ansible if not already installed
@@ -43,7 +46,7 @@ tmux source-file ~/.tmux.conf
 SESSION_NAME="Seedbox-Ansible"
 
 tmux new-session -d -s "$SESSION_NAME" "
-  ansible-playbook playbook.yml -vvv;
+  $PLAYBOOK_CMD;
   if [ \$? -eq 0 ]; then
     echo 'Playbook completed successfully. Press Enter to exit.';
   else
