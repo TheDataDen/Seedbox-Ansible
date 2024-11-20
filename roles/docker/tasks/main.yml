@@ -3,10 +3,14 @@
   command: which docker
   register: docker_exists
   ignore_errors: true
+  tags:
+    - docker
 
 - name: Set a fact to skip Docker installation if it exists
   set_fact:
     skip_docker_install: "{{ docker_exists.rc == 0 }}"
+  tags:
+    - docker
 
 - name: Update apt package index
   apt:
