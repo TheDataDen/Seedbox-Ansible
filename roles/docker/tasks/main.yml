@@ -48,7 +48,7 @@
 
 - name: Remove Docker GPG key if already exists
   file:
-    path: /etc/apt/keyrings/docker.gpg
+    path: /etc/apt/keyrings/docker.asc
     state: absent
   become: true
   when: not skip_docker_install
@@ -58,7 +58,7 @@
 - name: Download Docker GPG key to the trusted.gpg.d directory
   get_url:
     url: https://download.docker.com/linux/ubuntu/gpg
-    dest: /etc/apt/keyrings/docker.gpg
+    dest: /etc/apt/keyrings/docker.asc
     mode: '0644'
   become: true
   when: not skip_docker_install
@@ -67,7 +67,7 @@
 
 - name: Add Docker Repository
   apt_repository:
-    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
     state: present
   become: true
   when: 
