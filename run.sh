@@ -2,14 +2,31 @@
 
 set -e
 
-sudo apt-get update
-sudo apt-get install -y ansible tmux
+# Install Ansible if not already installed
+if ! command -v ansible &> /dev/null; then
+    sudo apt-get update
+    sudo apt-get install -y ansible
+fi
+
+# Install tmux if not already installed
+if ! command -v tmux &> /dev/null; then
+    sudo apt-get update
+    sudo apt-get install -y tmux
+fi
 
 # Set up tmux
-echo "set -g mouse on" > ~/.tmux.conf
-echo "set -g utf8 on" >> ~/.tmux.conf
-echo "set -g status-utf8 on" >> ~/.tmux.conf
-echo "set -g default-terminal 'screen-256color'" >> ~/.tmux.conf
+TMUX_CONF=~/.tmux.conf
+cat <<EOF > "$TMUX_CONF"
+# Enable mouse support
+set -g mouse on
+
+# Use 256 colors
+set -g default-terminal "screen-256color"
+
+# Other useful configurations
+set -g history-limit 10000
+EOF
+echo "tmux configuration written to $TMUX_CONF"
 
 tmux source-file ~/.tmux.conf
 
