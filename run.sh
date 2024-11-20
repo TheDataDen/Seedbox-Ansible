@@ -33,6 +33,7 @@ set -g default-terminal "screen-256color"
 set -g history-limit 10000
 EOF
 
+tmux start-server
 tmux source-file ~/.tmux.conf
 
 
