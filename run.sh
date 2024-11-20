@@ -2,15 +2,21 @@
 
 set -e
 
+APT_UDPDATED=false
+
 # Install Ansible if not already installed
 if ! command -v ansible &> /dev/null; then
     sudo apt-get update
     sudo apt-get install -y ansible
+    APT_UDPDATED=true
 fi
 
 # Install tmux if not already installed
 if ! command -v tmux &> /dev/null; then
-    sudo apt-get update
+    if ! $APT_UDPDATED; then
+        sudo apt-get update
+        APT_UDPDATED=true
+    fi
     sudo apt-get install -y tmux
 fi
 
@@ -26,7 +32,6 @@ set -g default-terminal "screen-256color"
 # Other useful configurations
 set -g history-limit 10000
 EOF
-echo "tmux configuration written to $TMUX_CONF"
 
 tmux source-file ~/.tmux.conf
 
