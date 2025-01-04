@@ -8,6 +8,7 @@ containers:
   pia_vpn: true
   radarr: true
   sonarr: true
+  recyclarr: true
   prowlarr: true
   flaresolverr: true
   # Disabled until the ebooks version is up and the internal port is changed
@@ -36,6 +37,12 @@ radarr:
 
 sonarr:
   port: 8989
+
+recyclarr:
+  # Should not use latest as when the major version changes there will be breaking changes
+  # 7 is the latest version at the time of creating this
+  version: 7
+  cron_schedule: "@daily"
 
 prowlarr:
   port: 9696

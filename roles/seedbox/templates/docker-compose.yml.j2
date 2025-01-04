@@ -149,6 +149,28 @@ services:
         condition: service_started
 {% endif %}
 {% endif %}
+{% if containers.recyclarr and (containers.sonarr or containers.radarr) %}
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr:{{ recyclarr.version }}
+    container_name: recyclarr
+    restart: unless-stopped
+    user: {{ PUID }}:{{ PGID }}
+    volumes:
+      - ./recyclarr/config:/config
+    environment:
+      - TZ={{ timezone }}
+      - CRON_SCHEDULE={{ recyclarr.cron_schedule }}
+      - RECYCLARR_CREATE_CONFIG=true
+    depends_on:
+{% if containers.sonarr %}
+      sonarr:
+        condition: service_healthy
+{% endif %}
+{% if containers.radarr %}
+      radarr:
+        condition: service_healthy
+{% endif %}
+{% endif %}
 {% if containers.prowlarr %}
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
