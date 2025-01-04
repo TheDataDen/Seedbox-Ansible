@@ -14,6 +14,7 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
 - Optional PIA VPN container that routes all neccessary traffic through the VPN
 - qBittorrent portHelper container that automatically updates the port for qBittorrent based on the port that is forwarded by the PIA VPN container
 - qBittorrent manageTorrents container that automatically sends torrents that are slow/hanging to the bottom of the queue; then eventually removes them if they remain slow/hanging
+- Recyclarr for automatically configuring your Sonarr and Radarr instances to follow the TRaSH guides
 - Multiple instances of readarr. One for audiobooks and one for ebooks
 - Syncthing for backing up your data to a remote server
 - Autoheal for automatically restarting containers that have become unhealthy
@@ -22,7 +23,7 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
 
 ## Usage
 
-### UNRAID Setup
+### UNRAID VM Setup
 
 1. Create a new VM and pick Ubuntu as the OS
 2. Give it a name, assign the logical CPUs (Id recommend atleast 4 if have the resources), and assign the memory (4GB probably would be enough but I recommend 8GB)
@@ -90,6 +91,7 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `pia_vpn`                    | No       | Enable/Disable the PIA VPN container.                    |
 | `radarr`                     | No       | Enable/Disable the Radarr container.                     |
 | `sonarr`                     | No       | Enable/Disable the Sonarr container.                     |
+| `recyclarr`                  | No       | Enable/Disable the Recyclarr container.                  |
 | `prowlarr`                   | No       | Enable/Disable the Prowlarr container.                   |
 | `flaresolverr`               | No       | Enable/Disable the FlareSolverr container.               |
 | `readarr_audiobooks`         | No       | Enable/Disable the readarr-audiobooks container.         |
@@ -126,6 +128,13 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | Variable Name | Required | Description                                      |
 | ------------- | -------- | ------------------------------------------------ |
 | `port`        | Yes      | The port that Sonarr's webUI will be running on. |
+
+#### recyclarr
+
+| Variable Name   | Required | Description                                              |
+| --------------- | -------- | -------------------------------------------------------- |
+| `version`       | Yes      | The version of Recyclarr to use.                         |
+| `cron_schedule` | Yes      | The cron schedule that controls how often Recyclarr runs |
 
 #### prowlarr
 
@@ -240,6 +249,7 @@ Below is a list of all of the containers that are available to be enabled/disabl
 | `pia_vpn`                    | Runs a Private Internet Access VPN where all of the traffic for the neccessary containers are routed through the vpn. If the VPN loses connection, the containers lose access to the internet. |
 | `radarr`                     | For managing your movies                                                                                                                                                                       |
 | `sonarr`                     | For managing your TV shows/Anime                                                                                                                                                               |
+| `recyclarr`                  | For automatically configuring your Sonarr and Radarr instances to follow the TRaSH guides                                                                                                      |
 | `prowlarr`                   | For managing your torrents. As well as updating the indexers on Radarr, Sonarr, and Readarr                                                                                                    |
 | `flaresolverr`               | Used in Prowlarr as a proxy server to bypass Cloudflare and DDoS-GUARD protection                                                                                                              |
 | `readarr_audiobooks`         | For managing your audiobooks                                                                                                                                                                   |
