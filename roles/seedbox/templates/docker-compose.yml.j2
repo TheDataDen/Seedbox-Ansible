@@ -159,7 +159,7 @@ services:
       - ./recyclarr/config:/config
     environment:
       - TZ={{ timezone }}
-      - CRON_SCHEDULE="{{ recyclarr.cron_schedule }}"
+      - CRON_SCHEDULE={{ recyclarr.cron_schedule }}
       - RECYCLARR_CREATE_CONFIG=true
     depends_on:
 {% if containers.sonarr %}
