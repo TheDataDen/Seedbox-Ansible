@@ -139,10 +139,10 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 #### notifiarr
 
-| Variable Name | Required | Description                                                  |
-| ------------- | -------- | ------------------------------------------------------------ |
-| `port`        | Yes      | The port that Notifiarr's webUI will be running on.          |
-| `api_key`     | No       | The API key for Notifiarr if you are a patron or subscriber. |
+| Variable Name | Required | Description                                         |
+| ------------- | -------- | --------------------------------------------------- |
+| `port`        | Yes      | The port that Notifiarr's webUI will be running on. |
+| `api_key`     | Yes      | The API key for your Notifiarr account.             |
 
 #### prowlarr
 

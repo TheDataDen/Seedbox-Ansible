@@ -179,10 +179,8 @@ services:
     restart: unless-stopped
     ports:
       - {{ notifiarr.port }}:5454
-{% if notifiarr.api_key is defined %}
     environment:
       - DN_API_KEY={{ notifiarr.api_key }}
-{% endif %}
     volumes:
       - ./notifiarr/config:/config
     healthcheck:

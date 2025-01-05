@@ -48,7 +48,7 @@ recyclarr:
 
 notifiarr:
   port: 5454
-  # If you do not have an API key, comment out the line below
+  # If you do not have an API key, create an account at https://notifiarr.com and get an API key
   api_key: REPLACEME
 
 prowlarr:
