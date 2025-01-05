@@ -183,12 +183,6 @@ services:
       - DN_API_KEY={{ notifiarr.api_key }}
     volumes:
       - ./notifiarr/config:/config
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:5454 || exit 1"]
-      interval: {{ health_check.interval }}
-      timeout: {{ health_check.timeout }}
-      retries: {{ health_check.retries }}
-      start_period: {{ health_check.start_period }}
     depends_on:
 {% if containers.sonarr %}
       sonarr:
