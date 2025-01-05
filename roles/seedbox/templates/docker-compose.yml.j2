@@ -171,6 +171,36 @@ services:
         condition: service_healthy
 {% endif %}
 {% endif %}
+{% if containers.notifiarr %}
+  notifiarr:
+    image: golift/notifiarr:latest
+    container_name: notifiarr
+    hostname: notifiarr
+    restart: unless-stopped
+    ports:
+      - {{ notifiarr.port }}:5454
+{% if notifiarr.api_key is defined %}
+    environment:
+      - DN_API_KEY={{ notifiarr.api_key }}
+{% endif %}
+    volumes:
+      - ./notifiarr/config:/config
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5454 || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+{% if containers.sonarr %}
+      sonarr:
+        condition: service_started
+{% endif %}
+{% if containers.radarr %}
+      radarr:
+        condition: service_started
+{% endif %}
+{% endif %}
 {% if containers.prowlarr %}
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
