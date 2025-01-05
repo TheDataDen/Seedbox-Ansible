@@ -14,7 +14,7 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
 - Optional PIA VPN container that routes all neccessary traffic through the VPN
 - qBittorrent portHelper container that automatically updates the port for qBittorrent based on the port that is forwarded by the PIA VPN container
 - qBittorrent manageTorrents container that automatically sends torrents that are slow/hanging to the bottom of the queue; then eventually removes them if they remain slow/hanging
-- Recyclarr for automatically configuring your Sonarr and Radarr instances to follow the TRaSH guides
+- Recyclarr or Notifiarr for automatically configuring your Sonarr and Radarr instances to follow the TRaSH guides
 - Multiple instances of readarr. One for audiobooks and one for ebooks
 - Syncthing for backing up your data to a remote server
 - Autoheal for automatically restarting containers that have become unhealthy
@@ -92,6 +92,7 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `radarr`                     | No       | Enable/Disable the Radarr container.                     |
 | `sonarr`                     | No       | Enable/Disable the Sonarr container.                     |
 | `recyclarr`                  | No       | Enable/Disable the Recyclarr container.                  |
+| `notifiarr`                  | No       | Enable/Disable the Notifiarr container.                  |
 | `prowlarr`                   | No       | Enable/Disable the Prowlarr container.                   |
 | `flaresolverr`               | No       | Enable/Disable the FlareSolverr container.               |
 | `readarr_audiobooks`         | No       | Enable/Disable the readarr-audiobooks container.         |
@@ -131,10 +132,17 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 #### recyclarr
 
-| Variable Name   | Required | Description                                              |
-| --------------- | -------- | -------------------------------------------------------- |
-| `version`       | Yes      | The version of Recyclarr to use.                         |
-| `cron_schedule` | Yes      | The cron schedule that controls how often Recyclarr runs |
+| Variable Name   | Required | Description                                               |
+| --------------- | -------- | --------------------------------------------------------- |
+| `version`       | Yes      | The version of Recyclarr to use.                          |
+| `cron_schedule` | Yes      | The cron schedule that controls how often Recyclarr runs. |
+
+#### notifiarr
+
+| Variable Name | Required | Description                                                  |
+| ------------- | -------- | ------------------------------------------------------------ |
+| `port`        | Yes      | The port that Notifiarr's webUI will be running on.          |
+| `api_key`     | No       | The API key for Notifiarr if you are a patron or subscriber. |
 
 #### prowlarr
 
@@ -250,6 +258,7 @@ Below is a list of all of the containers that are available to be enabled/disabl
 | `radarr`                     | For managing your movies                                                                                                                                                                       |
 | `sonarr`                     | For managing your TV shows/Anime                                                                                                                                                               |
 | `recyclarr`                  | For automatically configuring your Sonarr and Radarr instances to follow the TRaSH guides                                                                                                      |
+| `notifiarr`                  | For automatically configuring your Sonarr and Radarr instances to follow the TRaSH guides. As well as monitoring tools.                                                                        |
 | `prowlarr`                   | For managing your torrents. As well as updating the indexers on Radarr, Sonarr, and Readarr                                                                                                    |
 | `flaresolverr`               | Used in Prowlarr as a proxy server to bypass Cloudflare and DDoS-GUARD protection                                                                                                              |
 | `readarr_audiobooks`         | For managing your audiobooks                                                                                                                                                                   |

@@ -8,7 +8,9 @@ containers:
   pia_vpn: true
   radarr: true
   sonarr: true
-  recyclarr: true
+  # Disabled by default since notifiarr does everything recyclarr does, but recyclarr is an option if you want to use it
+  recyclarr: false
+  notifiarr: true
   prowlarr: true
   flaresolverr: true
   # Disabled until the ebooks version is up and the internal port is changed
@@ -44,6 +46,11 @@ recyclarr:
   version: 7
   cron_schedule: "@daily"
 
+notifiarr:
+  port: 5454
+  # If you do not have an API key, comment out the line below
+  api_key: REPLACEME
+
 prowlarr:
   port: 9696
 
@@ -76,7 +83,7 @@ sabnzbd:
   port: 8181
 
 portainer:
-    port: 9443
+  port: 9443
 
 watchtower:
   cron_schedule: "0 5 * * *"
@@ -106,4 +113,3 @@ media_shares:
     shareName: Books
   - mediaType: downloads
     shareName: Downloads
-
