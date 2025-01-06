@@ -29,7 +29,7 @@ services:
 {% if containers.sonarr %}
       - {{ sonarr.port }}:8989
 {% endif %}
-{% if containers.readarr_audiobooks %}
+{% if containers.readarr_audiobooks or containers.readarr_ebooks %}
       - {{ readarr_audiobooks.port }}:8787
 {% endif %}
 {% if containers.readarr_ebooks %}
