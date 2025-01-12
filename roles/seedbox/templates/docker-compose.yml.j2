@@ -511,7 +511,7 @@ services:
     volumes:
       - ./firefox/config:/config
     shm_size: {{ firefox.shm_size }}
-    health_check:
+    healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:3001 || exit 1"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
