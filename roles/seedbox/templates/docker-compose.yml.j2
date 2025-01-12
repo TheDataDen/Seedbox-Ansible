@@ -35,6 +35,9 @@ services:
 {% if containers.readarr_ebooks %}
       - {{ readarr_ebooks.port }}:8788
 {% endif %}
+{% if containers.firefox %}
+      - {{ firefox.port }}:3001
+{% endif %}
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -487,6 +490,41 @@ services:
         condition: service_healthy
 {% endif %}
 {% endif %}
+{% if containers.firefox %}
+  firefox:
+    image: lscr.io/linuxserver/firefox:latest
+    container_name: firefox
+    restart: unless-stopped
+{% if containers.pia_vpn %}
+    network_mode: "service:vpn"
+{% endif %}
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      - PUID={{ PUID }}
+      - PGID={{ PGID }}
+      - TZ={{ timezone }}
+{% if not containers.pia_vpn %}
+    ports:
+      - {{ firefox.port }}:3001
+{% endif %}
+    volumes:
+      - ./firefox/config:/config
+    shm_size: {{ firefox.shm_size }}
+    health_check:
+      test: ["CMD-SHELL", "curl -f http://localhost:3001 || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+{% if containers.pia_vpn %}
+    depends_on:
+      vpn:
+        condition: service_healthy
+{% endif %}
+{% endif %}
+
+
 {% if containers.portainer %}
   portainer:
     image: portainer/portainer-ce:alpine

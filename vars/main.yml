@@ -21,6 +21,7 @@ containers:
   qbittorrent_managetorrents: true
   sabnzbd: true
   portainer: true
+  firefox: true
   watchtower: true
   autoheal: true
   syncthing: true
@@ -81,6 +82,10 @@ qbittorrent_managetorrents:
 
 sabnzbd:
   port: 8181
+
+firefox:
+  port: 3001
+  shm_size: "1gb"
 
 portainer:
   port: 9443

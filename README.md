@@ -16,6 +16,7 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
 - qBittorrent manageTorrents container that automatically sends torrents that are slow/hanging to the bottom of the queue; then eventually removes them if they remain slow/hanging
 - Recyclarr or Notifiarr for automatically configuring your Sonarr and Radarr instances to follow the TRaSH guides
 - Multiple instances of readarr. One for audiobooks and one for ebooks
+- Firefox instance behind the VPN for manually searching for torrents
 - Syncthing for backing up your data to a remote server
 - Autoheal for automatically restarting containers that have become unhealthy
 - Watchtower for automatically updating containers
@@ -203,6 +204,13 @@ This container is disabled by default because there is no way to change the inte
 | ------------- | -------- | ------------------------------------------------- |
 | `port`        | Yes      | The port that SABnzbd's webUI will be running on. |
 
+#### firefox
+
+| Variable Name | Required | Description                                       |
+| ------------- | -------- | ------------------------------------------------- |
+| `port`        | Yes      | The port that Firefox's webUI will be running on. |
+| `shm_size`    | Yes      | The size of the shared memory for Firefox.        |
+
 #### portainer
 
 | Variable Name | Required | Description                                         |
@@ -268,6 +276,7 @@ Below is a list of all of the containers that are available to be enabled/disabl
 | `qbittorrent_porthelper`     | Used with the PIA VPN and qBittorrent to set the qBittorrent port used for incoming connection to the port that is forwarded by PIA                                                            |
 | `qbittorrent_managetorrents` | Used with qBittorrent to automatically send torrents that are slow/hanging to the bottom of the queue; then eventually removes them                                                            |
 | `sabnzbd`                    | Downloads NZBs (Usenet)                                                                                                                                                                        |
+| `firefox`                    | A Firefox instance that is used for manually searching for torrents                                                                                                                            |
 | `portainer`                  | A WebGUI for managing all of the docker containers                                                                                                                                             |
 | `watchtower`                 | Automatically updates the containers to their latest versions. Runs on a cron schedule                                                                                                         |
 | `autoheal`                   | Automatically restarts any container that becomes unhealthy                                                                                                                                    |
