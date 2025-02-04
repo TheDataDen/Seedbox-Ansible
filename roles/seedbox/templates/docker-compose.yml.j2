@@ -350,6 +350,45 @@ services:
         condition: service_started
 {% endif %}
 {% endif %}
+{% if containers.readarr_ebooks and containers.bookbounty %}
+  bookbounty:
+    image: thewicklowwolf/bookbounty:latest
+    container_name: bookbounty
+    restart: unless-stopped
+{% if containers.pia_vpn %}
+    network_mode: "service:vpn"
+{% endif %}
+    environment:
+      - PUID={{ PUID }}
+      - PGID={{ PGID }}
+      - readarr_address=http://{{ host_ip }}:{{ readarr_ebooks.port }}
+      - sync_schedule={{ bookbounty.sync_schedule }}
+      - selected_language={{ bookbounty.selected_language }}
+      - preferred_extensions_fiction={{ bookbounty.preferred_ext_fiction }}
+      - preferred_extensions_non_fiction={{ bookbounty.preferred_ext_non_fiction }}
+      - selected_path_type={{ bookbounty.selected_path_type }}
+{% if not containers.pia_vpn %}
+    ports:
+      - {{ bookbounty.port }}:5000
+{% endif %}
+    volumes:
+      - ./bookbounty/config:/bookbounty/config
+      - {{ bookbounty.download_path }}:/bookbounty/downloads
+      - /etc/localtime:/etc/localtime:ro
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--no-check-certificate", "-q", "http://localhost:5000/"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+{% if containers.pia_vpn %}
+      vpn:
+        condition: service_healthy
+{% endif %}
+      readarr-ebooks:
+        condition: service_started
+{% endif %}
 {% if containers.bazarr %}
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest

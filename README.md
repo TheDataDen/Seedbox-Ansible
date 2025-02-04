@@ -98,6 +98,7 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `flaresolverr`               | No       | Enable/Disable the FlareSolverr container.               |
 | `readarr_audiobooks`         | No       | Enable/Disable the readarr-audiobooks container.         |
 | `readarr_ebooks`             | No       | Enable/Disable the readarr-ebooks container.             |
+| `bookbounty`                 | No       | Enable/Disable the Bookbounty container.                 |
 | `bazarr`                     | No       | Enable/Disable the Bazarr container.                     |
 | `qbittorrent`                | No       | Enable/Disable the qBittorrent container.                |
 | `qbittorrent_managetorrents` | No       | Enable/Disable the qBittorrent manageTorrents container. |
@@ -170,6 +171,18 @@ This container is disabled by default because there is no way to change the inte
 | Variable Name | Required | Description                                              |
 | ------------- | -------- | -------------------------------------------------------- |
 | `port`        | Yes      | The port that readarr-ebooks's webUI will be running on. |
+
+#### bookbounty
+
+| Variable Name               | Required | Description                                                                                  |
+| --------------------------- | -------- | -------------------------------------------------------------------------------------------- |
+| `port`                      | Yes      | The port that Bookbounty's webUI will be running on.                                         |
+| `sync_schedule`             | Yes      | The cron schedule that controls how often Bookbounty syncs. 24h format, comma seperated list |
+| `selected_language`         | Yes      | The language that Bookbounty will sync. Default is English                                   |
+| `preferred_ext_fiction`     | Yes      | The preferred extensions for fiction. Comma sperated list.                                   |
+| `preferred_ext_non_fiction` | Yes      | The preferred extensions for non-fiction. Comma sperated list.                               |
+| `selected_path_type`        | Yes      | The path type that Bookbounty will use. Either `file` or `folder`                            |
+| `download_path`             | Yes      | The path that Bookbounty will download to.                                                   |
 
 #### bazarr
 
@@ -271,6 +284,7 @@ Below is a list of all of the containers that are available to be enabled/disabl
 | `flaresolverr`               | Used in Prowlarr as a proxy server to bypass Cloudflare and DDoS-GUARD protection                                                                                                              |
 | `readarr_audiobooks`         | For managing your audiobooks                                                                                                                                                                   |
 | `readarr_ebooks`             | For managing your ebooks                                                                                                                                                                       |
+| `bookbounty`                 | For downloading ebooks that Readarr can't find                                                                                                                                                 |
 | `bazarr`                     | Automatically downloads external subtitles for your movies, TV Shows, and Anime                                                                                                                |
 | `qbittorrent`                | Downloads torrents                                                                                                                                                                             |
 | `qbittorrent_porthelper`     | Used with the PIA VPN and qBittorrent to set the qBittorrent port used for incoming connection to the port that is forwarded by PIA                                                            |

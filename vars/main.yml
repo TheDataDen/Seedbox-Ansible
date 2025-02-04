@@ -16,6 +16,7 @@ containers:
   # Disabled until the ebooks version is up and the internal port is changed
   readarr_audiobooks: false
   readarr_ebooks: true
+  bookbounty: true
   bazarr: true
   qbittorrent: true
   qbittorrent_managetorrents: true
@@ -63,6 +64,17 @@ readarr_audiobooks:
 
 readarr_ebooks:
   port: 8788
+
+bookbounty:
+  port: 5000
+  # Comma separated list of 24h hours to check for books
+  sync_schedule: 0,6,12,18
+  selected_language: English
+  preferred_ext_fiction: .epub, .mobi, .azw3
+  preferred_ext_non_fiction: .epub, .mobi, .azw3, .pdf
+  selected_path_type: file
+  # If you don't use calibre you can change this to another location
+  download_path: /data/downloads/calibre-import
 
 bazarr:
   port: 6767
