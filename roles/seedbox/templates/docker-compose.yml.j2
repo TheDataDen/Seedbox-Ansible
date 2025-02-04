@@ -35,6 +35,9 @@ services:
 {% if containers.readarr_ebooks %}
       - {{ readarr_ebooks.port }}:8788
 {% endif %}
+{% if containers.bookbounty %}
+      - {{ bookbounty.port }}:5000
+{% endif %}
 {% if containers.firefox %}
       - {{ firefox.port }}:3001
 {% endif %}
