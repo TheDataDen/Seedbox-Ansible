@@ -9,36 +9,51 @@ services:
       - ./pia:/pia-port
     ports:
 {% if containers.prowlarr %}
+      # Prowlarr
       - {{ prowlarr.port }}:9696
 {% endif %}
 {% if containers.flaresolverr %}
+      # FlareSolverr
       - {{ flaresolverr.port }}:8191
 {% endif %}
 {% if containers.bazarr %}
+      # Bazarr
       - {{ bazarr.port }}:6767
 {% endif %}
 {% if containers.qbittorrent %}
+      # qBittorrent
       - {{ qbittorrent.port }}:{{ qbittorrent.port }}
 {% endif %}
 {% if containers.sabnzbd %}
+      # SABnzbd
       - {{ sabnzbd.port }}:8080
 {% endif %}
 {% if containers.radarr %}
+      # Radarr
       - {{ radarr.port }}:7878
 {% endif %}
 {% if containers.sonarr %}
+      # Sonarr
       - {{ sonarr.port }}:8989
 {% endif %}
 {% if containers.readarr_audiobooks or containers.readarr_ebooks %}
+      # Readarr Audiobooks
       - {{ readarr_audiobooks.port }}:8787
 {% endif %}
 {% if containers.readarr_ebooks %}
+      # Readarr Ebooks
       - {{ readarr_ebooks.port }}:8788
 {% endif %}
+{% if containers.lazylibrarian %}
+      # Lazylibrarian
+      - {{ lazylibrarian.port }}:5299
+{% endif %}
 {% if containers.bookbounty %}
+      # Bookbounty
       - {{ bookbounty.port }}:5000
 {% endif %}
 {% if containers.firefox %}
+      # Firefox
       - {{ firefox.port }}:3001
 {% endif %}
     cap_add:
@@ -356,6 +371,48 @@ services:
 {% endif %}
 {% if containers.prowlarr %}
       prowlarr:
+        condition: service_started
+{% endif %}
+{% endif %}
+{% if containers.lazylibrarian %}
+  lazylibrarian:
+    image: lscr.io/linuxserver/lazylibrarian:latest
+    container_name: lazylibrarian
+    restart: unless-stopped
+{% if containers.pia_vpn %}
+    network_mode: "service:vpn"
+{% endif %}
+    environment:
+      - PUID={{ PUID }}
+      - PGID={{ PGID }}
+      - TZ={{ timezone }}
+{% if lazylibrarian.docker_mods %}
+      - DOCKER_MODS={{ lazylibrarian.docker_mods }}
+{% endif %}
+    volumes:
+      - ./lazylibrarian/config:/config
+      - /data:/data
+{% if not containers.pia_vpn %}
+    ports:
+      - {{ lazylibrarian.port }}:5299
+{% endif %}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5299 || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+{% if containers.pia_vpn %}
+      vpn:
+        condition: service_healthy
+{% endif %}
+{% if containers.qbittorrent %}
+      qbittorrent:
+        condition: service_started
+{% endif %}
+{% if containers.sabnzbd %}
+      sabnzbd:
         condition: service_started
 {% endif %}
 {% endif %}

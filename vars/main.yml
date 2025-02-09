@@ -1,3 +1,6 @@
+# This is the config file for the ansible playbook
+# If you disable a container, you do NOT need to comment out the container specific variables
+
 docker_user: REPLACEME
 host_ip: 10.1.10.26
 timezone: America/New_York
@@ -16,6 +19,8 @@ containers:
   # Disabled until the ebooks version is up and the internal port is changed
   readarr_audiobooks: false
   readarr_ebooks: true
+  # Available as an alternative to Readarr
+  lazylibrarian: false
   bookbounty: true
   bazarr: true
   qbittorrent: true
@@ -66,6 +71,11 @@ readarr_audiobooks:
 
 readarr_ebooks:
   port: 8788
+
+lazylibrarian:
+  port: 5299
+  # Comment out if you don't want to use mods
+  docker_mods: linuxserver/mods:universal-calibre|linuxserver/mods:lazylibrarian-ffmpeg
 
 bookbounty:
   port: 5000

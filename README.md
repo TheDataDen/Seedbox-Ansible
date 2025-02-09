@@ -98,6 +98,7 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `flaresolverr`               | No       | Enable/Disable the FlareSolverr container.               |
 | `readarr_audiobooks`         | No       | Enable/Disable the readarr-audiobooks container.         |
 | `readarr_ebooks`             | No       | Enable/Disable the readarr-ebooks container.             |
+| `lazylibrarian`              | No       | Enable/Disable the Lazylibrarian container.              |
 | `bookbounty`                 | No       | Enable/Disable the Bookbounty container.                 |
 | `bazarr`                     | No       | Enable/Disable the Bazarr container.                     |
 | `qbittorrent`                | No       | Enable/Disable the qBittorrent container.                |
@@ -173,6 +174,13 @@ This container is disabled by default because there is no way to change the inte
 | Variable Name | Required | Description                                              |
 | ------------- | -------- | -------------------------------------------------------- |
 | `port`        | Yes      | The port that readarr-ebooks's webUI will be running on. |
+
+#### lazylibrarian
+
+| Variable Name | Required | Description                                                                               |
+| ------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `port`        | Yes      | The port that Lazylibrarian's webUI will be running on.                                   |
+| `docker_mods` | No       | The mods that will be used for Lazylibrarian. Default enables calibre-importer and ffmpeg |
 
 #### bookbounty
 
@@ -286,6 +294,7 @@ Below is a list of all of the containers that are available to be enabled/disabl
 | `flaresolverr`               | Used in Prowlarr as a proxy server to bypass Cloudflare and DDoS-GUARD protection                                                                                                              |
 | `readarr_audiobooks`         | For managing your audiobooks                                                                                                                                                                   |
 | `readarr_ebooks`             | For managing your ebooks                                                                                                                                                                       |
+| `lazylibrarian`              | For managing your ebooks and audiobooks. An alternative to readarr                                                                                                                             |
 | `bookbounty`                 | For downloading ebooks that Readarr can't find                                                                                                                                                 |
 | `bazarr`                     | Automatically downloads external subtitles for your movies, TV Shows, and Anime                                                                                                                |
 | `qbittorrent`                | Downloads torrents                                                                                                                                                                             |
