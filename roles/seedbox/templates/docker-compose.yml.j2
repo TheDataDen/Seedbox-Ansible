@@ -6,7 +6,10 @@ services:
     restart: unless-stopped
     volumes:
       - pia-dat:/pia
-      - ./pia:/pia-port
+      - ./pia/port:/pia-port
+{% if extras.mama.enabled %}
+      - ./pia/persist:/persist
+{% endif %}
     ports:
 {% if containers.prowlarr %}
       # Prowlarr
@@ -76,6 +79,9 @@ services:
 {% endif %}
 {% if pia_vpn.port_persist %}
       - PORT_PERSIST=1
+{% endif %}
+{% if extras.mam.enabled %}
+      - POST_UP=/persist/mam.sh
 {% endif %}
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
@@ -386,7 +392,7 @@ services:
       - PUID={{ PUID }}
       - PGID={{ PGID }}
       - TZ={{ timezone }}
-{% if lazylibrarian.docker_mods %}
+{% if lazylibrarian.docker_mods is defined %}
       - DOCKER_MODS={{ lazylibrarian.docker_mods }}
 {% endif %}
     volumes:
@@ -530,7 +536,7 @@ services:
       vpn:
         condition: service_healthy
 {% endif %}
-{% if containers.pia_vpn %}
+{% if containers.pia_vpn and containers.qbittorrent %}
   qbittorrent-porthelper:
     image: strenkml/qbittorrent-porthelper
     container_name: qbittorrent-porthelper
@@ -543,7 +549,7 @@ services:
       - QBITTORRENT_UPDATE_TIME_SECONDS={{ qbittorrent_porthelper.update_time_seconds }}
       - PIA_PORT_FILE_NAME=port.dat
     volumes:
-      - ./pia:/pia_port:ro
+      - ./pia/port:/pia_port:ro
     depends_on:
       qbittorrent:
         condition: service_healthy

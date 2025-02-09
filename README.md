@@ -21,6 +21,7 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
 - Autoheal for automatically restarting containers that have become unhealthy
 - Watchtower for automatically updating containers
 - Portainer for a gui for managing all of the containers
+- Optional feature to automatically update your VPN IP in your MAM account
 
 ## Usage
 
@@ -108,6 +109,15 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `watchtower`                 | No       | Enable/Disable the Watchtower container.                 |
 | `autoheal`                   | No       | Enable/Disable the Autoheal container.                   |
 | `syncthing`                  | No       | Enable/Disable the Syncthing container.                  |
+
+### Extras
+
+#### MAM
+
+| Variable Name    | Required | Description                                                                                                                             |
+| ---------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `enabled`        | Yes      | Enable/Disable the MAM script to run with the VPN comes up                                                                              |
+| `session_cookie` | Yes      | The MAM session cookie that will be used to login to MAM. Only needs to be set for the first run, after that a cookie file will be used |
 
 ### Indiviual Container Settings
 

@@ -1,6 +1,6 @@
 ---
 - name: Create dockers directory for seedbox stack
-  file:
+  ansible.builtin.file:
     path: "/home/{{ docker_user }}/dockers/seedbox"
     state: directory
     owner: "{{ docker_user }}"
@@ -9,8 +9,47 @@
   tags:
     - seedbox
 
+- name: Check if the pia port.dat file is in root pia directory (Migration step)
+  ansible.builtin.stat:
+    path: "/home/{{ docker_user }}/dockers/seedbox/pia/port.dat"
+  register: pia_port
+  tags:
+    - seedbox
+  when: containers.pia_vpn
+
+- name: Create new pia port directory if neeeded (Migration step)
+  ansible.builtin.file:
+    path: "/home/{{ docker_user }}/dockers/seedbox/pia/port"
+    state: directory
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: "0755"
+    recurse: true
+  tags:
+    - seedbox
+  when: containers.pia_vpn and pia_port.stat.exists
+
+- name: Move pia port.dat file to new location (Migration step)
+  ansible.builtin.command:
+    cmd: "mv /home/{{ docker_user }}/dockers/seedbox/pia/port.dat /home/{{ docker_user }}/dockers/seedbox/pia/port/port.dat"
+    creates: "/home/{{ docker_user }}/dockers/seedbox/pia/port/port.dat"
+  tags:
+    - seedbox
+  when: containers.pia_vpn and pia_port.stat.exists
+
+- name: Copy mam.sh to persist directory (Extras MAM)
+  ansible.builtin.copy:
+    src: mam.sh
+    dest: "/home/{{ docker_user }}/dockers/seedbox/pia/persist/mam.sh"
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: "0755"
+  tags:
+    - seedbox
+  when: extras.mam.enabled and containers.pia_vpn
+
 - name: Create docker-compose.yml
-  template:
+  ansible.builtin.template:
     src: docker-compose.yml.j2
     dest: "/home/{{ docker_user }}/dockers/seedbox/docker-compose.yml"
     owner: "{{ docker_user }}"
@@ -19,8 +58,44 @@
   tags:
     - seedbox
 
+- name: Create mam pia directory
+  ansible.builtin.file:
+    path: "/home/{{ docker_user }}/dockers/seedbox/pia/persist"
+    state: directory
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: "0755"
+
 - name: Create Seedbox Docker stack
-  command:
+  ansible.builtin.command:
     cmd: "docker compose -f /home/{{ docker_user }}/dockers/seedbox/docker-compose.yml up -d"
+  changed_when: true
   tags:
     - seedbox
+
+- name: Check if mam.cookies file exists (Extras MAM)
+  ansible.builtin.stat:
+    path: "/home/{{ docker_user }}/dockers/seedbox/pia/persist/mam.cookies"
+  register: mam_cookies
+  tags:
+    - seedbox
+  when: containers.pia_vpn and extras.mam.enabled
+
+- name: Wait for VPN container to be healthy (Extras MAM)
+  community.docker.docker_container_info:
+    name: pia_vpn
+  register: pia_vpn_info
+  until: pia_vpn_info.container.State.Health.Status == "healthy"
+  retries: 30
+  delay: 5
+  tags:
+    - seedbox
+  when: containers.pia_vpn and extras.mam.enabled and not mam_cookies.stat.exists
+
+- name: Run command to generate MAM cookies (Extras MAM)
+  community.docker.docker_container_exec:
+    container: pia_vpn
+    command: "curl -c /persist/mam.cookies -b 'mam_id={{ extras.mam.session_cookie }}' https://t.myanonamouse.net/json/dynamicSeedbox.php"
+  tags:
+    - seedbox
+  when: containers.pia_vpn and extras.mam.enabled and not mam_cookies.stat.exists

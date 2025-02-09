@@ -32,10 +32,19 @@ containers:
   autoheal: true
   syncthing: true
 
+extras:
+  # If you use MAM as one of your trackers and use the pia container. Runs a script that sets your IP in your MAM account when the VPN connects
+  mam:
+    enabled: false
+    # This only needs to be set on the first run, after that a cookie file will be used
+    # [USERNAME] -> Preferences -> Security -> View IP Locked Session Cookie
+    session_cookie: REPLACEME
+
 pia_vpn:
   username: REPLACEME
   password: REPLACEME
   local_network: 10.1.10.0/24
+  # Make sure you are using a server location that supports port forwarding (none of the US locations support it, but Canada does)
   # Comment out if using Dedicated IP
   server_loc: ca_ontario
   # Comment out if not using Dedicated IP

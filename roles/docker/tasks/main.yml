@@ -1,26 +1,28 @@
 ---
 - name: Check if docker command exists
-  command: which docker
+  ansible.builtin.command:
+    cmd: which docker
   register: docker_exists
+  changed_when: false
   ignore_errors: true
   tags:
     - docker
 
 - name: Set a fact to skip Docker installation if it exists
-  set_fact:
+  ansible.builtin.set_fact:
     skip_docker_install: "{{ docker_exists.rc == 0 }}"
   tags:
     - docker
 
 - name: Update apt package index
-  apt:
-    update_cache: yes
+  ansible.builtin.apt:
+    update_cache: true
   when: not skip_docker_install
   tags:
     - docker
 
 - name: Install prerequisite packages
-  apt:
+  ansible.builtin.apt:
     name: "{{ item }}"
     state: present
   loop:
@@ -39,7 +41,7 @@
     - docker
 
 - name: Ensure the keyring directory exists
-  file:
+  ansible.builtin.file:
     path: /etc/apt/keyrings
     state: directory
     mode: '0755'
@@ -47,7 +49,7 @@
   when: not skip_docker_install
 
 - name: Remove Docker GPG key if already exists
-  file:
+  ansible.builtin.file:
     path: /etc/apt/keyrings/docker.asc
     state: absent
   become: true
@@ -56,7 +58,7 @@
     - docker
 
 - name: Download Docker GPG key to the trusted.gpg.d directory
-  get_url:
+  ansible.builtin.get_url:
     url: https://download.docker.com/linux/ubuntu/gpg
     dest: /etc/apt/keyrings/docker.asc
     mode: '0644'
@@ -66,24 +68,24 @@
     - docker
 
 - name: Add Docker Repository
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
     state: present
   become: true
-  when: 
+  when:
     - not skip_docker_install
   tags:
     - docker
 
 - name: Update apt package index again after adding Docker repo
-  apt:
-    update_cache: yes
+  ansible.builtin.apt:
+    update_cache: true
   when: not skip_docker_install
   tags:
     - docker
 
 - name: Install Docker and related packages
-  apt:
+  ansible.builtin.apt:
     name: "{{ item }}"
     state: present
   loop:
@@ -97,16 +99,16 @@
     - docker
 
 - name: Ensure Docker service is running and enabled
-  service:
+  ansible.builtin.service:
     name: docker
     state: started
-    enabled: yes
+    enabled: true
   when: not skip_docker_install
   tags:
     - docker
 
 - name: Ensure docker group exists
-  group:
+  ansible.builtin.group:
     name: docker
     state: present
   when: not skip_docker_install
@@ -114,20 +116,20 @@
     - docker
 
 - name: Add user to the docker group
-  user:
+  ansible.builtin.user:
     name: "{{ docker_user }}"
     groups: docker
-    append: yes
+    append: true
   when: not skip_docker_install
   tags:
     - docker
 
 - name: Create the dockers directory
-  file:
+  ansible.builtin.file:
     path: "/home/{{ docker_user }}/dockers"
     state: directory
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
-    mode: 0755
+    mode: "0755"
   tags:
     - docker

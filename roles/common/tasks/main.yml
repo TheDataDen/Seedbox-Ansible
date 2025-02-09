@@ -1,6 +1,6 @@
 ---
 - name: Update and Upgrade apt packages
-  apt:
+  ansible.builtin.apt:
     update_cache: true
     upgrade: dist
   tags:
@@ -8,7 +8,7 @@
     - upgrade
 
 - name: Install common packages
-  apt:
+  ansible.builtin.apt:
     name: "{{ item }}"
     state: present
   loop: "{{ common_packages }}"
@@ -16,7 +16,7 @@
     - packages
 
 - name: Restart SSH service
-  service:
+  ansible.builtin.service:
     name: ssh
     state: restarted
     enabled: true
@@ -24,7 +24,7 @@
     - ssh
 
 - name: Create mountpoint for UNRAID shares
-  file:
+  ansible.builtin.file:
     path: "/data"
     state: directory
     owner: "{{ docker_user }}"
@@ -34,7 +34,7 @@
     - share
 
 - name: Mount UNRAID shares
-  mount:
+  ansible.posix.mount:
     path: "/data/{{ item.mediaType }}"
     src: "{{ item.shareName }}"
     fstype: virtiofs
