@@ -112,13 +112,15 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 #### pia_vpn
 
-| Variable Name   | Required | Description                                                                                          |
-| --------------- | -------- | ---------------------------------------------------------------------------------------------------- |
-| `local_network` | Yes      | The local network that the PIA VPN container will use.                                               |
-| `username`      | Yes      | The username that will be used to connect to the PIA VPN container.                                  |
-| `password`      | Yes      | The password that will be used to connect to the PIA VPN container.                                  |
-| `server_loc`    | No       | The location of the PIA server. If using Dedicated IP, this should be commented out with a `#`.      |
-| `dip_token`     | No       | The DIP token of the PIA server. If NOT using Dedicated IP, this should be commented out with a `#`. |
+| Variable Name   | Required | Description                                                                                                        |
+| --------------- | -------- | ------------------------------------------------------------------------------------------------------------------ |
+| `local_network` | Yes      | The local network that the PIA VPN container will use.                                                             |
+| `username`      | Yes      | The username that will be used to connect to the PIA VPN container.                                                |
+| `password`      | Yes      | The password that will be used to connect to the PIA VPN container.                                                |
+| `server_loc`    | No       | The location of the PIA server. If using Dedicated IP, this should be commented out with a `#`.                    |
+| `dip_token`     | No       | The DIP token of the PIA server. If NOT using Dedicated IP, this should be commented out with a `#`.               |
+| `port_fatal`    | No       | Enables the port_fatal option for the PIA VPN container. If the VPN port forward fails, the container will exit.   |
+| `port_persist`  | No       | Enables the port_persist option for the PIA VPN container. The container will try to use the same port every time. |
 
 #### radarr
 
