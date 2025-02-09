@@ -110,7 +110,7 @@ services:
       - {{ radarr.port }}:7878
 {% endif %}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:7878 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:7878 || exit 1"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}
@@ -153,7 +153,7 @@ services:
       - {{ sonarr.port }}:8989
 {% endif %}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8989 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:8989 || exit 1"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}
@@ -239,7 +239,7 @@ services:
       - {{ prowlarr.port }}:9696
 {% endif %}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9696 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:9696 || exit 1"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}
@@ -277,7 +277,7 @@ services:
       - {{ flaresolverr.port }}:8191
 {% endif %}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8191 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:8191 || exit 1"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}
@@ -308,7 +308,7 @@ services:
       - {{ readarr_audiobooks.port }}:8787
 {% endif %}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8787 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:8787 || exit 1"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}
@@ -351,7 +351,7 @@ services:
       - {{ readarr_ebooks.port }}:8788      
 {% endif %}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8787 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:8787 || exit 1"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}
@@ -397,7 +397,7 @@ services:
       - {{ lazylibrarian.port }}:5299
 {% endif %}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:5299 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:5299 || exit 1"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}
@@ -442,7 +442,7 @@ services:
       - {{ bookbounty.download_path }}:/bookbounty/downloads
       - /etc/localtime:/etc/localtime:ro
     healthcheck:
-      test: ["CMD", "wget", "--spider", "--no-check-certificate", "-q", "http://localhost:5000/"]
+      test: ["CMD", "wget", "--spider", "--no-check-certificate", "-q", "http://{{ host_ip }}:5000/"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}
@@ -475,7 +475,7 @@ services:
       - {{ bazarr.port }}:6767
 {% endif %}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:6767 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:6767 || exit 1"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}
@@ -520,7 +520,7 @@ services:
       - {{ qbittorrent.port }}:{{ qbittorrent.port }}
 {% endif %}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:{{ qbittorrent.port }} || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:{{ qbittorrent.port }} || exit 1"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}
@@ -584,7 +584,7 @@ services:
       - {{ sabnzbd.port }}:8080
 {% endif %}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:8080 || exit 1"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}
@@ -617,7 +617,7 @@ services:
       - ./firefox/config:/config
     shm_size: {{ firefox.shm_size }}
     healthcheck:
-      test: ["CMD-SHELL", "curl -fk https://localhost:3001 || exit 1"]
+      test: ["CMD-SHELL", "curl -fk https://{{ host_ip }}:3001 || exit 1"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}
@@ -640,7 +640,7 @@ services:
       - 8000:8000
       - {{ portainer.port }}:9443
     healthcheck:
-      test: ["CMD", "wget", "--spider", "--no-check-certificate", "-q", "https://localhost:9443/api/status"]
+      test: ["CMD", "wget", "--spider", "--no-check-certificate", "-q", "https://{{ host_ip }}:9443/api/status"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}
