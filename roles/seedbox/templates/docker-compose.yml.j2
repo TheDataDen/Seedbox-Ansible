@@ -56,6 +56,12 @@ services:
       - PORT_FORWARDING=1
       - PORT_FILE=/pia-port/port.dat
       - FIREWALL=1
+{% if pia_vpn.port_fatal %}
+      - PORT_FATAL=1
+{% endif %}
+{% if pia_vpn.port_persist %}
+      - PORT_PERSIST=1
+{% endif %}
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
       - net.ipv6.conf.default.disable_ipv6=1

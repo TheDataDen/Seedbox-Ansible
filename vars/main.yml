@@ -35,6 +35,8 @@ pia_vpn:
   server_loc: ca_ontario
   # Comment out if not using Dedicated IP
   dip_token: REPLACEME
+  port_fatal: true
+  port_persist: false
 
 radarr:
   port: 7878
