@@ -401,7 +401,7 @@ services:
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}
-      start_period: {{ health_check.start_period }}
+      start_period: 120s
     depends_on:
 {% if containers.pia_vpn %}
       vpn:
