@@ -61,7 +61,7 @@ The [run.sh](run.sh) script will install Ansible and tmux, create a tmux session
 
 To detach from the tmux session, press `Ctrl+B` then `D`.
 
-To re-attach to the tmux session run the following command: `tmux attach-session -t Seedbox-Ansible`
+To re-attach to the tmux session run the following script: `./attach.sh`
 
 ```bash
 ./run.sh
