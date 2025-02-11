@@ -7,7 +7,7 @@ services:
     volumes:
       - pia-dat:/pia
       - ./pia/port:/pia-port
-{% if extras.mama.enabled %}
+{% if extras.mam.enabled %}
       - ./pia/persist:/persist
 {% endif %}
     ports:
