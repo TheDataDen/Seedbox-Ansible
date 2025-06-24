@@ -215,7 +215,7 @@ services:
       qbittorrent:
         condition: service_started
 {% endif %}
-{% end if %}
+{% endif %}
 {% if containers.radarr %}
   radarr:
     image: lscr.io/linuxserver/radarr:latest
