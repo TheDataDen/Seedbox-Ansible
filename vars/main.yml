@@ -55,7 +55,7 @@ pia_vpn:
   port_persist: false
 
 cleanuperr:
-  # Change to true after you confirm that the setup is correct
+  # Change to false after you confirm that the setup is correct
   dry_run: true
   ignored:
     - mam
