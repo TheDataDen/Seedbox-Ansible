@@ -9,8 +9,10 @@ PGID: 1000
 
 containers:
   pia_vpn: true
+  cleanuperr: true
   radarr: true
   sonarr: true
+  huntarr: true
   # Disabled by default since notifiarr does everything recyclarr does, but recyclarr is an option if you want to use it
   recyclarr: false
   notifiarr: true
@@ -52,11 +54,48 @@ pia_vpn:
   port_fatal: true
   port_persist: false
 
+cleanuperr:
+  # Change to true after you confirm that the setup is correct
+  dry_run: true
+  ignored:
+    - mam
+    - not-managed
+  sonarr:
+    # blacklist or whitelist
+    list_type: blacklist
+    list: https://raw.githubusercontent.com/flmorg/cleanuperr/refs/heads/main/blacklist
+  radarr:
+    # blacklist or whitelist
+    list_type: blacklist
+    list: https://raw.githubusercontent.com/flmorg/cleanuperr/refs/heads/main/blacklist
+  notifiarr:
+    discord_channel_id: REPLACEME
+  search:
+    enabled: true
+    delay: 30
+  queue_cleaner:
+    enabled: true
+    triggers: 0 0/5 * * * ?
+  content_blocker:
+    enabled: true
+    triggers: 0 0/5 * * * ?
+  download_cleaner:
+    enabled: true
+    triggers: 0 0/5 * * * ?
+    ratio: 2
+
 radarr:
   port: 7878
+  # You won't have this for the first time. Add this after if you plan on using Cleanuperr or another service that uses the api key
+  api_key: REPLACEME
 
 sonarr:
   port: 8989
+  # You won't have this for the first time. Add this after if you plan on using Cleanuperr or another service that uses the api key
+  api_key: REPLACEME
+
+huntarr:
+  port: 9705
 
 recyclarr:
   # Should not use latest as when the major version changes there will be breaking changes

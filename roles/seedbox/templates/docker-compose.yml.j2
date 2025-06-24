@@ -59,6 +59,10 @@ services:
       # Firefox
       - {{ firefox.port }}:3001
 {% endif %}
+{% if containers.huntarr %}
+      # Huntarr
+      - {{ huntarr.port }}:9705
+{% endif %}
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -96,6 +100,122 @@ services:
       start_period: 30s
       start_interval: 3s
 {% endif %}
+{% if containers.cleanuperr %}
+  cleanuperr:
+    image: ghcr.io/flmorg/cleanuperr:latest
+    restart: unless-stopped
+    container_name: cleanuperr
+    volumes:
+      - /data/downloads:/data/downloads
+      - ./cleanuperr/ignore.txt:/ignored.txt
+    environment:
+      - TZ={{ timezone }}
+      - DRY_RUN={{ cleanuperr.dry_run }}
+      - HTTP_MAX_RETRIES=0
+      - HTTP_TIMEOUT=100
+      - HTTP_VALIDATE_CERT=Enabled
+      - LOGGING__LOGLEVEL=Information
+      - LOGGING__ENHANCED=true
+      - SEARCH_ENABLED={{ cleanuperr.search.enabled }}
+      - SEARCH_DELAY={{ cleanuperr.search.delay }}
+      - TRIGGERS__QUEUECLEANER={{ cleanuperr.queue_cleaner.triggers }}
+      - QUEUECLEANER__ENABLED={{ cleanuperr.queue_cleaner.enabled }}
+      - QUEUECLEANER__IGNORED_DOWNLOADS_PATH=/ignored.txt
+      - QUEUECLEANER__RUNSEQUENTIALLY=true
+      - QUEUECLEANER__IMPORT_FAILED_MAX_STRIKES=5
+      - QUEUECLEANER__IMPORT_FAILED_IGNORE_PRIVATE=false
+      - QUEUECLEANER__IMPORT_FAILED_DELETE_PRIVATE=false
+      - QUEUECLEANER__IMPORT_FAILED_IGNORE_PATTERNS__0=title mismatch
+      - QUEUECLEANER__IMPORT_FAILED_IGNORE_PATTERNS__1=manual import required
+      - QUEUECLEANER__STALLED_MAX_STRIKES=5
+      - QUEUECLEANER__STALLED_RESET_STRIKES_ON_PROGRESS=true
+      - QUEUECLEANER__STALLED_IGNORE_PRIVATE=false
+      - QUEUECLEANER__STALLED_DELETE_PRIVATE=false
+      - QUEUECLEANER__DOWNLOADING_METADATA_MAX_STRIKES=5
+      - QUEUECLEANER__SLOW_MAX_STRIKES=5
+      - QUEUECLEANER__SLOW_RESET_STRIKES_ON_PROGRESS=true
+      - QUEUECLEANER__SLOW_IGNORE_PRIVATE=false
+      - QUEUECLEANER__SLOW_DELETE_PRIVATE=false
+      - QUEUECLEANER__SLOW_MIN_SPEED=1MB
+      - QUEUECLEANER__SLOW_MAX_TIME=20
+      - QUEUECLEANER__SLOW_IGNORE_ABOVE_SIZE=60GB
+      - TRIGGERS__CONTENTBLOCKER={{ cleanuperr.content_blocker.triggers }}
+      - CONTENTBLOCKER__ENABLED={{ cleanuperr.content_blocker.enabled }}
+      - CONTENTBLOCKER__IGNORED_DOWNLOADS_PATH=/ignored.txt
+      - CONTENTBLOCKER__IGNORE_PRIVATE=false
+      - CONTENTBLOCKER__DELETE_PRIVATE=false
+      - TRIGGERS__DOWNLOADCLEANER={{ cleanuperr.download_cleaner.triggers }}
+      - DOWNLOADCLEANER__ENABLED={{ cleanuperr.download_cleaner.enabled }}
+      - DOWNLOADCLEANER__IGNORED_DOWNLOADS_PATH=/ignored.txt
+      - DOWNLOADCLEANER__DELETE_PRIVATE=false
+      - DOWNLOADCLEANER__CATEGORIES__0__NAME=tv
+      - DOWNLOADCLEANER__CATEGORIES__0__MAX_RATIO={{ cleanuperr.download_cleaner.ratio }}
+      - DOWNLOADCLEANER__CATEGORIES__0__MIN_SEED_TIME=0
+      - DOWNLOADCLEANER__CATEGORIES__0__MAX_SEED_TIME=-1
+      - DOWNLOADCLEANER__CATEGORIES__1__NAME=movies
+      - DOWNLOADCLEANER__CATEGORIES__1__MAX_RATIO={{ cleanuperr.download_cleaner.ratio }}
+      - DOWNLOADCLEANER__CATEGORIES__1__MIN_SEED_TIME=0
+      - DOWNLOADCLEANER__CATEGORIES__1__MAX_SEED_TIME=-1
+      - DOWNLOADCLEANER__CATEGORIES__2__NAME=audiobooks
+      - DOWNLOADCLEANER__CATEGORIES__2__MAX_RATIO={{ cleanuperr.download_cleaner.ratio }}
+      - DOWNLOADCLEANER__CATEGORIES__2__MIN_SEED_TIME=0
+      - DOWNLOADCLEANER__CATEGORIES__2__MAX_SEED_TIME=-1
+      - DOWNLOADCLEANER__CATEGORIES__3__NAME=books
+      - DOWNLOADCLEANER__CATEGORIES__3__MAX_RATIO={{ cleanuperr.download_cleaner.ratio }}
+      - DOWNLOADCLEANER__CATEGORIES__3__MIN_SEED_TIME=0
+      - DOWNLOADCLEANER__CATEGORIES__3__MAX_SEED_TIME=-1
+      - DOWNLOADCLEANER__UNLINKED_USE_TAG=true
+      - DOWNLOADCLEANER__UNLINKED_CATEGORIES__0=tv
+      - DOWNLOADCLEANER__UNLINKED_CATEGORIES__1=movies
+      - DOWNLOADCLEANER__UNLINKED_CATEGORIES__2=audiobooks
+      - DOWNLOADCLEANER__UNLINKED_CATEGORIES__3=books
+{% if containers.qBittorrent %}
+      - DOWNLOAD_CLIENT=qBittorrent
+      - QBITTORRENT__URL=http://{{ host_ip }}:{{ qbittorrent.port }}
+      - QBITTORRENT__USERNAME={{ qBittorrent.username }}
+      - QBITTORRENT__PASSWORD={{ qBittorrent.password }}
+{% endif %}
+{% if containers.sonarr and sonarr.api_key != "REPLACEME" %}
+      - SONARR__ENABLED=true
+      - SONARR__IMPORT_FAILED_MAX_STRIKES=-1
+      - SONARR__SEARCHTYPE=Episode
+      - SONARR__BLOCK__TYPE={{ cleanuperr.sonarr.list_type }}
+      - SONARR__BLOCK__PATH={{ cleanuperr.sonarr.list }}
+      - SONARR__INSTANCES__0__URL=http://{{ host_ip }}:{{ sonarr.port }}
+      - SONARR__INSTANCES__0__APIKEY={{ sonarr.api_key }}
+{% endif %}
+{% if containers.radarr and radarr.api_key != "REPLACEME" %}
+      - RADARR__ENABLED=true
+      - RADARR__IMPORT_FAILED_MAX_STRIKES=-1
+      - RADARR__BLOCK__TYPE={{ cleanuperr.radarr.list_type }}
+      - RADARR__BLOCK__PATH={{ cleanuperr.radarr.list }}
+      - RADARR__INSTANCES__0__URL=http://{{ host_ip }}:{{ radarr.port }}
+      - RADARR__INSTANCES__0__APIKEY={{ radarr.api_key }}
+{% endif %}
+{% if containers.notifiarr and notifiarr.api_key != "REPLACEME" %}
+      - NOTIFIARR__ON_IMPORT_FAILED_STRIKE=true
+      - NOTIFIARR__ON_STALLED_STRIKE=true
+      - NOTIFIARR__ON_SLOW_STRIKE=true
+      - NOTIFIARR__ON_QUEUE_ITEM_DELETED=true
+      - NOTIFIARR__ON_DOWNLOAD_CLEANED=true
+      - NOTIFIARR__ON_CATEGORY_CHANGED=true
+      - NOTIFIARR__API_KEY={{ notifiarr.api_key }}
+      - NOTIFIARR__CHANNEL_ID={{ cleanuperr.notifiarr.discord_channel_id }}
+{% endif %}
+    depends_on:
+{% if containers.sonarr %}
+      sonarr:
+        condition: service_started
+{% endif %}
+{% if containers.radarr %}
+      radarr:
+        condition: service_started
+{% endif %}
+{% if containers.qBittorrent %}
+      qbittorrent:
+        condition: service_started
+{% endif %}
+{% end if %}
 {% if containers.radarr %}
   radarr:
     image: lscr.io/linuxserver/radarr:latest
@@ -179,6 +299,44 @@ services:
 {% endif %}
 {% if containers.prowlarr %}
       prowlarr:
+        condition: service_started
+{% endif %}
+{% endif %}
+{% if containers.huntarr %}
+  huntarr:
+    image: huntarr/huntarr:latest
+    container_name: huntarr
+    restart: unless-stopped
+{% if containers.pia_vpn %}
+    network_mode: "service:vpn"
+{% endif %}
+{% if not containers.pia_vpn %}
+    ports:
+      - {{ huntarr.port }}:8989
+{% endif %}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:{{ huntarr.port }} || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+      vpn:
+        condition: service_healthy
+{% if containers.sonarr %}
+      sonarr:
+        condition: service_started
+{% endif %}
+{% if containers.radarr %}
+      radarr:
+        condition: service_started
+{% endif %}
+{% if containers.readarr_audiobooks %}
+      readarr-audiobooks:
+        condition: service_started
+{% endif %}
+{% if containers.readarr_ebooks %}
+      readarr-ebooks:
         condition: service_started
 {% endif %}
 {% endif %}

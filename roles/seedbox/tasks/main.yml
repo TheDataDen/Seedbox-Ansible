@@ -99,3 +99,24 @@
   tags:
     - seedbox
   when: containers.pia_vpn and extras.mam.enabled and not mam_cookies.stat.exists
+
+- name: Create/Wipe Cleanuperr Ignored file
+  ansible.builtin.copy:
+    content: ""
+    dest: "/home/{{ docker_user }}/dockers/seedbox/cleanuperr/ignored.txt"
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: "0755"
+    backup: true
+  tags:
+    - seedbox
+  when: containers.cleanuperr and cleanuperr.queue_cleaner.enabled and cleanuperr.ignored is defined
+
+- name: Add lines to Cleanuperr Ignored file
+  ansible.builtin.lineinfile:
+    path: "/home/{{ docker_user }}/dockers/seedbox/cleanuperr/ignored.txt"
+    line: "{{ item }}"
+  loop: "{{  cleanuperr.ignored }}"
+  tags:
+    - seedbox
+  when: containers.cleanuperr and cleanuperr.queue_cleaner.enabled and cleanuperr.ignored is defined
