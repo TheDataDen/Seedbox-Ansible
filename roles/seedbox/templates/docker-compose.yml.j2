@@ -107,7 +107,7 @@ services:
     container_name: cleanuperr
     volumes:
       - /data/downloads:/data/downloads
-      - ./cleanuperr/ignore.txt:/ignored.txt
+      - ./cleanuperr/ignored.txt:/ignored.txt
     environment:
       - TZ={{ timezone }}
       - DRY_RUN={{ cleanuperr.dry_run }}
