@@ -169,11 +169,11 @@ services:
       - DOWNLOADCLEANER__UNLINKED_CATEGORIES__1=movies
       - DOWNLOADCLEANER__UNLINKED_CATEGORIES__2=audiobooks
       - DOWNLOADCLEANER__UNLINKED_CATEGORIES__3=books
-{% if containers.qBittorrent %}
+{% if containers.qbittorrent %}
       - DOWNLOAD_CLIENT=qBittorrent
       - QBITTORRENT__URL=http://{{ host_ip }}:{{ qbittorrent.port }}
-      - QBITTORRENT__USERNAME={{ qBittorrent.username }}
-      - QBITTORRENT__PASSWORD={{ qBittorrent.password }}
+      - QBITTORRENT__USERNAME={{ qbittorrent.username }}
+      - QBITTORRENT__PASSWORD={{ qbittorrent.password }}
 {% endif %}
 {% if containers.sonarr and sonarr.api_key != "REPLACEME" %}
       - SONARR__ENABLED=true
@@ -211,7 +211,7 @@ services:
       radarr:
         condition: service_started
 {% endif %}
-{% if containers.qBittorrent %}
+{% if containers.qbittorrent %}
       qbittorrent:
         condition: service_started
 {% endif %}
