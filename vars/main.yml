@@ -10,8 +10,8 @@ PGID: 1000
 logging:
   driver: local
   options:
-    max-size: 10m
-    max-file: 3
+    max_size: 10m
+    max_file: 3
 
 containers:
   pia_vpn: true
