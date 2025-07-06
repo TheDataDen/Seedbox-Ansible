@@ -86,6 +86,14 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `PUID`        | Yes      | The UID of the user that will run the docker containers. (Probably doesn't need to be changed) |
 | `PGID`        | Yes      | The GID of the user that will run the docker containers. (Probably doesn't need to be changed) |
 
+### Logging Settings
+
+| Variable Name              | Required | Description                      |
+| -------------------------- | -------- | -------------------------------- |
+| `logging.driver`           | Yes      | The Docker logging driver.       |
+| `logging.options.max_size` | Yes      | The max size of the log.         |
+| `logging.options.max_file` | Yes      | The max number of files to keep. |
+
 ### Container Settings
 
 | Variable Name                | Required | Description                                              |

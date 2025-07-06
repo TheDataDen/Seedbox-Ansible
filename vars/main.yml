@@ -7,6 +7,12 @@ timezone: America/New_York
 PUID: 1000
 PGID: 1000
 
+logging:
+  driver: local
+  options:
+    max-size: 10m
+    max-file: 3
+
 containers:
   pia_vpn: true
   cleanuperr: true

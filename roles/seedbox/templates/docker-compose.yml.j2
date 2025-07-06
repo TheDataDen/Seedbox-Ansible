@@ -1,9 +1,16 @@
+x-logging: &default-logging
+  driver: {{ logging.driver }}
+  options:
+    max-size: "{{ logging.options.max_size }}"
+    max-file: "{{ logging.options.max_file }}"
+
 services:
 {% if containers.pia_vpn %}
   vpn:
     image: thrnz/docker-wireguard-pia
     container_name: pia_vpn
     restart: unless-stopped
+    logging: *default-logging
     volumes:
       - pia-dat:/pia
       - ./pia/port:/pia-port
@@ -103,8 +110,9 @@ services:
 {% if containers.cleanuperr %}
   cleanuperr:
     image: ghcr.io/flmorg/cleanuperr:latest
-    restart: unless-stopped
     container_name: cleanuperr
+    restart: unless-stopped
+    logging: *default-logging
     volumes:
       - /data/downloads:/data/downloads
       - ./cleanuperr/ignored.txt:/ignored.txt
@@ -221,6 +229,7 @@ services:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     restart: unless-stopped
+    logging: *default-logging
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -264,6 +273,7 @@ services:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
     restart: unless-stopped
+    logging: *default-logging
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -307,6 +317,7 @@ services:
     image: huntarr/huntarr:latest
     container_name: huntarr
     restart: unless-stopped
+    logging: *default-logging
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -345,6 +356,7 @@ services:
     image: ghcr.io/recyclarr/recyclarr:{{ recyclarr.version }}
     container_name: recyclarr
     restart: unless-stopped
+    logging: *default-logging
     user: {{ PUID }}:{{ PGID }}
     volumes:
       - ./recyclarr/config:/config
@@ -368,6 +380,7 @@ services:
     container_name: notifiarr
     hostname: notifiarr
     restart: unless-stopped
+    logging: *default-logging
     ports:
       - {{ notifiarr.port }}:5454
     environment:
@@ -389,6 +402,7 @@ services:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
     restart: unless-stopped
+    logging: *default-logging
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -431,6 +445,7 @@ services:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
     restart: unless-stopped
+    logging: *default-logging
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -457,6 +472,7 @@ services:
     image: lscr.io/linuxserver/readarr:develop
     container_name: readarr-audiobooks
     restart: unless-stopped
+    logging: *default-logging
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -500,6 +516,7 @@ services:
     image: lscr.io/linuxserver/readarr:develop
     container_name: readarr-ebooks
     restart: unless-stopped
+    logging: *default-logging
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -543,6 +560,7 @@ services:
     image: lscr.io/linuxserver/lazylibrarian:latest
     container_name: lazylibrarian
     restart: unless-stopped
+    logging: *default-logging
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -585,6 +603,7 @@ services:
     image: thewicklowwolf/bookbounty:latest
     container_name: bookbounty
     restart: unless-stopped
+    logging: *default-logging
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -624,6 +643,7 @@ services:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
     restart: unless-stopped
+    logging: *default-logging
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -663,6 +683,7 @@ services:
     image: qbittorrentofficial/qbittorrent-nox:latest
     container_name: qbittorrent
     restart: unless-stopped
+    logging: *default-logging
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -699,6 +720,7 @@ services:
     image: strenkml/qbittorrent-porthelper
     container_name: qbittorrent-porthelper
     restart: unless-stopped
+    logging: *default-logging
     environment:
       - QBITTORRENT_HOST={{ qbittorrent.host }}
       - QBITTORRENT_PORT={{ qbittorrent.port }}
@@ -717,6 +739,7 @@ services:
     image: strenkml/qbittorrent-manage-torrents
     container_name: qbittorrent-managetorrents
     restart: unless-stopped
+    logging: *default-logging
     environment:
       - QBITTORRENT_HOST={{ qbittorrent.host }}
       - QBITTORRENT_PORT={{ qbittorrent.port }}
@@ -733,6 +756,7 @@ services:
     image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
     restart: unless-stopped
+    logging: *default-logging
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -764,6 +788,7 @@ services:
     image: lscr.io/linuxserver/firefox:latest
     container_name: firefox
     restart: unless-stopped
+    logging: *default-logging
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -797,6 +822,7 @@ services:
     image: portainer/portainer-ce:alpine
     container_name: portainer
     restart: unless-stopped
+    logging: *default-logging
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
@@ -815,6 +841,7 @@ services:
     image: containrrr/watchtower:latest
     container_name: watchtower
     restart: unless-stopped
+    logging: *default-logging
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --schedule "{{ watchtower.cron_schedule }}"
@@ -824,6 +851,7 @@ services:
     image: willfarrell/autoheal
     container_name: autoheal
     restart: unless-stopped
+    logging: *default-logging
     environment:
       - AUTOHEAL_CONTAINER_LABEL=all
     volumes:
@@ -834,6 +862,7 @@ services:
     image: syncthing/syncthing:latest
     container_name: syncthing
     restart: unless-stopped
+    logging: *default-logging
     ports:
       - {{ syncthing.gui_port }}:8384
       - 22000:22000/tcp
