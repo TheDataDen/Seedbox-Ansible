@@ -1,7 +1,9 @@
 ---
-- hosts: localhost
+- name: Setup Seedbox
+  hosts: localhost
   become: true
   roles:
+    - checks
     - common
     - docker
     - seedbox

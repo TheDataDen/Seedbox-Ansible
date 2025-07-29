@@ -17,15 +17,16 @@ containers:
   pia_vpn: true
   cleanuperr: true
   radarr: true
+  radarr_2: false
   sonarr: true
+  sonarr_2: false
   huntarr: true
   # Disabled by default since notifiarr does everything recyclarr does, but recyclarr is an option if you want to use it
   recyclarr: false
   notifiarr: true
   prowlarr: true
   flaresolverr: true
-  # Disabled until the ebooks version is up and the internal port is changed
-  readarr_audiobooks: false
+  readarr_audiobooks: true
   readarr_ebooks: true
   # Available as an alternative to Readarr
   lazylibrarian: false
@@ -95,8 +96,18 @@ radarr:
   # You won't have this for the first time. Add this after if you plan on using Cleanuperr or another service that uses the api key
   api_key: REPLACEME
 
+radarr_2:
+  port: 7879
+  # You won't have this for the first time. Add this after if you plan on using Cleanuperr or another service that uses the api key
+  api_key: REPLACEME
+
 sonarr:
   port: 8989
+  # You won't have this for the first time. Add this after if you plan on using Cleanuperr or another service that uses the api key
+  api_key: REPLACEME
+
+sonarr_2:
+  port: 8990
   # You won't have this for the first time. Add this after if you plan on using Cleanuperr or another service that uses the api key
   api_key: REPLACEME
 
