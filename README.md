@@ -16,6 +16,7 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
 - qBittorrent manageTorrents container that automatically sends torrents that are slow/hanging to the bottom of the queue; then eventually removes them if they remain slow/hanging
 - Recyclarr or Notifiarr for automatically configuring your Sonarr and Radarr instances to follow the TRaSH guides
 - Multiple instances of readarr. One for audiobooks and one for ebooks
+- Multiple instances of Radarr and Sonarr.
 - Firefox instance behind the VPN for manually searching for torrents
 - Syncthing for backing up your data to a remote server
 - Autoheal for automatically restarting containers that have become unhealthy
@@ -101,7 +102,9 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `pia_vpn`                    | No       | Enable/Disable the PIA VPN container.                    |
 | `cleanuperr`                 | No       | Enable/Disable the Cleanuperr container.                 |
 | `radarr`                     | No       | Enable/Disable the Radarr container.                     |
+| `radarr_2`                   | No       | Enable/Disable the Second Radarr container.              |
 | `sonarr`                     | No       | Enable/Disable the Sonarr container.                     |
+| `sonarr_2`                   | No       | Enable/Disable the Second Sonarr container.              |
 | `huntarr`                    | No       | Enable/Disable the Huntarr container.                    |
 | `recyclarr`                  | No       | Enable/Disable the Recyclarr container.                  |
 | `notifiarr`                  | No       | Enable/Disable the Notifiarr container.                  |
@@ -166,15 +169,31 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 #### radarr
 
-| Variable Name | Required | Description                                      |
-| ------------- | -------- | ------------------------------------------------ |
-| `port`        | Yes      | The port that Radarr's webUI will be running on. |
+| Variable Name   | Required | Description                                      |
+| --------------- | -------- | ------------------------------------------------ |
+| `port`          | Yes      | The port that Radarr's webUI will be running on. |
+| `instance_name` | No       | The name that will appear in the browser tab.    |
+
+#### radarr_2
+
+| Variable Name   | Required | Description                                                 |
+| --------------- | -------- | ----------------------------------------------------------- |
+| `port`          | Yes      | The port that the second Radarr's webUI will be running on. |
+| `instance_name` | No       | The name that will appear in the browser tab.               |
 
 #### sonarr
 
-| Variable Name | Required | Description                                      |
-| ------------- | -------- | ------------------------------------------------ |
-| `port`        | Yes      | The port that Sonarr's webUI will be running on. |
+| Variable Name   | Required | Description                                      |
+| --------------- | -------- | ------------------------------------------------ |
+| `port`          | Yes      | The port that Sonarr's webUI will be running on. |
+| `instance_name` | No       | The name that will appear in the browser tab.    |
+
+#### sonarr_2
+
+| Variable Name   | Required | Description                                                 |
+| --------------- | -------- | ----------------------------------------------------------- |
+| `port`          | Yes      | The port that the second Sonarr's webUI will be running on. |
+| `instance_name` | No       | The name that will appear in the browser tab.               |
 
 #### huntarr
 
@@ -210,17 +229,17 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 #### readarr_audiobooks
 
-This container is disabled by default because there is no way to change the internal port that Readarr uses outside of the webUI. So if you want to have both instances of Readarr you will need to run the playbook once, change the internal port of the Ebooks container and then enanle this container and run the playbook again.
-
-| Variable Name | Required | Description                                                  |
-| ------------- | -------- | ------------------------------------------------------------ |
-| `port`        | Yes      | The port that readarr-audiobooks's webUI will be running on. |
+| Variable Name   | Required | Description                                                  |
+| --------------- | -------- | ------------------------------------------------------------ |
+| `port`          | Yes      | The port that readarr-audiobooks's webUI will be running on. |
+| `instance_name` | Yes      | The name that will appear in the browser tab.                |
 
 #### readarr_ebooks
 
-| Variable Name | Required | Description                                              |
-| ------------- | -------- | -------------------------------------------------------- |
-| `port`        | Yes      | The port that readarr-ebooks's webUI will be running on. |
+| Variable Name   | Required | Description                                              |
+| --------------- | -------- | -------------------------------------------------------- |
+| `port`          | Yes      | The port that readarr-ebooks's webUI will be running on. |
+| `instance_name` | Yes      | The name that will appear in the browser tab.            |
 
 #### lazylibrarian
 
@@ -335,7 +354,9 @@ Below is a list of all of the containers that are available to be enabled/disabl
 | `pia_vpn`                    | Runs a Private Internet Access VPN where all of the traffic for the neccessary containers are routed through the vpn. If the VPN loses connection, the containers lose access to the internet              |
 | `cleanuperr`                 | Automatically cleans up files from your downloads and prevents downloads from clogging up the queue                                                                                                        |
 | `radarr`                     | For managing your movies                                                                                                                                                                                   |
+| `radarr_2`                   | For managing your movies. Second instance. Possible uses: 4K versions, IMAX versions, multiple editions, etc.                                                                                              |
 | `sonarr`                     | For managing your TV shows/Anime                                                                                                                                                                           |
+| `sonarr_2`                   | For managing your TV shows/Anime. Second instance. Poissible uses: 4K versions, multiple editions, etc.                                                                                                    |
 | `huntarr`                    | For automatically search for Movies/Shows/Books that are not recently released. Sonarr/Radarr works off of RSS feeds so older content that might be added to an indexer is not automatically searched for. |
 | `recyclarr`                  | For automatically configuring your Sonarr and Radarr instances to follow the TRaSH guides                                                                                                                  |
 | `notifiarr`                  | For automatically configuring your Sonarr and Radarr instances to follow the TRaSH guides. As well as monitoring tools.                                                                                    |
