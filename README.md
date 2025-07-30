@@ -83,8 +83,8 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `docker_user` | Yes      | The user that you created on the Ubuntu VM                                                     |
 | `host_ip`     | Yes      | The IP address of the VM.                                                                      |
 | `timezone`    | Yes      | The Timezone that you are in                                                                   |
-| `PUID`        | Yes      | The UID of the user that will run the docker containers. (Probably doesn't need to be changed) |
-| `PGID`        | Yes      | The GID of the user that will run the docker containers. (Probably doesn't need to be changed) |
+| `puid`        | Yes      | The UID of the user that will run the docker containers. (Probably doesn't need to be changed) |
+| `pgid`        | Yes      | The GID of the user that will run the docker containers. (Probably doesn't need to be changed) |
 
 ### Logging Settings
 

@@ -1,0 +1,3 @@
+seedbox_radarr_2_internal_port: 7879
+seedbox_sonarr_2_internal_port: 8990
+seedbox_readarr_ebooks_internal_port: 8788

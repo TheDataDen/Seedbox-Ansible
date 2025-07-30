@@ -1,3 +1,3 @@
 # TODO
 
-- Update Cleanuperr
+- Pull the api key from the config file for cleanuperr

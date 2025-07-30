@@ -9,6 +9,108 @@
   tags:
     - seedbox
 
+- name: Check for Radarr name change
+  ansible.builtin.set_fact:
+    radarr_name_change: "{{ containers.radarr and radarr.instance_name is defined }}"
+
+- name: Check for Radarr 2 name change
+  ansible.builtin.set_fact:
+    radarr_2_name_change: "{{ containers.radarr_2 and radarr_2.instance_name is defined }}"
+
+- name: Check for Sonarr name change
+  ansible.builtin.set_fact:
+    sonarr_name_change: "{{ containers.sonarr and sonarr.instance_name is defined }}"
+
+- name: Check for Sonarr 2 name change
+  ansible.builtin.set_fact:
+    sonarr_2_name_change: "{{ containers.sonarr_2 and sonarr_2.instance_name is defined }}"
+
+- name: Check for Readarr Audiobooks name change
+  ansible.builtin.set_fact:
+    readarr_audiobooks_name_change: "{{ containers.readarr_audiobooks and readarr_audiobooks.instance_name is defined }}"
+
+- name: Check for Readarr Ebooks name change
+  ansible.builtin.set_fact:
+    readarr_ebooks_name_change: "{{ containers.readarr_ebooks and readarr_ebooks.instance_name is defined }}"
+
+- name: Change Radarr Instance name
+  when: radarr_name_change
+  tags: seedbox
+  ansible.builtin.include_tasks: changeName.yml
+  vars:
+    app_name: "radarr"
+    target_name: "{{ radarr.instance_name }}"
+    default_name: "Radarr"
+
+- name: Change Radarr 2 Instance name
+  when: radarr_2_name_change
+  tags: seedbox
+  ansible.builtin.include_tasks: changeName.yml
+  vars:
+    app_name: "radarr_2"
+    target_name: "{{ radarr_2.instance_name }}"
+    default_name: "Radarr"
+
+- name: Change Sonarr Instance name
+  when: sonarr_name_change
+  tags: seedbox
+  ansible.builtin.include_tasks: changeName.yml
+  vars:
+    app_name: "sonarr"
+    target_name: "{{ sonarr.instance_name }}"
+    default_name: "Sonarr"
+
+- name: Change Sonarr 2 Instance name
+  when: sonarr_2_name_change
+  tags: seedbox
+  ansible.builtin.include_tasks: changeName.yml
+  vars:
+    app_name: "sonarr_2"
+    target_name: "{{ sonarr_2.instance_name }}"
+    default_name: "Sonarr"
+
+- name: Change Readarr Audiobooks Instance name
+  when: readarr_audiobooks_name_change
+  tags: seedbox
+  ansible.builtin.include_tasks: changeName.yml
+  vars:
+    app_name: "readarr_audiobooks"
+    target_name: "{{ readarr_audiobooks.instance_name }}"
+    default_name: "Readarr"
+
+- name: Change Readarr Ebooks Instance name
+  when: readarr_ebooks_name_change
+  tags: seedbox
+  ansible.builtin.include_tasks: changeName.yml
+  vars:
+    app_name: "readarr_ebooks"
+    target_name: "{{ readarr_ebooks.instance_name }}"
+    default_name: "Readarr"
+
+- name: Change radarr 2 port
+  when: containers.radarr_2 and containers.vpn
+  tags: seedbox
+  ansible.builtin.include_tasks: changePort.yml
+  vars:
+    app_name: "radarr_2"
+    target_port: "{{ seedbox_radarr_2_internal_port }}"
+
+- name: Change sonarr 2 port
+  when: containers.sonarr_2 and containers.vpn
+  tags: seedbox
+  ansible.builtin.include_tasks: changePort.yml
+  vars:
+    app_name: "sonarr_2"
+    target_port: "{{ seedbox_sonarr_2_internal_port }}"
+
+- name: Change readarr ebooks port
+  when: containers.readarr_ebooks and containers.vpn
+  tags: seedbox
+  ansible.builtin.include_tasks: changePort.yml
+  vars:
+    app_name: "readarr_ebooks"
+    target_port: "{{ seedbox_readarr_ebooks_internal_port }}"
+
 - name: Check if the pia port.dat file is in root pia directory (Migration step)
   ansible.builtin.stat:
     path: "/home/{{ docker_user }}/dockers/seedbox/pia/port.dat"
@@ -93,6 +195,40 @@
   changed_when: true
   tags:
     - seedbox
+
+# We dont need to restart sonarr_2 or radarr_2 because they will be restarted by the healthcheck
+- name: Restart containers that have a name change
+  tags:
+    - seedbox
+  when: radarr_name_change or sonarr_name_change or readarr_audiobooks_name_change or readarr_ebooks_name_change
+  block:
+    - name: Wait for 30 seconds to allow the containers to start
+      ansible.builtin.pause:
+        seconds: 30
+
+    - name: Restart Radarr container
+      ansible.builtin.command:
+        cmd: "docker restart radarr"
+      when: radarr_name_change
+      changed_when: true
+
+    - name: Restart Sonarr container
+      ansible.builtin.command:
+        cmd: "docker restart sonarr"
+      when: sonarr_name_change
+      changed_when: true
+
+    - name: Restart Readarr Audiobooks container
+      ansible.builtin.command:
+        cmd: "docker restart readarr-audiobooks"
+      when: readarr_audiobooks_name_change
+      changed_when: true
+
+    - name: Restart Readarr Ebooks container
+      ansible.builtin.command:
+        cmd: "docker restart readarr-ebooks"
+      when: readarr_ebooks_name_change
+      changed_when: true
 
 - name: Check if mam.cookies file exists (Extras MAM)
   ansible.builtin.stat:

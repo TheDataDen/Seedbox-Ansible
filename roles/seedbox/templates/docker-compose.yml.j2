@@ -42,17 +42,25 @@ services:
       # Radarr
       - {{ radarr.port }}:7878
 {% endif %}
+{% if containers.radarr_2 %}
+      # Radarr 2
+      - {{ radarr_2.port }}:{{ seedbox_radarr_2_internal_port }}
+{% endif %}
 {% if containers.sonarr %}
       # Sonarr
       - {{ sonarr.port }}:8989
 {% endif %}
-{% if containers.readarr_audiobooks or containers.readarr_ebooks %}
+{% if containers.sonarr_2 %}
+      # Sonarr 2
+      - {{ sonarr_2.port }}:{{ seedbox_sonarr_2_internal_port }}
+{% endif %}
+{% if containers.readarr_audiobooks %}
       # Readarr Audiobooks
       - {{ readarr_audiobooks.port }}:8787
 {% endif %}
 {% if containers.readarr_ebooks %}
       # Readarr Ebooks
-      - {{ readarr_ebooks.port }}:8788
+      - {{ readarr_ebooks.port }}:{{ seedbox_readarr_ebooks_internal_port }}
 {% endif %}
 {% if containers.lazylibrarian %}
       # Lazylibrarian
@@ -192,6 +200,10 @@ services:
       - SONARR__INSTANCES__0__URL=http://{{ host_ip }}:{{ sonarr.port }}
       - SONARR__INSTANCES__0__APIKEY={{ sonarr.api_key }}
 {% endif %}
+{% if containers.sonarr_2 and sonarr_2.api_key != "REPLACEME" %}
+      - SONARR__INSTANCES__1__URL=http://{{ host_ip }}:{{ sonarr_2.port }}
+      - SONARR__INSTANCES__1__APIKEY={{ sonarr_2.api_key }}
+{% endif %}
 {% if containers.radarr and radarr.api_key != "REPLACEME" %}
       - RADARR__ENABLED=true
       - RADARR__IMPORT_FAILED_MAX_STRIKES=-1
@@ -199,6 +211,10 @@ services:
       - RADARR__BLOCK__PATH={{ cleanuperr.radarr.list }}
       - RADARR__INSTANCES__0__URL=http://{{ host_ip }}:{{ radarr.port }}
       - RADARR__INSTANCES__0__APIKEY={{ radarr.api_key }}
+{% endif %}
+{% if containers.radarr_2 and radarr_2.api_key != "REPLACEME" %}
+      - RADARR__INSTANCES__1__URL=http://{{ host_ip }}:{{ radarr_2.port }}
+      - RADARR__INSTANCES__1__APIKEY={{ radarr_2.api_key }}
 {% endif %}
 {% if containers.notifiarr and notifiarr.api_key != "REPLACEME" %}
       - NOTIFIARR__ON_IMPORT_FAILED_STRIKE=true
@@ -215,8 +231,16 @@ services:
       sonarr:
         condition: service_started
 {% endif %}
+{% if containers.sonarr_2 %}
+      sonarr_2:
+        condition: service_started
+{% endif %}
 {% if containers.radarr %}
       radarr:
+        condition: service_started
+{% endif %}
+{% if containers.radarr_2 %}
+      radarr_2:
         condition: service_started
 {% endif %}
 {% if containers.qbittorrent %}
@@ -234,8 +258,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - PUID={{ PUID }}
-      - PGID={{ PGID }}
+      - puid={{ puid }}
+      - pgid={{ pgid }}
       - TZ={{ timezone }}
     volumes:
       - ./radarr/config:/config
@@ -268,6 +292,50 @@ services:
         condition: service_started
 {% endif %}
 {% endif %}
+{% if containers.radarr_2 %}
+  radarr_2:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr_2
+    restart: unless-stopped
+    logging: *default-logging
+{% if containers.pia_vpn %}
+    network_mode: "service:vpn"
+{% endif %}
+    environment:
+      - puid={{ puid }}
+      - pgid={{ pgid }}
+      - TZ={{ timezone }}
+    volumes:
+      - ./radarr_2/config:/config
+      - /data:/data
+{% if not containers.pia_vpn %}
+    ports:
+      - {{ radarr_2.port }}:7878
+{% endif %}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:{{ radarr_2.port }} || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+{% if containers.pia_vpn %}
+      vpn:
+        condition: service_healthy
+{% endif %}
+{% if containers.qbittorrent %}
+      qbittorrent:
+        condition: service_started
+{% endif %}
+{% if containers.sabnzbd %}
+      sabnzbd:
+        condition: service_started
+{% endif %}
+{% if containers.prowlarr %}
+      prowlarr:
+        condition: service_started
+{% endif %}
+{% endif %}
 {% if containers.sonarr %}
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
@@ -278,8 +346,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - PUID={{ PUID }}
-      - PGID={{ PGID }}
+      - puid={{ puid }}
+      - pgid={{ pgid }}
       - TZ={{ timezone }}
     volumes:
       - ./sonarr/config:/config
@@ -290,6 +358,50 @@ services:
 {% endif %}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:{{ sonarr.port }} || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+{% if containers.pia_vpn %}
+      vpn:
+        condition: service_healthy
+{% endif %}
+{% if containers.qbittorrent %}
+      qbittorrent:
+        condition: service_started
+{% endif %}
+{% if containers.sabnzbd %}
+      sabnzbd:
+        condition: service_started
+{% endif %}
+{% if containers.prowlarr %}
+      prowlarr:
+        condition: service_started
+{% endif %}
+{% endif %}
+{% if containers.sonarr_2 %}
+  sonarr_2:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr_2
+    restart: unless-stopped
+    logging: *default-logging
+{% if containers.pia_vpn %}
+    network_mode: "service:vpn"
+{% endif %}
+    environment:
+      - puid={{ puid }}
+      - pgid={{ pgid }}
+      - TZ={{ timezone }}
+    volumes:
+      - ./sonarr_2/config:/config
+      - /data:/data
+{% if not containers.pia_vpn %}
+    ports:
+      - {{ sonarr_2.port }}:8989
+{% endif %}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:{{ sonarr_2.port }} || exit 1"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}
@@ -323,7 +435,7 @@ services:
 {% endif %}
 {% if not containers.pia_vpn %}
     ports:
-      - {{ huntarr.port }}:8989
+      - {{ huntarr.port }}:9705
 {% endif %}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:{{ huntarr.port }} || exit 1"]
@@ -332,14 +444,24 @@ services:
       retries: {{ health_check.retries }}
       start_period: {{ health_check.start_period }}
     depends_on:
+{% if containers.pia_vpn %}
       vpn:
         condition: service_healthy
+{% endif %}
 {% if containers.sonarr %}
       sonarr:
         condition: service_started
 {% endif %}
+{% if containers.sonarr_2 %}
+      sonarr_2:
+        condition: service_started
+{% endif %}
 {% if containers.radarr %}
       radarr:
+        condition: service_started
+{% endif %}
+{% if containers.radarr_2 %}
+      radarr_2:
         condition: service_started
 {% endif %}
 {% if containers.readarr_audiobooks %}
@@ -357,7 +479,7 @@ services:
     container_name: recyclarr
     restart: unless-stopped
     logging: *default-logging
-    user: {{ PUID }}:{{ PGID }}
+    user: {{ puid }}:{{ pgid }}
     volumes:
       - ./recyclarr/config:/config
     environment:
@@ -369,8 +491,16 @@ services:
       sonarr:
         condition: service_healthy
 {% endif %}
+{% if containers.sonarr_2 %}
+      sonarr_2:
+        condition: service_healthy
+{% endif %}
 {% if containers.radarr %}
       radarr:
+        condition: service_healthy
+{% endif %}
+{% if containers.radarr_2 %}
+      radarr_2:
         condition: service_healthy
 {% endif %}
 {% endif %}
@@ -392,8 +522,16 @@ services:
       sonarr:
         condition: service_started
 {% endif %}
+{% if containers.sonarr_2 %}
+      sonarr_2:
+        condition: service_started
+{% endif %}
 {% if containers.radarr %}
       radarr:
+        condition: service_started
+{% endif %}
+{% if containers.radarr_2 %}
+      radarr_2:
         condition: service_started
 {% endif %}
 {% endif %}
@@ -407,8 +545,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - PUID={{ PUID }}
-      - PGID={{ PGID }}
+      - puid={{ puid }}
+      - pgid={{ pgid }}
       - TZ={{ timezone }}
     volumes:
       - ./prowlarr/config:/config
@@ -477,8 +615,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - PUID={{ PUID }}
-      - PGID={{ PGID }}
+      - puid={{ puid }}
+      - pgid={{ pgid }}
       - TZ={{ timezone }}
     volumes:
       - ./readarr-audiobooks/config:/config
@@ -521,15 +659,15 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - PUID={{ PUID }}
-      - PGID={{ PGID }}
+      - puid={{ puid }}
+      - pgid={{ pgid }}
       - TZ={{ timezone }}
     volumes:
       - ./readarr-ebooks/config:/config
       - /data:/data
 {% if not containers.pia_vpn %}
     ports:
-      - {{ readarr_ebooks.port }}:8788      
+      - {{ readarr_ebooks.port }}:8787      
 {% endif %}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:{{ readarr_ebooks.port }} || exit 1"]
@@ -565,8 +703,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - PUID={{ PUID }}
-      - PGID={{ PGID }}
+      - puid={{ puid }}
+      - pgid={{ pgid }}
       - TZ={{ timezone }}
 {% if lazylibrarian.docker_mods is defined %}
       - DOCKER_MODS={{ lazylibrarian.docker_mods }}
@@ -608,8 +746,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - PUID={{ PUID }}
-      - PGID={{ PGID }}
+      - puid={{ puid }}
+      - pgid={{ pgid }}
       - readarr_address=http://{{ host_ip }}:{{ readarr_ebooks.port }}
       - sync_schedule={{ bookbounty.sync_schedule }}
       - selected_language={{ bookbounty.selected_language }}
@@ -648,8 +786,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - PUID={{ PUID }}
-      - PGID={{ PGID }}
+      - puid={{ puid }}
+      - pgid={{ pgid }}
       - TZ={{ timezone }}
     volumes:
       - ./bazarr/config:/config
@@ -715,7 +853,7 @@ services:
       vpn:
         condition: service_healthy
 {% endif %}
-{% if containers.pia_vpn and containers.qbittorrent %}
+{% if containers.pia_vpn and containers.qbittorrent_porthelper %}
   qbittorrent-porthelper:
     image: strenkml/qbittorrent-porthelper
     container_name: qbittorrent-porthelper
@@ -761,8 +899,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - PUID={{ PUID }}
-      - PGID={{ PGID }}
+      - puid={{ puid }}
+      - pgid={{ pgid }}
       - TZ={{ timezone }}
     volumes:
       - ./sabnzbd/config:/config
@@ -795,8 +933,8 @@ services:
     security_opt:
       - seccomp:unconfined
     environment:
-      - PUID={{ PUID }}
-      - PGID={{ PGID }}
+      - puid={{ puid }}
+      - pgid={{ pgid }}
       - TZ={{ timezone }}
 {% if not containers.pia_vpn %}
     ports:
@@ -869,8 +1007,8 @@ services:
       - 22000:22000/udp
       - 21027:21027/udp
     environment:
-      - PUID={{ PUID }}
-      - PGID={{ PGID }}
+      - puid={{ puid }}
+      - pgid={{ pgid }}
     volumes:
       - ./:/dockers
 {% endif %}
