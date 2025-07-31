@@ -35,6 +35,7 @@ containers:
   bazarr: true
   qbittorrent: true
   qbittorrent_managetorrents: true
+  qbittorrent_porthelper: true
   sabnzbd: true
   portainer: true
   firefox: true
