@@ -1,7 +1,7 @@
 ---
 - name: Create {{ app_name }} config directory
   ansible.builtin.file:
-    path: "/home/{{ docker_user }}/dockers/seedbox/{{ app_name }}/config"
+    path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/{{ app_name }}/config"
     state: directory
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
@@ -9,7 +9,7 @@
 
 - name: Create {{ app_name }} cron folder
   ansible.builtin.file:
-    path: "/home/{{ docker_user }}/dockers/seedbox/{{ app_name }}/crontabs"
+    path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/{{ app_name }}/crontabs"
     state: directory
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"

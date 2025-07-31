@@ -1,7 +1,7 @@
 ---
 - name: Create dockers directory for seedbox stack
   ansible.builtin.file:
-    path: "/home/{{ docker_user }}/dockers/seedbox"
+    path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}"
     state: directory
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
@@ -113,7 +113,7 @@
 
 - name: Check if the pia port.dat file is in root pia directory (Migration step)
   ansible.builtin.stat:
-    path: "/home/{{ docker_user }}/dockers/seedbox/pia/port.dat"
+    path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/pia/port.dat"
   register: pia_port
   tags:
     - seedbox
@@ -121,7 +121,7 @@
 
 - name: Create new pia port directory if neeeded (Migration step)
   ansible.builtin.file:
-    path: "/home/{{ docker_user }}/dockers/seedbox/pia/port"
+    path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/pia/port"
     state: directory
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
@@ -133,8 +133,10 @@
 
 - name: Move pia port.dat file to new location (Migration step)
   ansible.builtin.command:
-    cmd: "mv /home/{{ docker_user }}/dockers/seedbox/pia/port.dat /home/{{ docker_user }}/dockers/seedbox/pia/port/port.dat"
-    creates: "/home/{{ docker_user }}/dockers/seedbox/pia/port/port.dat"
+    cmd: >
+      mv /home/{{ docker_user }}/dockers/{{ docker_directory_name }}/pia/port.dat
+      /home/{{ docker_user }}/dockers/{{ docker_directory_name }}/pia/port/port.dat
+    creates: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/pia/port/port.dat"
   tags:
     - seedbox
   when: containers.pia_vpn and pia_port.stat.exists
@@ -142,7 +144,7 @@
 - name: Copy mam.sh to persist directory (Extras MAM)
   ansible.builtin.copy:
     src: mam.sh
-    dest: "/home/{{ docker_user }}/dockers/seedbox/pia/persist/mam.sh"
+    dest: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/pia/persist/mam.sh"
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: "0755"
@@ -153,7 +155,7 @@
 - name: Create docker-compose.yml
   ansible.builtin.template:
     src: docker-compose.yml.j2
-    dest: "/home/{{ docker_user }}/dockers/seedbox/docker-compose.yml"
+    dest: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/docker-compose.yml"
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: "0644"
@@ -162,7 +164,7 @@
 
 - name: Create mam pia directory
   ansible.builtin.file:
-    path: "/home/{{ docker_user }}/dockers/seedbox/pia/persist"
+    path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/pia/persist"
     state: directory
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
@@ -175,7 +177,7 @@
     - name: Create/Wipe Cleanuperr Ignored file
       ansible.builtin.copy:
         content: ""
-        dest: "/home/{{ docker_user }}/dockers/seedbox/cleanuperr/ignored.txt"
+        dest: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/cleanuperr/ignored.txt"
         owner: "{{ docker_user }}"
         group: "{{ docker_user }}"
         mode: "0755"
@@ -183,13 +185,13 @@
 
     - name: Add lines to Cleanuperr Ignored file
       ansible.builtin.lineinfile:
-        path: "/home/{{ docker_user }}/dockers/seedbox/cleanuperr/ignored.txt"
+        path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/cleanuperr/ignored.txt"
         line: "{{ item }}"
       loop: "{{  cleanuperr.ignored }}"
 
 - name: Create Seedbox Docker stack
   ansible.builtin.command:
-    cmd: "docker compose -f /home/{{ docker_user }}/dockers/seedbox/docker-compose.yml up -d"
+    cmd: "docker compose -f /home/{{ docker_user }}/dockers/{{ docker_directory_name }}/docker-compose.yml up -d"
   changed_when: true
   tags:
     - seedbox
@@ -238,7 +240,7 @@
   block:
     - name: Check if mam.cookies file exists (Extras MAM)
       ansible.builtin.stat:
-        path: "/home/{{ docker_user }}/dockers/seedbox/pia/persist/mam.cookies"
+        path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/pia/persist/mam.cookies"
       register: mam_cookies
       tags:
         - seedbox
@@ -297,12 +299,12 @@
     - name: Create docker-compose.yml
       ansible.builtin.template:
         src: docker-compose.yml.j2
-        dest: "/home/{{ docker_user }}/dockers/seedbox/docker-compose.yml"
+        dest: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/docker-compose.yml"
         owner: "{{ docker_user }}"
         group: "{{ docker_user }}"
         mode: "0644"
 
     - name: Create Seedbox Docker stack
       ansible.builtin.command:
-        cmd: "docker compose -f /home/{{ docker_user }}/dockers/seedbox/docker-compose.yml up -d"
+        cmd: "docker compose -f /home/{{ docker_user }}/dockers/{{ docker_directory_name }}/docker-compose.yml up -d"
       changed_when: true

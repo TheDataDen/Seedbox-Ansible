@@ -1,12 +1,12 @@
 ---
 - name: Check if {{ app_name }} config file exists
   ansible.builtin.stat:
-    path: "/home/{{ docker_user }}/dockers/seedbox/{{ app_name }}/config/config.xml"
+    path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/{{ app_name }}/config/config.xml"
   register: config_file_stat
 
 - name: Load {{ app_name }} Config File
   ansible.builtin.slurp:
-    src: "/home/{{ docker_user }}/dockers/seedbox/{{ app_name }}/config/config.xml"
+    src: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/{{ app_name }}/config/config.xml"
   register: app_config
   when: config_file_stat.stat.exists
 
