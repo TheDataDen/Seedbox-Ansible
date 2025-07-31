@@ -15,9 +15,9 @@
 - name: Fail if duplicate ports are found
   ansible.builtin.fail:
     msg: >-
-      Duplicate ports detected: {{ enabled_ports | select('defined') | groupby('') | selectattr('1', 'length', '>', 1) | map('first') | list }}
+      Duplicate ports detected: {{ enabled_ports | select('defined') | groupby('port') | selectattr('1', 'length', '>', 1) | map('first') | list }}
   when: >
-    enabled_ports | select('defined') | groupby('') |
+    enabled_ports | select('defined') | groupby('port') |
     selectattr('1', 'length', '>', 1) | list | length > 0
   tags:
     - checks
