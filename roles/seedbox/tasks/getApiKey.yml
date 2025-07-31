@@ -1,0 +1,16 @@
+---
+- name: Check if {{ app_name }} config file exists
+  ansible.builtin.stat:
+    path: "/home/{{ docker_user }}/dockers/seedbox/{{ app_name }}/config/config.xml"
+  register: config_file_stat
+
+- name: Load {{ app_name }} Config File
+  ansible.builtin.slurp:
+    src: "/home/{{ docker_user }}/dockers/seedbox/{{ app_name }}/config/config.xml"
+  register: app_config
+  when: config_file_stat.stat.exists
+
+- name: Get {{ app_name }} API Key
+  ansible.builtin.set_fact:
+    "{{app_name}}_api_key": "{{ app_config.content | b64decode | regex_search('<ApiKey>(.*?)</ApiKey>', '\\1') }}"
+  when: config_file_stat.stat.exists

@@ -1,2 +1,3 @@
 skip_list:
   - name[template]
+  - var-naming[no-jinja]

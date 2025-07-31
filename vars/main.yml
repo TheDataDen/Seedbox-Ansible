@@ -95,37 +95,25 @@ radarr:
   port: 7878
 
   # The name that will be displayed in the browser tab. Uncomment the line below to change the name
-  #instance_name: Radarr
-
-  # You won't have this for the first time. Add this after if you plan on using Cleanuperr or another service that uses the api key
-  api_key: REPLACEME
+  # instance_name: Radarr
 
 radarr_2:
   port: 7879
 
   # The name that will be displayed in the browser tab. Uncomment the line below to change the name
-  #instance_name: Radarr 2
-
-  # You won't have this for the first time. Add this after if you plan on using Cleanuperr or another service that uses the api key
-  api_key: REPLACEME
+  # instance_name: Radarr 2
 
 sonarr:
   port: 8989
 
   # The name that will be displayed in the browser tab. Uncomment the line below to change the name
-  #instance_name: Sonarr
-
-  # You won't have this for the first time. Add this after if you plan on using Cleanuperr or another service that uses the api key
-  api_key: REPLACEME
+  # instance_name: Sonarr
 
 sonarr_2:
   port: 8990
 
   # The name that will be displayed in the browser tab. Uncomment the line below to change the name
-  #instance_name: Sonarr 2
-
-  # You won't have this for the first time. Add this after if you plan on using Cleanuperr or another service that uses the api key
-  api_key: REPLACEME
+  # instance_name: Sonarr 2
 
 huntarr:
   port: 9705

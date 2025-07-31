@@ -168,26 +168,24 @@
     group: "{{ docker_user }}"
     mode: "0755"
 
-- name: Create/Wipe Cleanuperr Ignored file
-  ansible.builtin.copy:
-    content: ""
-    dest: "/home/{{ docker_user }}/dockers/seedbox/cleanuperr/ignored.txt"
-    owner: "{{ docker_user }}"
-    group: "{{ docker_user }}"
-    mode: "0755"
-    backup: true
-  tags:
-    - seedbox
+- name: Setup Cleanuperr Ignored file
   when: containers.cleanuperr and cleanuperr.queue_cleaner.enabled and cleanuperr.ignored is defined
+  tags: seedbox
+  block:
+    - name: Create/Wipe Cleanuperr Ignored file
+      ansible.builtin.copy:
+        content: ""
+        dest: "/home/{{ docker_user }}/dockers/seedbox/cleanuperr/ignored.txt"
+        owner: "{{ docker_user }}"
+        group: "{{ docker_user }}"
+        mode: "0755"
+        backup: true
 
-- name: Add lines to Cleanuperr Ignored file
-  ansible.builtin.lineinfile:
-    path: "/home/{{ docker_user }}/dockers/seedbox/cleanuperr/ignored.txt"
-    line: "{{ item }}"
-  loop: "{{  cleanuperr.ignored }}"
-  tags:
-    - seedbox
-  when: containers.cleanuperr and cleanuperr.queue_cleaner.enabled and cleanuperr.ignored is defined
+    - name: Add lines to Cleanuperr Ignored file
+      ansible.builtin.lineinfile:
+        path: "/home/{{ docker_user }}/dockers/seedbox/cleanuperr/ignored.txt"
+        line: "{{ item }}"
+      loop: "{{  cleanuperr.ignored }}"
 
 - name: Create Seedbox Docker stack
   ansible.builtin.command:
@@ -230,29 +228,81 @@
       when: readarr_ebooks_name_change
       changed_when: true
 
-- name: Check if mam.cookies file exists (Extras MAM)
-  ansible.builtin.stat:
-    path: "/home/{{ docker_user }}/dockers/seedbox/pia/persist/mam.cookies"
-  register: mam_cookies
-  tags:
-    - seedbox
+    - name: Wait for 15 seconds to allow the containers to start
+      ansible.builtin.pause:
+        seconds: 15
+
+- name: MAM Cookies
   when: containers.pia_vpn and extras.mam.enabled
+  tags: seedbox
+  block:
+    - name: Check if mam.cookies file exists (Extras MAM)
+      ansible.builtin.stat:
+        path: "/home/{{ docker_user }}/dockers/seedbox/pia/persist/mam.cookies"
+      register: mam_cookies
+      tags:
+        - seedbox
 
-- name: Wait for VPN container to be healthy (Extras MAM)
-  community.docker.docker_container_info:
-    name: pia_vpn
-  register: pia_vpn_info
-  until: pia_vpn_info.container.State.Health.Status == "healthy"
-  retries: 30
-  delay: 5
-  tags:
-    - seedbox
-  when: containers.pia_vpn and extras.mam.enabled and not mam_cookies.stat.exists
+    - name: Wait for VPN container to be healthy (Extras MAM)
+      community.docker.docker_container_info:
+        name: pia_vpn
+      register: pia_vpn_info
+      until: pia_vpn_info.container.State.Health.Status == "healthy"
+      retries: 30
+      delay: 5
+      tags:
+        - seedbox
+      when: not mam_cookies.stat.exists
 
-- name: Run command to generate MAM cookies (Extras MAM)
-  community.docker.docker_container_exec:
-    container: pia_vpn
-    command: "curl -c /persist/mam.cookies -b 'mam_id={{ extras.mam.session_cookie }}' https://t.myanonamouse.net/json/dynamicSeedbox.php"
-  tags:
-    - seedbox
-  when: containers.pia_vpn and extras.mam.enabled and not mam_cookies.stat.exists
+    - name: Run command to generate MAM cookies (Extras MAM)
+      community.docker.docker_container_exec:
+        container: pia_vpn
+        command: "curl -c /persist/mam.cookies -b 'mam_id={{ extras.mam.session_cookie }}' https://t.myanonamouse.net/json/dynamicSeedbox.php"
+      tags:
+        - seedbox
+      when: not mam_cookies.stat.exists
+
+- name: Regenerate Docker Compose File for Cleanuperr API Keys
+  when: containers.cleanuperr
+  tags: seedbox
+  block:
+    - name: Get Sonarr API Key
+      when: containers.sonarr
+      tags: seedbox
+      ansible.builtin.include_tasks: getApiKey.yml
+      vars:
+        app_name: "sonarr"
+
+    - name: Get Sonarr 2 API Key
+      when: containers.sonarr_2
+      tags: seedbox
+      ansible.builtin.include_tasks: getApiKey.yml
+      vars:
+        app_name: "sonarr_2"
+
+    - name: Get Radarr API Key
+      when: containers.radarr
+      tags: seedbox
+      ansible.builtin.include_tasks: getApiKey.yml
+      vars:
+        app_name: "radarr"
+
+    - name: Get Radarr 2 API Key
+      when: containers.radarr_2
+      tags: seedbox
+      ansible.builtin.include_tasks: getApiKey.yml
+      vars:
+        app_name: "radarr_2"
+
+    - name: Create docker-compose.yml
+      ansible.builtin.template:
+        src: docker-compose.yml.j2
+        dest: "/home/{{ docker_user }}/dockers/seedbox/docker-compose.yml"
+        owner: "{{ docker_user }}"
+        group: "{{ docker_user }}"
+        mode: "0644"
+
+    - name: Create Seedbox Docker stack
+      ansible.builtin.command:
+        cmd: "docker compose -f /home/{{ docker_user }}/dockers/seedbox/docker-compose.yml up -d"
+      changed_when: true
