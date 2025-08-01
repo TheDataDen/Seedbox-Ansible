@@ -2,7 +2,7 @@
 
 set -e
 
-PLAYBOOK_CMD="ansible-playbook playbook.yml -vvv --tags checks,packages,ssh,docker,seedbox"
+PLAYBOOK_CMD="ansible-playbook playbook.yml -vvv"
 
 APT_UPDATED=false
 
