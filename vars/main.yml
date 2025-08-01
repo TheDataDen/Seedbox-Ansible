@@ -1,0 +1,219 @@
+# This is the config file for the ansible playbook
+# If you disable a container, you do NOT need to comment out the container specific variables
+
+docker_user: REPLACEME
+docker_directory_name: seedbox
+host_ip: REPLACEME
+timezone: America/New_York
+puid: 1000
+pgid: 1000
+
+logging:
+  driver: local
+  options:
+    max_size: 10m
+    max_file: 3
+
+containers:
+  pia_vpn: true
+  cleanuparr: true
+  radarr: true
+  radarr_2: false
+  sonarr: true
+  sonarr_2: false
+  huntarr: false
+  # Disabled by default since notifiarr does everything recyclarr does, but recyclarr is an option if you want to use it
+  recyclarr: false
+  notifiarr: true
+  prowlarr: true
+  flaresolverr: true
+  readarr_audiobooks: true
+  readarr_ebooks: true
+  # Available as an alternative to Readarr
+  lazylibrarian: false
+  bookbounty: false
+  bazarr: true
+  qbittorrent: true
+  qbittorrent_managetorrents: false
+  qbittorrent_porthelper: true
+  sabnzbd: true
+  portainer: true
+  firefox: true
+  watchtower: true
+  autoheal: true
+  syncthing: true
+
+extras:
+  # If you use MAM as one of your trackers and use the pia container. Runs a script that sets your IP in your MAM account when the VPN connects
+  mam:
+    enabled: false
+    # This only needs to be set on the first run, after that a cookie file will be used
+    # [USERNAME] -> Preferences -> Security -> View IP Locked Session Cookie
+    session_cookie: REPLACEME
+
+pia_vpn:
+  username: REPLACEME
+  password: REPLACEME
+  local_network: 10.1.10.0/24
+  # Make sure you are using a server location that supports port forwarding (none of the US locations support it, but Canada does)
+  # Comment out if using Dedicated IP
+  server_loc: ca_ontario
+  # Comment out if not using Dedicated IP
+  #dip_token: REPLACEME
+  port_fatal: true
+  port_persist: false
+
+cleanuparr:
+  # Change to false after you confirm that the setup is correct
+  dry_run: true
+  ignored:
+    - mam
+    - not-managed
+  sonarr:
+    # blacklist or whitelist
+    list_type: blacklist
+    list: https://raw.githubusercontent.com/flmorg/cleanuparr/refs/heads/main/blacklist
+  radarr:
+    # blacklist or whitelist
+    list_type: blacklist
+    list: https://raw.githubusercontent.com/flmorg/cleanuparr/refs/heads/main/blacklist
+  notifiarr:
+    discord_channel_id: REPLACEME
+  search:
+    enabled: true
+    delay: 30
+  queue_cleaner:
+    enabled: true
+    triggers: 0 0/5 * * * ?
+  content_blocker:
+    enabled: true
+    triggers: 0 0/5 * * * ?
+  download_cleaner:
+    enabled: true
+    triggers: 0 0/5 * * * ?
+    ratio: 2
+
+radarr:
+  port: 7878
+
+  # The name that will be displayed in the browser tab. Uncomment the line below to change the name
+  # instance_name: Radarr
+
+radarr_2:
+  port: 7879
+
+  # The name that will be displayed in the browser tab. Uncomment the line below to change the name
+  # instance_name: Radarr
+
+sonarr:
+  port: 8989
+
+  # The name that will be displayed in the browser tab. Uncomment the line below to change the name
+  # instance_name: Sonarr
+
+sonarr_2:
+  port: 8990
+
+  # The name that will be displayed in the browser tab. Uncomment the line below to change the name
+  # instance_name: Sonarr
+
+huntarr:
+  port: 9705
+
+recyclarr:
+  # Should not use latest as when the major version changes there will be breaking changes
+  # 7 is the latest version at the time of creating this
+  version: 7
+  cron_schedule: "@daily"
+
+notifiarr:
+  port: 5454
+  # If you do not have an API key, create an account at https://notifiarr.com and get an API key
+  api_key: REPLACEME
+
+prowlarr:
+  port: 9696
+
+flaresolverr:
+  port: 8191
+
+readarr_audiobooks:
+  port: 8787
+  # The name that will be displayed in the browser tab
+  instance_name: Readarr Audiobooks
+
+readarr_ebooks:
+  port: 8788
+  # The name that will be displayed in the browser tab
+  instance_name: Readarr Ebooks
+
+lazylibrarian:
+  port: 5299
+  # Comment out if you don't want to use mods
+  docker_mods: linuxserver/mods:universal-calibre|linuxserver/mods:lazylibrarian-ffmpeg
+
+bookbounty:
+  port: 5000
+  # Comma separated list of 24h hours to check for books
+  sync_schedule: 0,6,12,18
+  selected_language: English
+  preferred_ext_fiction: .epub, .mobi, .azw3
+  preferred_ext_non_fiction: .epub, .mobi, .azw3, .pdf
+  selected_path_type: file
+  # If you don't use calibre you can change this to another location
+  download_path: /data/downloads/calibre-import
+
+bazarr:
+  port: 6767
+
+qbittorrent:
+  port: 8081
+  # host, username, and password: Only required if using the porthelper or managetorrents containers
+  host: "{{ host_ip }}"
+  username: REPLACEME
+  password: REPLACEME
+
+qbittorrent_porthelper:
+  update_time_seconds: 60
+
+qbittorrent_managetorrents:
+  update_time_seconds: 120
+
+sabnzbd:
+  port: 8181
+
+firefox:
+  port: 3001
+  shm_size: "1gb"
+
+portainer:
+  port: 9443
+
+watchtower:
+  cron_schedule: "0 5 * * *"
+
+syncthing:
+  gui_port: 8384
+
+# Used for all of the health checks except for the pia_vpn health check
+health_check:
+  interval: 60s
+  timeout: 10s
+  retries: 3
+  start_period: 60s
+
+# mediaType is the name of the folder in /data (will be created if it doesn't exist)
+# shareName is the name of the virtiofs share in UNRAID
+media_shares:
+  - mediaType: tv
+    shareName: TV Shows
+  - mediaType: movies
+    shareName: Movies
+  - mediaType: anime
+    shareName: Anime
+  - mediaType: audiobooks
+    shareName: Audiobooks
+  - mediaType: books
+    shareName: Books
+  - mediaType: downloads
+    shareName: Downloads
