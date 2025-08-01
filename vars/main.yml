@@ -2,10 +2,11 @@
 # If you disable a container, you do NOT need to comment out the container specific variables
 
 docker_user: REPLACEME
-host_ip: 10.1.10.26
+docker_directory_name: seedbox
+host_ip: REPLACEME
 timezone: America/New_York
-PUID: 1000
-PGID: 1000
+puid: 1000
+pgid: 1000
 
 logging:
   driver: local
@@ -15,24 +16,26 @@ logging:
 
 containers:
   pia_vpn: true
-  cleanuperr: true
+  cleanuparr: true
   radarr: true
+  radarr_2: false
   sonarr: true
-  huntarr: true
+  sonarr_2: false
+  huntarr: false
   # Disabled by default since notifiarr does everything recyclarr does, but recyclarr is an option if you want to use it
   recyclarr: false
   notifiarr: true
   prowlarr: true
   flaresolverr: true
-  # Disabled until the ebooks version is up and the internal port is changed
-  readarr_audiobooks: false
+  readarr_audiobooks: true
   readarr_ebooks: true
   # Available as an alternative to Readarr
   lazylibrarian: false
-  bookbounty: true
+  bookbounty: false
   bazarr: true
   qbittorrent: true
-  qbittorrent_managetorrents: true
+  qbittorrent_managetorrents: false
+  qbittorrent_porthelper: true
   sabnzbd: true
   portainer: true
   firefox: true
@@ -56,11 +59,11 @@ pia_vpn:
   # Comment out if using Dedicated IP
   server_loc: ca_ontario
   # Comment out if not using Dedicated IP
-  dip_token: REPLACEME
+  #dip_token: REPLACEME
   port_fatal: true
   port_persist: false
 
-cleanuperr:
+cleanuparr:
   # Change to false after you confirm that the setup is correct
   dry_run: true
   ignored:
@@ -69,11 +72,11 @@ cleanuperr:
   sonarr:
     # blacklist or whitelist
     list_type: blacklist
-    list: https://raw.githubusercontent.com/flmorg/cleanuperr/refs/heads/main/blacklist
+    list: https://raw.githubusercontent.com/flmorg/cleanuparr/refs/heads/main/blacklist
   radarr:
     # blacklist or whitelist
     list_type: blacklist
-    list: https://raw.githubusercontent.com/flmorg/cleanuperr/refs/heads/main/blacklist
+    list: https://raw.githubusercontent.com/flmorg/cleanuparr/refs/heads/main/blacklist
   notifiarr:
     discord_channel_id: REPLACEME
   search:
@@ -92,13 +95,27 @@ cleanuperr:
 
 radarr:
   port: 7878
-  # You won't have this for the first time. Add this after if you plan on using Cleanuperr or another service that uses the api key
-  api_key: REPLACEME
+
+  # The name that will be displayed in the browser tab. Uncomment the line below to change the name
+  # instance_name: Radarr
+
+radarr_2:
+  port: 7879
+
+  # The name that will be displayed in the browser tab. Uncomment the line below to change the name
+  # instance_name: Radarr
 
 sonarr:
   port: 8989
-  # You won't have this for the first time. Add this after if you plan on using Cleanuperr or another service that uses the api key
-  api_key: REPLACEME
+
+  # The name that will be displayed in the browser tab. Uncomment the line below to change the name
+  # instance_name: Sonarr
+
+sonarr_2:
+  port: 8990
+
+  # The name that will be displayed in the browser tab. Uncomment the line below to change the name
+  # instance_name: Sonarr
 
 huntarr:
   port: 9705
@@ -122,9 +139,13 @@ flaresolverr:
 
 readarr_audiobooks:
   port: 8787
+  # The name that will be displayed in the browser tab
+  instance_name: Readarr Audiobooks
 
 readarr_ebooks:
   port: 8788
+  # The name that will be displayed in the browser tab
+  instance_name: Readarr Ebooks
 
 lazylibrarian:
   port: 5299

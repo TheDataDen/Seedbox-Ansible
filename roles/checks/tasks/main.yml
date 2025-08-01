@@ -1,0 +1,38 @@
+---
+- name: Build a list of enabled container ports
+  ansible.builtin.set_fact:
+    enabled_ports: >-
+      {{
+        enabled_ports | default([]) +
+        [lookup('vars', item, default={}).get('port')]
+        if containers[item] and lookup('vars', item, default={}).get('port') is defined
+        else enabled_ports | default([])
+      }}
+  loop: "{{ containers.keys() }}"
+  tags:
+    - checks
+
+- name: Fail if duplicate ports are found
+  ansible.builtin.fail:
+    msg: >-
+      Duplicate ports detected: {{ enabled_ports | select('defined') | list | difference(enabled_ports | select('defined') | unique | list) }}
+  when: >
+    enabled_ports | select('defined') | list | difference(enabled_ports | select('defined') | unique | list) | length > 0
+  tags:
+    - checks
+
+- name: Check if radarr_2 is enabled and not the primary container
+  ansible.builtin.fail:
+    msg: >-
+      radarr_2 is enabled but not the primary container. Please disable radarr_2 and enable the primary radarr container instead.
+  when: containers.radarr_2 and not containers.radarr
+  tags:
+    - checks
+
+- name: Check if sonarr_2 is enabled and not the primary container
+  ansible.builtin.fail:
+    msg: >-
+      sonarr_2 is enabled but not the primary container. Please disable sonarr_2 and enable the primary sonarr container instead.
+  when: containers.sonarr_2 and not containers.sonarr
+  tags:
+    - checks

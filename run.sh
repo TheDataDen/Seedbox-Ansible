@@ -11,6 +11,7 @@ if ! command -v ansible &> /dev/null; then
     sudo apt-get update
     sudo apt-get install -y ansible
     APT_UPDATED=true
+    ansible-galaxy install -r requirements.yml
 fi
 
 # Install tmux if not already installed
