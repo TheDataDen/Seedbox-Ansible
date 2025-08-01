@@ -15,6 +15,32 @@
   tags:
     - packages
 
+- name: Install virtiofsd depending on Ubuntu version
+  tags:
+    - packages
+  block:
+    - name: Ensure universe repo is enabled
+      apt_repository:
+        repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_facts['distribution_release'] }} universe"
+        state: present
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Try installing virtiofsd directly
+      apt:
+        name: virtiofsd
+        state: present
+      register: virtiofsd_result
+      failed_when: false
+
+    - name: Fallback to qemu-system if virtiofsd is unavailable
+      apt:
+        name: qemu-system
+        state: present
+      when: virtiofsd_result is failed
+
 - name: Restart SSH service
   ansible.builtin.service:
     name: ssh

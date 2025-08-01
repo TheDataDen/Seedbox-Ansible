@@ -1,7 +1,7 @@
 #!/bin/sh
 
 CONFIG="/config/config.xml"
-TARGET_PORT={{ target_port }}
+TARGET_PORT="{{ target_port }}"
 
 echo "[port-patch] Waiting for config.xml..."
 
@@ -25,4 +25,4 @@ fi
 echo "[port-patch] Patching port from $CURRENT_PORT to $TARGET_PORT..."
 sed -i "s|<Port>$CURRENT_PORT</Port>|<Port>$TARGET_PORT</Port>|" "$CONFIG"
 
-ehco "Container with be restarted by the failing healthcheck"
+echo "Container with be restarted by the failing healthcheck"

@@ -1,8 +1,8 @@
 #!/bin/sh
-
+set -x
 CONFIG="/config/config.xml"
-TARGET_NAME={{ target_name }}
-DEFAULT_NAME={{ default_name }}
+TARGET_NAME="{{ target_name }}"
+DEFAULT_NAME="{{ default_name }}"
 
 echo "[name-patch] Waiting for config.xml..."
 
@@ -16,9 +16,10 @@ if [ ! -f "$CONFIG" ]; then
   exit 0
 fi
 
-CURRENT_NAME=$(sed -n 's|.*<InstanceName>\(.\+\)</InstanceName>.*|\1|p' "$CONFIG")
-
-if [ "$CURRENT_NAME" = "$TARGET_NAME" ]; then
+CURRENT_NAME=$(sed -n 's|.*<InstanceName>\(.*\)</InstanceName>.*|\1|p' "$CONFIG")
+if [ "$CURRENT_NAME" = "" ]; then
+  echo "[name-patch] Could not find current name. Continuing..."
+elif [ "$CURRENT_NAME" = "$TARGET_NAME" ]; then
   echo "[name-patch] Name already set to $TARGET_NAME, nothing to do"
   exit 0
 elif [ "$CURRENT_NAME" != "$DEFAULT_NAME" ]; then
@@ -29,4 +30,4 @@ fi
 echo "[name-patch] Patching name from $CURRENT_NAME to $TARGET_NAME..."
 sed -i "s|<InstanceName>$CURRENT_NAME</InstanceName>|<InstanceName>$TARGET_NAME</InstanceName>|" "$CONFIG"
 
-ehco "Container with be restarted by the failing healthcheck"
+echo "Container with be restarted by the failing healthcheck"Y

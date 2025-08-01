@@ -1,6 +1,7 @@
 ---
 - name: Create directories for {{ app_name }} name patch
   ansible.builtin.include_tasks: changeCommon.yml
+  tags: seedbox
 
 - name: Create {{ app_name }} patch-name script
   ansible.builtin.template:
@@ -9,11 +10,14 @@
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: "0755"
+  tags: seedbox
 
 - name: Add cron for {{ app_name }} patch-name
   ansible.builtin.lineinfile:
-    path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/{{ app_name }}/crontabs/root"
+    path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/{{ app_name }}/config/crontabs/root"
     line: "@reboot /config/patch-name.sh"
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: "0755"
+    create: true
+  tags: seedbox

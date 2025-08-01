@@ -100,7 +100,7 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | Variable Name                | Required | Description                                              |
 | ---------------------------- | -------- | -------------------------------------------------------- |
 | `pia_vpn`                    | No       | Enable/Disable the PIA VPN container.                    |
-| `cleanuperr`                 | No       | Enable/Disable the Cleanuperr container.                 |
+| `cleanuparr`                 | No       | Enable/Disable the Cleanuperr container.                 |
 | `radarr`                     | No       | Enable/Disable the Radarr container.                     |
 | `radarr_2`                   | No       | Enable/Disable the Second Radarr container.              |
 | `sonarr`                     | No       | Enable/Disable the Sonarr container.                     |
@@ -110,8 +110,8 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `notifiarr`                  | No       | Enable/Disable the Notifiarr container.                  |
 | `prowlarr`                   | No       | Enable/Disable the Prowlarr container.                   |
 | `flaresolverr`               | No       | Enable/Disable the FlareSolverr container.               |
-| `readarr_audiobooks`         | No       | Enable/Disable the readarr-audiobooks container.         |
-| `readarr_ebooks`             | No       | Enable/Disable the readarr-ebooks container.             |
+| `readarr_audiobooks`         | No       | Enable/Disable the readarr_audiobooks container.         |
+| `readarr_ebooks`             | No       | Enable/Disable the readarr_ebooks container.             |
 | `lazylibrarian`              | No       | Enable/Disable the Lazylibrarian container.              |
 | `bookbounty`                 | No       | Enable/Disable the Bookbounty container.                 |
 | `bazarr`                     | No       | Enable/Disable the Bazarr container.                     |
@@ -146,7 +146,7 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `port_fatal`    | No       | Enables the port_fatal option for the PIA VPN container. If the VPN port forward fails, the container will exit.   |
 | `port_persist`  | No       | Enables the port_persist option for the PIA VPN container. The container will try to use the same port every time. |
 
-#### cleanuperr
+#### cleanuparr
 
 | Variable Name                  | Required | Description                                                                                        |
 | ------------------------------ | -------- | -------------------------------------------------------------------------------------------------- |
@@ -231,14 +231,14 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 | Variable Name   | Required | Description                                                  |
 | --------------- | -------- | ------------------------------------------------------------ |
-| `port`          | Yes      | The port that readarr-audiobooks's webUI will be running on. |
+| `port`          | Yes      | The port that readarr_audiobooks's webUI will be running on. |
 | `instance_name` | Yes      | The name that will appear in the browser tab.                |
 
 #### readarr_ebooks
 
 | Variable Name   | Required | Description                                              |
 | --------------- | -------- | -------------------------------------------------------- |
-| `port`          | Yes      | The port that readarr-ebooks's webUI will be running on. |
+| `port`          | Yes      | The port that readarr_ebooks's webUI will be running on. |
 | `instance_name` | Yes      | The name that will appear in the browser tab.            |
 
 #### lazylibrarian
@@ -352,7 +352,7 @@ Below is a list of all of the containers that are available to be enabled/disabl
 | Container Name               | Description                                                                                                                                                                                                |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `pia_vpn`                    | Runs a Private Internet Access VPN where all of the traffic for the neccessary containers are routed through the vpn. If the VPN loses connection, the containers lose access to the internet              |
-| `cleanuperr`                 | Automatically cleans up files from your downloads and prevents downloads from clogging up the queue                                                                                                        |
+| `cleanuparr`                 | Automatically cleans up files from your downloads and prevents downloads from clogging up the queue                                                                                                        |
 | `radarr`                     | For managing your movies                                                                                                                                                                                   |
 | `radarr_2`                   | For managing your movies. Second instance. Possible uses: 4K versions, IMAX versions, multiple editions, etc.                                                                                              |
 | `sonarr`                     | For managing your TV shows/Anime                                                                                                                                                                           |

@@ -12,26 +12,32 @@
 - name: Check for Radarr name change
   ansible.builtin.set_fact:
     radarr_name_change: "{{ containers.radarr and radarr.instance_name is defined }}"
+  tags: seedbox
 
 - name: Check for Radarr 2 name change
   ansible.builtin.set_fact:
     radarr_2_name_change: "{{ containers.radarr_2 and radarr_2.instance_name is defined }}"
+  tags: seedbox
 
 - name: Check for Sonarr name change
   ansible.builtin.set_fact:
     sonarr_name_change: "{{ containers.sonarr and sonarr.instance_name is defined }}"
+  tags: seedbox
 
 - name: Check for Sonarr 2 name change
   ansible.builtin.set_fact:
     sonarr_2_name_change: "{{ containers.sonarr_2 and sonarr_2.instance_name is defined }}"
+  tags: seedbox
 
 - name: Check for Readarr Audiobooks name change
   ansible.builtin.set_fact:
     readarr_audiobooks_name_change: "{{ containers.readarr_audiobooks and readarr_audiobooks.instance_name is defined }}"
+  tags: seedbox
 
 - name: Check for Readarr Ebooks name change
   ansible.builtin.set_fact:
     readarr_ebooks_name_change: "{{ containers.readarr_ebooks and readarr_ebooks.instance_name is defined }}"
+  tags: seedbox
 
 - name: Change Radarr Instance name
   when: radarr_name_change
@@ -88,7 +94,7 @@
     default_name: "Readarr"
 
 - name: Change radarr 2 port
-  when: containers.radarr_2 and containers.vpn
+  when: containers.radarr_2 and containers.pia_vpn
   tags: seedbox
   ansible.builtin.include_tasks: changePort.yml
   vars:
@@ -96,7 +102,7 @@
     target_port: "{{ seedbox_radarr_2_internal_port }}"
 
 - name: Change sonarr 2 port
-  when: containers.sonarr_2 and containers.vpn
+  when: containers.sonarr_2 and containers.pia_vpn
   tags: seedbox
   ansible.builtin.include_tasks: changePort.yml
   vars:
@@ -104,7 +110,7 @@
     target_port: "{{ seedbox_sonarr_2_internal_port }}"
 
 - name: Change readarr ebooks port
-  when: containers.readarr_ebooks and containers.vpn
+  when: containers.readarr_ebooks and containers.pia_vpn
   tags: seedbox
   ansible.builtin.include_tasks: changePort.yml
   vars:
@@ -171,13 +177,21 @@
     mode: "0755"
 
 - name: Setup Cleanuperr Ignored file
-  when: containers.cleanuperr and cleanuperr.queue_cleaner.enabled and cleanuperr.ignored is defined
+  when: containers.cleanuparr and cleanuparr.queue_cleaner.enabled and cleanuparr.ignored is defined
   tags: seedbox
   block:
+    - name: Create dockers directory for seedbox stack
+      ansible.builtin.file:
+        path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/cleanuparr"
+        state: directory
+        owner: "{{ docker_user }}"
+        group: "{{ docker_user }}"
+        mode: "0755"
+
     - name: Create/Wipe Cleanuperr Ignored file
       ansible.builtin.copy:
         content: ""
-        dest: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/cleanuperr/ignored.txt"
+        dest: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/cleanuparr/ignored.txt"
         owner: "{{ docker_user }}"
         group: "{{ docker_user }}"
         mode: "0755"
@@ -185,9 +199,9 @@
 
     - name: Add lines to Cleanuperr Ignored file
       ansible.builtin.lineinfile:
-        path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/cleanuperr/ignored.txt"
+        path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/cleanuparr/ignored.txt"
         line: "{{ item }}"
-      loop: "{{  cleanuperr.ignored }}"
+      loop: "{{  cleanuparr.ignored }}"
 
 - name: Create Seedbox Docker stack
   ansible.builtin.command:
@@ -220,13 +234,13 @@
 
     - name: Restart Readarr Audiobooks container
       ansible.builtin.command:
-        cmd: "docker restart readarr-audiobooks"
+        cmd: "docker restart readarr_audiobooks"
       when: readarr_audiobooks_name_change
       changed_when: true
 
     - name: Restart Readarr Ebooks container
       ansible.builtin.command:
-        cmd: "docker restart readarr-ebooks"
+        cmd: "docker restart readarr_ebooks"
       when: readarr_ebooks_name_change
       changed_when: true
 
@@ -265,7 +279,7 @@
       when: not mam_cookies.stat.exists
 
 - name: Regenerate Docker Compose File for Cleanuperr API Keys
-  when: containers.cleanuperr
+  when: containers.cleanuparr
   tags: seedbox
   block:
     - name: Get Sonarr API Key
@@ -308,3 +322,4 @@
       ansible.builtin.command:
         cmd: "docker compose -f /home/{{ docker_user }}/dockers/{{ docker_directory_name }}/docker-compose.yml up -d"
       changed_when: true
+      tags: seedbox

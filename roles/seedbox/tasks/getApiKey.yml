@@ -3,14 +3,17 @@
   ansible.builtin.stat:
     path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/{{ app_name }}/config/config.xml"
   register: config_file_stat
+  tags: seedbox
 
 - name: Load {{ app_name }} Config File
   ansible.builtin.slurp:
     src: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/{{ app_name }}/config/config.xml"
   register: app_config
   when: config_file_stat.stat.exists
+  tags: seedbox
 
 - name: Get {{ app_name }} API Key
   ansible.builtin.set_fact:
     "{{app_name}}_api_key": "{{ app_config.content | b64decode | regex_search('<ApiKey>(.*?)</ApiKey>', '\\1') }}"
   when: config_file_stat.stat.exists
+  tags: seedbox
