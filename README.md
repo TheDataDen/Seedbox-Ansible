@@ -35,6 +35,10 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
 5. For UNRAID shares, add a new share for each of the media folders that you have. For example, anime, audiobooks, ebooks, downloads, movies, tv shows, etc.
    - For each of the UNRAID shares, select the `virtiofs` mode (9p is the default but virtiofs is better)
    - You can either use the drop down menu to select the share or type it in manually
+   - **IMPORTANT!!!**: If you have a cache/buffer pool:
+     - You should add a share called `Staging` and set it to only use your cache/buffer pool. This is the share that your downloads should be configured to use for their temporary storage while they are downloading. Their completed download locatio should be set to the `Downloads` share
+     - All of the other media shares should be set to use only the array
+     - This is because hardlinks only work when the files are on the same filesystem, they do not work between the array and the cache/buffer pool. This does mean that your write speeds will be slower but things will hardlink rather than copy (which uses more space)
 6. Turn on `VM Console enable Copy/paste` this will make it a lot easier for filling in some of the settings
 7. Create the VM and go through the Ubuntu install process (I recommend using the default settings)
 
