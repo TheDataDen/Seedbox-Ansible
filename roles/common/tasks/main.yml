@@ -20,23 +20,23 @@
     - packages
   block:
     - name: Ensure universe repo is enabled
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_facts['distribution_release'] }} universe"
         state: present
 
     - name: Update apt cache
-      apt:
-        update_cache: yes
+      ansible.builtin.apt:
+        update_cache: true
 
     - name: Try installing virtiofsd directly
-      apt:
+      ansible.builtin.apt:
         name: virtiofsd
         state: present
       register: virtiofsd_result
       failed_when: false
 
     - name: Fallback to qemu-system if virtiofsd is unavailable
-      apt:
+      ansible.builtin.apt:
         name: qemu-system
         state: present
       when: virtiofsd_result is failed
@@ -67,5 +67,19 @@
     state: mounted
   become: true
   loop: "{{ media_shares }}"
+  tags:
+    - share
+
+- name: Create the Torrent and Usenet directories for Staging
+  ansible.builtin.file:
+    path: "/data/{{ downloaders.staging.directory_name }}/{{ item }}"
+    state: directory
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: "0755"
+  loop:
+    - Torrents
+    - Usenet
+  when: downloaders.staging.enabled
   tags:
     - share
