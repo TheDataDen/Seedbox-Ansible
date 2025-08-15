@@ -844,6 +844,9 @@ services:
     volumes:
       - ./qbittorrent/config:/config
       - /data/downloads/Torrents:/data/downloads/Torrents
+{% if downloaders.staging.enabled %}
+      - /data/{{ downloaders.staging.directory_name }}/Torrents:/data/staging/Torrents
+{% endif %}
 {% if not containers.pia_vpn %}
     ports:
       - {{ qbittorrent.port }}:{{ qbittorrent.port }}
@@ -911,6 +914,9 @@ services:
     volumes:
       - ./sabnzbd/config:/config
       - /data/downloads/Usenet:/data/downloads/Usenet
+{% if downloaders.staging.enabled %}
+      - /data/{{ downloaders.staging.directory_name }}/Usenet:/data/staging/Usenet
+{% endif %}
 {% if not containers.pia_vpn %}
     ports:
       - {{ sabnzbd.port }}:8080

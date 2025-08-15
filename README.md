@@ -127,6 +127,14 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `autoheal`                   | No       | Enable/Disable the Autoheal container.                   |
 | `syncthing`                  | No       | Enable/Disable the Syncthing container.                  |
 
+### Downloader Settings
+
+| Variable Name            | Required | Description                                                                                           |
+| ------------------------ | -------- | ----------------------------------------------------------------------------------------------------- |
+| `staging`                | Yes      | Enable/Disable the staging directory. See the important note in item 5 of [here](#unraid-vm-setup)    |
+| `staging.enabled`        | Yes      | Enable/Disable the staging directory.                                                                 |
+| `staging.directory_name` | Yes      | The same as the mediaType that you use to add the share in the [Media Shares](#media-shares) section. |
+
 ### Extras
 
 #### MAM
