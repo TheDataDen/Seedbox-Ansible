@@ -217,3 +217,5 @@ media_shares:
     shareName: Books
   - mediaType: downloads
     shareName: Downloads
+  - mediaType: staging
+    shareName: Staging
