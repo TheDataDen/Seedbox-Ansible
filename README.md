@@ -2,10 +2,54 @@
 
 This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine running on UNRAID. All you have to do is create a new Ubuntu VM in UNRAID, add the appriopriate shares to the VM and run the playbook!
 
-## Requirements
+## Table of Contents
 
-- Ubuntu 20.04 or higher (preferably an LTS version) iso
-- UNRAID (with virtualization enabled in the BIOS)
+- [Seedbox-Ansible](#seedbox-ansible)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Usage](#usage)
+    - [General UNRAID Setup](#general-unraid-setup)
+      - [UNRAID Share Permissions](#unraid-share-permissions)
+    - [UNRAID VM Setup](#unraid-vm-setup)
+    - [Ansible Setup](#ansible-setup)
+    - [Run the playbook](#run-the-playbook)
+  - [Configuration](#configuration)
+    - [Miscellaneous Settings](#miscellaneous-settings)
+    - [Logging Settings](#logging-settings)
+    - [Container Settings](#container-settings)
+    - [Extras](#extras)
+      - [MAM](#mam)
+    - [Indiviual Container Settings](#indiviual-container-settings)
+      - [pia\_vpn](#pia_vpn)
+      - [cleanuparr](#cleanuparr)
+      - [radarr](#radarr)
+      - [radarr\_2](#radarr_2)
+      - [sonarr](#sonarr)
+      - [sonarr\_2](#sonarr_2)
+      - [huntarr](#huntarr)
+      - [recyclarr](#recyclarr)
+      - [notifiarr](#notifiarr)
+      - [prowlarr](#prowlarr)
+      - [flaresolverr](#flaresolverr)
+      - [readarr\_audiobooks](#readarr_audiobooks)
+      - [readarr\_ebooks](#readarr_ebooks)
+      - [lazylibrarian](#lazylibrarian)
+      - [bookbounty](#bookbounty)
+      - [bazarr](#bazarr)
+      - [qbittorrent](#qbittorrent)
+      - [qbittorrent\_porthelper](#qbittorrent_porthelper)
+      - [qbittorrent\_managetorrents](#qbittorrent_managetorrents)
+      - [sabnzbd](#sabnzbd)
+      - [firefox](#firefox)
+      - [portainer](#portainer)
+      - [watchtower](#watchtower)
+      - [syncthing](#syncthing)
+      - [Health Check Settings](#health-check-settings)
+  - [Containers](#containers)
+  - [Post-Installation Configuration](#post-installation-configuration)
+  - [Disclaimer](#disclaimer)
+  - [License](#license)
+  - [Support](#support)
 
 ## Features
 
