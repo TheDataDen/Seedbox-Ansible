@@ -125,6 +125,8 @@ services:
       - /data/downloads:/data/downloads
       - ./cleanuparr/ignored.txt:/ignored.txt
     environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - TZ={{ timezone }}
       - DRY_RUN={{ cleanuparr.dry_run }}
       - HTTP_MAX_RETRIES=0
@@ -258,8 +260,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - puid={{ puid }}
-      - pgid={{ pgid }}
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - TZ={{ timezone }}
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
@@ -303,8 +305,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - puid={{ puid }}
-      - pgid={{ pgid }}
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - TZ={{ timezone }}
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
@@ -348,8 +350,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - puid={{ puid }}
-      - pgid={{ pgid }}
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - TZ={{ timezone }}
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
@@ -393,8 +395,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - puid={{ puid }}
-      - pgid={{ pgid }}
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - TZ={{ timezone }}
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
@@ -487,6 +489,8 @@ services:
     volumes:
       - ./recyclarr/config:/config
     environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - TZ={{ timezone }}
       - CRON_SCHEDULE={{ recyclarr.cron_schedule }}
       - RECYCLARR_CREATE_CONFIG=true
@@ -518,6 +522,8 @@ services:
     ports:
       - {{ notifiarr.port }}:5454
     environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - DN_API_KEY={{ notifiarr.api_key }}
     volumes:
       - ./notifiarr/config:/config
@@ -549,8 +555,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - puid={{ puid }}
-      - pgid={{ pgid }}
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - TZ={{ timezone }}
     volumes:
       - ./prowlarr/config:/config
@@ -592,6 +598,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - LOG_LEVEL=info
 {% if not containers.pia_vpn %}
     ports:
@@ -619,8 +627,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - puid={{ puid }}
-      - pgid={{ pgid }}
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - TZ={{ timezone }}
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
@@ -664,8 +672,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - puid={{ puid }}
-      - pgid={{ pgid }}
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - TZ={{ timezone }}
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
@@ -709,8 +717,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - puid={{ puid }}
-      - pgid={{ pgid }}
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - TZ={{ timezone }}
 {% if lazylibrarian.docker_mods is defined %}
       - DOCKER_MODS={{ lazylibrarian.docker_mods }}
@@ -752,8 +760,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - puid={{ puid }}
-      - pgid={{ pgid }}
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - readarr_address=http://{{ host_ip }}:{{ readarr_ebooks.port }}
       - sync_schedule={{ bookbounty.sync_schedule }}
       - selected_language={{ bookbounty.selected_language }}
@@ -792,8 +800,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - puid={{ puid }}
-      - pgid={{ pgid }}
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - TZ={{ timezone }}
     volumes:
       - ./bazarr/config:/config
@@ -832,6 +840,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - QBT_LEGAL_NOTICE=confirm
       - QBT_VERSION=latest
       - QBT_WEBUI_PORT={{ qbittorrent.port }}
@@ -869,6 +879,8 @@ services:
     restart: unless-stopped
     logging: *default-logging
     environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - QBITTORRENT_HOST={{ qbittorrent.host }}
       - QBITTORRENT_PORT={{ qbittorrent.port }}
       - QBITTORRENT_USERNAME={{ qbittorrent.username }}
@@ -888,6 +900,8 @@ services:
     restart: unless-stopped
     logging: *default-logging
     environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - QBITTORRENT_HOST={{ qbittorrent.host }}
       - QBITTORRENT_PORT={{ qbittorrent.port }}
       - QBITTORRENT_USERNAME={{ qbittorrent.username }}
@@ -908,8 +922,8 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - puid={{ puid }}
-      - pgid={{ pgid }}
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - TZ={{ timezone }}
     volumes:
       - ./sabnzbd/config:/config
@@ -945,8 +959,8 @@ services:
     security_opt:
       - seccomp:unconfined
     environment:
-      - puid={{ puid }}
-      - pgid={{ pgid }}
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - TZ={{ timezone }}
 {% if not containers.pia_vpn %}
     ports:
@@ -1003,6 +1017,8 @@ services:
     restart: unless-stopped
     logging: *default-logging
     environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
       - AUTOHEAL_CONTAINER_LABEL=all
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -1019,8 +1035,8 @@ services:
       - 22000:22000/udp
       - 21027:21027/udp
     environment:
-      - puid={{ puid }}
-      - pgid={{ pgid }}
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
     volumes:
       - ./:/dockers
 {% endif %}
