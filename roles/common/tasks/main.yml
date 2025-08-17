@@ -49,9 +49,67 @@
   tags:
     - ssh
 
+- name: Cleanup /data mounts and directory
+  become: true
+  tags:
+    - share
+    - cleanup
+  block:
+    - name: Get fstab mountpoints under /data
+      ansible.builtin.command: awk '!/^#/ && NF && $2 ~ "^/data(/|$)" {print $2}' /etc/fstab
+      register: data_mounts
+      changed_when: false
+
+    - name: Remove mounts from fstab and unmount them
+      ansible.posix.mount:
+        path: "{{ item }}"
+        state: absent
+      loop: "{{ data_mounts.stdout_lines }}"
+      loop_control:
+        label: "{{ item }}"
+
+    - name: Check what is still mounted under /data
+      ansible.builtin.command: findmnt -rn -o TARGET /data
+      register: data_mounted
+      changed_when: false
+      failed_when: false
+
+    - name: Remove mountpoint directories under /data (only if not still mounted)
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop: "{{ data_mounts.stdout_lines }}"
+      loop_control:
+        label: "{{ item }}"
+      when:
+        - data_mounts.stdout_lines | length > 0
+        - data_mounted.stdout_lines | select("equalto", item) | list | length == 0
+
+    - name: Check if /data itself is currently a mountpoint
+      ansible.builtin.command: findmnt -rn /data
+      register: data_is_mount
+      changed_when: false
+      failed_when: false
+
+    - name: See if /data is empty
+      ansible.builtin.find:
+        paths: /data
+        file_type: any
+        hidden: true
+        recurse: false
+      register: data_contents
+
+    - name: Remove /data if it's empty and not a mountpoint
+      ansible.builtin.file:
+        path: /data
+        state: absent
+      when:
+        - data_is_mount.rc != 0        # /data is not a mount
+        - data_contents.matched == 0   # /data has no files/dirs
+
 - name: Create mountpoint for UNRAID shares
   ansible.builtin.file:
-    path: "/data"
+    path: "/shares"
     state: directory
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
@@ -61,25 +119,33 @@
 
 - name: Mount UNRAID shares
   ansible.posix.mount:
-    path: "/data/{{ item.mediaType }}"
-    src: "{{ item.shareName }}"
+    path: "/shares"
+    src: "{{ shares_mount_tag }}"
     fstype: virtiofs
     state: mounted
   become: true
-  loop: "{{ media_shares }}"
   tags:
     - share
 
-- name: Create the Torrent and Usenet directories for Staging
+- name: Create {{ sabnzbd.sub_dir_name }} and {{ qbittorrent.sub_dir_name }} under Downloads/Staging
   ansible.builtin.file:
-    path: "/data/{{ downloaders.staging.directory_name }}/{{ item }}"
+    path: "/shares/{{ item.0.share_name }}/{{ item.1 }}"
     state: directory
-    owner: "{{ docker_user }}"
-    group: "{{ docker_user }}"
     mode: "0755"
-  loop:
-    - Torrents
-    - Usenet
-  when: downloaders.staging.enabled
+  loop: >-
+    {{
+      (
+        shares
+        | selectattr('share_name', 'search', '(?i)(download|staging)')
+        | list
+      )
+      | product([
+          sabnzbd.sub_dir_name | default('Usenet'),
+          qbittorrent.sub_dir_name | default('Torrents')
+        ])
+      | list
+    }}
+  loop_control:
+    label: "{{ item.0.share_name }} -> {{ item.1 }}"
   tags:
     - share
