@@ -68,26 +68,3 @@
   become: true
   tags:
     - share
-
-- name: Create {{ sabnzbd.sub_dir_name }} and {{ qbittorrent.sub_dir_name }} under Downloads/Staging
-  ansible.builtin.file:
-    path: "/shares/{{ item.0.share_name }}/{{ item.1 }}"
-    state: directory
-    mode: "0755"
-  loop: >-
-    {{
-      (
-        shares
-        | selectattr('share_name', 'search', '(?i)(download|staging)')
-        | list
-      )
-      | product([
-          sabnzbd.sub_dir_name | default('Usenet'),
-          qbittorrent.sub_dir_name | default('Torrents')
-        ])
-      | list
-    }}
-  loop_control:
-    label: "{{ item.0.share_name }} -> {{ item.1 }}"
-  tags:
-    - share

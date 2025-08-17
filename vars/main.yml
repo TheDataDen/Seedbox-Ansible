@@ -6,7 +6,7 @@ docker_directory_name: seedbox
 host_ip: REPLACEME
 timezone: America/New_York
 puid: 1000
-pgid: 1000
+pgid: 1001
 shares_mount_tag: Shares
 
 logging:
@@ -43,26 +43,6 @@ containers:
   watchtower: true
   autoheal: true
   syncthing: true
-
-shares:
-  - share_name: Downloads
-    dir_name: downloads
-  - share_name: Staging
-    dir_name: staging
-  - share_name: TV Shows
-    dir_name: tv
-  - share_name: Anime
-    dir_name: anime
-  - share_name: Podcasts
-    dir_name: podcasts
-  - share_name: Movies
-    dir_name: movies
-  - share_name: Movie Editions
-    dir_name: movies_editions
-  - share_name: Audiobooks
-    dir_name: audiobooks
-  - share_name: Books
-    dir_name: books
 
 extras:
   # If you use MAM as one of your trackers and use the pia container. Runs a script that sets your IP in your MAM account when the VPN connects
@@ -121,21 +101,11 @@ cleanuparr:
 radarr:
   port: 7878
 
-  # The name of the share that will be mounted to the container, the dir_name will be used on the container side
-  mounts:
-    - Downloads
-    - Movies
-
   # The name that will be displayed in the browser tab. Uncomment the line below to change the name
   # instance_name: Radarr
 
 radarr_2:
   port: 7879
-
-  # The name of the share that will be mounted to the container, the dir_name will be used on the container side
-  mounts:
-    - Downloads
-    - Movie Editions
 
   # The name that will be displayed in the browser tab. Uncomment the line below to change the name
   # instance_name: Radarr
@@ -143,23 +113,11 @@ radarr_2:
 sonarr:
   port: 8989
 
-  # The name of the share that will be mounted to the container, the dir_name will be used on the container side
-  mounts:
-    - Downloads
-    - TV Shows
-    - Anime
-    - Podcasts
-
   # The name that will be displayed in the browser tab. Uncomment the line below to change the name
   # instance_name: Sonarr
 
 sonarr_2:
   port: 8990
-
-  # The name of the share that will be mounted to the container, the dir_name will be used on the container side
-  mounts:
-    - Downloads
-    - TV Shows
 
   # The name that will be displayed in the browser tab. Uncomment the line below to change the name
   # instance_name: Sonarr
@@ -187,21 +145,11 @@ flaresolverr:
 readarr_audiobooks:
   port: 8787
 
-  # The name of the share that will be mounted to the container, the dir_name will be used on the container side
-  mounts:
-    - Downloads
-    - Audiobooks
-
   # The name that will be displayed in the browser tab
   instance_name: Readarr Audiobooks
 
 readarr_ebooks:
   port: 8788
-
-  # The name of the share that will be mounted to the container, the dir_name will be used on the container side
-  mounts:
-    - Downloads
-    - Books
 
   # The name that will be displayed in the browser tab
   instance_name: Readarr Ebooks
@@ -209,22 +157,11 @@ readarr_ebooks:
 lazylibrarian:
   port: 5299
 
-  # The name of the share that will be mounted to the container, the dir_name will be used on the container side
-  mounts:
-    - Downloads
-    - Books
-    - Audiobooks
-
   # Comment out if you don't want to use mods
   docker_mods: linuxserver/mods:universal-calibre|linuxserver/mods:lazylibrarian-ffmpeg
 
 bookbounty:
   port: 5000
-
-  # The name of the share that will be mounted to the container, the dir_name will be used on the container side
-  mounts:
-    - Downloads
-    - Books
 
   # Comma separated list of 24h hours to check for books
   sync_schedule: 0,6,12,18
@@ -238,22 +175,8 @@ bookbounty:
 bazarr:
   port: 6767
 
-  # The name of the share that will be mounted to the container, the dir_name will be used on the container side
-  mounts:
-    - Movies
-    - TV Shows
-    - Anime
-
 qbittorrent:
   port: 8081
-
-  sub_dir_name: Torrents
-
-  # The name of the share that will be mounted to the container, the dir_name will be used on the container side
-  # Should only be the downloads share and the staging share (if using)
-  mounts:
-    - Downloads
-    - Staging
 
   # host, username, and password: Only required if using the porthelper or managetorrents containers
   host: "{{ host_ip }}"
@@ -268,14 +191,6 @@ qbittorrent_managetorrents:
 
 sabnzbd:
   port: 8181
-
-  sub_dir_name: Usenet
-
-  # The name of the share that will be mounted to the container, the dir_name will be used on the container side
-  # Should only be the downloads share and the staging share (if using)
-  mounts:
-    - Downloads
-    - Staging
 
 firefox:
   port: 3001

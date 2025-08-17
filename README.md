@@ -39,6 +39,181 @@ There are really only two ways that I have seen people do this.
 >   - All of the other media shares should be set to use only the array
 >   - This is because hardlinks only work when the files are on the same filesystem, they do not work between the array and the cache/buffer pool. This does mean that your write speeds will be slower but things will hardlink rather than copy (which uses more space)
 
+#### UNRAID Share Permissions
+Since all of the shares are going to be mounted to the VM and passed to the containers, you will want to make sure that there are permissions set up on UNRAID's end to only allow the seedbox to access what it needs to.
+
+The following comamnds need to executed on UNRAID! Open a terminal in the web gui.
+
+1. Created a group called `media` with the command `groupadd media`
+2. Set the group id of the media group to `1001` with the command `groupmod -g 1001 media`
+3. Added my user and root to the group with the command `usermod -a -G media root` and `usermod -a -G media <username>`
+4. Created a group called `private` with the command `groupadd private`
+5. Added my user and root to the group with the command `usermod -a -G private root` and `usermod -a -G private <username>`
+6. In the `User Scripts` plugin (install if you don't have it) create a script called `fixPermssions` with the following contents:
+```bash
+#!/bin/bash
+
+name=""
+puid="nobody"
+pgid=""
+dir_perms=""
+file_perms=""
+
+og="$puid:$pgid"
+
+touched_shares=()
+
+function checkAlreadyUpdated() {
+    local needle=$1
+
+    for item in "${touched_shares[@]}"; do
+        if [[ "$item" == "$needle" ]]; then
+            return 0   # true
+        fi
+    done
+    return 1   # false
+}
+
+function setDirPerms() {
+    directory=$1
+    
+    echo "[$name] Setting directory perms for $directory to $dir_perms..."
+    find "$directory" -type d -exec chmod $dir_perms {} +
+}
+
+function setFilePerms() {
+    directory=$1
+    
+    echo "[$name] Setting file perms for $directory to $file_perms..."
+    find "$directory" -type f -exec chmod $file_perms {} +
+}
+
+function setOwnerGroup() {
+    directory=$1
+    
+    echo "[$name] Setting owner:group for $directory to $og..."
+    chown -R $og "$directory"
+}
+
+function setPerms() {
+    setOwnerGroup "$1"
+
+    setDirPerms "$1"
+    
+    setFilePerms "$1"
+}
+
+function setSharePerms() {
+    directory=/mnt/user/$1
+    
+    if checkAlreadyUpdated "$1"; then
+        echo "Share $1 already had its perms set! Please remove the duplication!"
+    else
+        setPerms "$directory"
+        
+        touched_shares+=("$1")
+    fi
+}
+
+function setVars() {
+    name=$1
+    pgid=$2
+    dir_perms=$3
+    file_perms=$4
+    
+    og="$puid:$pgid"
+    
+    echo -e "\n"
+}
+
+function checkShares() {
+    for folder in /mnt/user/*/; do
+        folder_name=$(basename "$folder")
+        found=false
+    
+        # Check if the folder_name is in the touched_shares array
+        for item in "${touched_shares[@]}"; do
+            if [[ "$folder_name" == "$item" ]]; then
+                found=true
+                break
+            fi
+        done
+    
+        # If not found, report it
+        if [[ "$found" == false ]]; then
+            echo "Share '$folder_name' is not being updated, please edit the script and add the share"
+        fi
+    done
+}
+
+
+# Media Shares (special permissions)
+setVars "Media" "media" "775" "774"
+
+setSharePerms "movies"
+
+setSharePerms "movie_editions"
+
+setSharePerms "tv"
+
+setSharePerms "anime"
+
+setSharePerms "downloads"
+
+setSharePerms "staging"
+
+setSharePerms "audiobooks"
+
+setSharePerms "books"
+
+setSharePerms "podcasts"
+
+
+# Normal Shares (no special permissions)
+setVars "Normal" "users" "775" "774"
+
+setSharePerms "Games"
+
+setSharePerms "Manga"
+
+setSharePerms "Programming"
+
+
+# Public Shares (everyone can access)
+setVars "Public" "users" "777" "776"
+
+setSharePerms "guest"
+
+
+#Private Shares (only the private group can access)
+setVars "Private" "private" "770" "774"
+
+setSharePerms "Emails"
+
+setSharePerms "Important Files"
+
+
+#System Shares
+setVars "System" "users" "775" "664"
+
+setSharePerms "system"
+
+setSharePerms "appdata"
+
+setSharePerms "domains"
+
+
+checkShares
+
+echo "Done Setting Permissions!"
+```
+
+Make sure to set your share names in the `setSharePerms` function calls under the right section. You can also add more sections if you want to. There is a `setPerms` function that you can use to set the permissions for a directory rather than the whole share.
+
+The script will let you know if you are missing any shares as well as if you have duplicate shares.
+
+I have `User Scripts` set to run the `fixPermssions` script every hour which is probably overkill, but it ensure that nothing is setting the permissions to something that should not be.
+
 ### UNRAID VM Setup
 
 1. Create a new VM and pick Ubuntu as the OS
@@ -91,14 +266,14 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 ### Miscellaneous Settings
 
-| Variable Name      | Required | Description                                                                                    |
-| ------------------ | -------- | ---------------------------------------------------------------------------------------------- |
-| `docker_user`      | Yes      | The user that you created on the Ubuntu VM                                                     |
-| `host_ip`          | Yes      | The IP address of the VM.                                                                      |
-| `timezone`         | Yes      | The Timezone that you are in                                                                   |
-| `puid`             | Yes      | The UID of the user that will run the docker containers. (Probably doesn't need to be changed) |
-| `pgid`             | Yes      | The GID of the user that will run the docker containers. (Probably doesn't need to be changed) |
-| `shares_mount_tag` | Yes      | The tag that will be used for the UNRAID shares when passed to VM.                             |
+| Variable Name      | Required | Description                                                                                                                                                                                                            |
+| ------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docker_user`      | Yes      | The user that you created on the Ubuntu VM                                                                                                                                                                             |
+| `host_ip`          | Yes      | The IP address of the VM.                                                                                                                                                                                              |
+| `timezone`         | Yes      | The Timezone that you are in                                                                                                                                                                                           |
+| `puid`             | Yes      | The UID of the user that will run the docker containers. (Probably doesn't need to be changed)                                                                                                                         |
+| `pgid`             | Yes      | The GID of the user that will run the docker containers. This needs to be set to the group id of the `media` group. The [instructions](#unraid-share-permissions) set it to `1001` unless you set it to something else |
+| `shares_mount_tag` | Yes      | The tag that will be used for the UNRAID shares when passed to VM.                                                                                                                                                     |
 
 ### Logging Settings
 
@@ -136,36 +311,6 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `autoheal`                   | No       | Enable/Disable the Autoheal container.                   |
 | `syncthing`                  | No       | Enable/Disable the Syncthing container.                  |
 
-### Shares
-
-Since we are passing every UNRAID share to the VM we need a way to tell the seedbox which ones are important. This list also allows you to specify a different directory name that will be used on the container side. Useful for changing `TV Shows` to `tv` for example.
-
-`share_name` is the name of the UNRAID share`
-`dir_name` is the name of the directory that will be created on the container side
-
-Example:
-```yaml
-shares:
-  - share_name: Downloads
-    dir_name: downloads
-  - share_name: Staging
-    dir_name: staging
-  - share_name: TV Shows
-    dir_name: tv
-  - share_name: Anime
-    dir_name: anime
-  - share_name: Podcasts
-    dir_name: podcasts
-  - share_name: Movies
-    dir_name: movies
-  - share_name: Movie Editions
-    dir_name: movies_editions
-  - share_name: Audiobooks
-    dir_name: audiobooks
-  - share_name: Books
-    dir_name: books
-```
-
 ### Extras
 
 #### MAM
@@ -191,57 +336,52 @@ shares:
 
 #### cleanuparr
 
-| Variable Name                  | Required | Description                                                                                                                                        |
-| ------------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mounts`                       | Yes      | A list of UNRAID shares that will be mounted to the container. Each mount **MUST** match one of the `share_name`s in the [Shares](#shares) section |
-| `dry_run`                      | Yes      | If true, the container will not actually clean up the files. Use this to verify your setup.                                                        |
-| `ignored`                      | Yes      | A list of ignored tags, categories, and torrents. The file will be created if it doesn't exist.                                                    |
-| `sonarr.list_type`             | Yes      | Either `blacklist` or `whitelist`. The type of list that will be used for blocking bad files.                                                      |
-| `sonarr.list`                  | Yes      | The path to the file that contains the list of blocked files. Can either be local or an url.                                                       |
-| `radarr.list_type`             | Yes      | Either `blacklist` or `whitelist`. The type of list that will be used for blocking bad files.                                                      |
-| `radarr.list`                  | Yes      | The path to the file that contains the list of blocked files. Can either be local or an url.                                                       |
-| `notifiarr.discord_channel_id` | Yes      | The ID of the discord channel that notifiarr will post to.                                                                                         |
-| `search.enabled`               | Yes      | If true, the container will search for replacements after a download has been removed from an arr.                                                 |
-| `search.delay`                 | Yes      | The delay before the search is performed. Helps to prevent spamming the indexer.                                                                   |
-| `queue_cleaner.enabled`        | Yes      | If true, the container will clean up the queue.                                                                                                    |
-| `queue_cleaner.triggers`       | Yes      | The cron schedule that controls when the queue cleaner will run.                                                                                   |
-| `content_blocker.enabled`      | Yes      | If true, the container will block files that are not allowed.                                                                                      |
-| `content_blocker.triggers`     | Yes      | The cron schedule that controls when the content blocker will run.                                                                                 |
-| `download_cleaner.enabled`     | Yes      | If true, the container will clean up files that have finished seeding.                                                                             |
-| `download_cleaner.triggers`    | Yes      | The cron schedule that controls when the download cleaner will run.                                                                                |
-| `download_cleaner.ratio`       | Yes      | The ratio that the download cleaner will use to determine if a file is finished seeding.                                                           |
+| Variable Name                  | Required | Description                                                                                        |
+| ------------------------------ | -------- | -------------------------------------------------------------------------------------------------- |
+| `dry_run`                      | Yes      | If true, the container will not actually clean up the files. Use this to verify your setup.        |
+| `ignored`                      | Yes      | A list of ignored tags, categories, and torrents. The file will be created if it doesn't exist.    |
+| `sonarr.list_type`             | Yes      | Either `blacklist` or `whitelist`. The type of list that will be used for blocking bad files.      |
+| `sonarr.list`                  | Yes      | The path to the file that contains the list of blocked files. Can either be local or an url.       |
+| `radarr.list_type`             | Yes      | Either `blacklist` or `whitelist`. The type of list that will be used for blocking bad files.      |
+| `radarr.list`                  | Yes      | The path to the file that contains the list of blocked files. Can either be local or an url.       |
+| `notifiarr.discord_channel_id` | Yes      | The ID of the discord channel that notifiarr will post to.                                         |
+| `search.enabled`               | Yes      | If true, the container will search for replacements after a download has been removed from an arr. |
+| `search.delay`                 | Yes      | The delay before the search is performed. Helps to prevent spamming the indexer.                   |
+| `queue_cleaner.enabled`        | Yes      | If true, the container will clean up the queue.                                                    |
+| `queue_cleaner.triggers`       | Yes      | The cron schedule that controls when the queue cleaner will run.                                   |
+| `content_blocker.enabled`      | Yes      | If true, the container will block files that are not allowed.                                      |
+| `content_blocker.triggers`     | Yes      | The cron schedule that controls when the content blocker will run.                                 |
+| `download_cleaner.enabled`     | Yes      | If true, the container will clean up files that have finished seeding.                             |
+| `download_cleaner.triggers`    | Yes      | The cron schedule that controls when the download cleaner will run.                                |
+| `download_cleaner.ratio`       | Yes      | The ratio that the download cleaner will use to determine if a file is finished seeding.           |
 
 #### radarr
 
-| Variable Name   | Required | Description                                                                                                                                        |
-| --------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `port`          | Yes      | The port that Radarr's webUI will be running on.                                                                                                   |
-| `mounts`        | Yes      | A list of UNRAID shares that will be mounted to the container. Each mount **MUST** match one of the `share_name`s in the [Shares](#shares) section |
-| `instance_name` | No       | The name that will appear in the browser tab.                                                                                                      |
+| Variable Name   | Required | Description                                      |
+| --------------- | -------- | ------------------------------------------------ |
+| `port`          | Yes      | The port that Radarr's webUI will be running on. |
+| `instance_name` | No       | The name that will appear in the browser tab.    |
 
 #### radarr_2
 
-| Variable Name   | Required | Description                                                                                                                                        |
-| --------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `port`          | Yes      | The port that the second Radarr's webUI will be running on.                                                                                        |
-| `mounts`        | Yes      | A list of UNRAID shares that will be mounted to the container. Each mount **MUST** match one of the `share_name`s in the [Shares](#shares) section |
-| `instance_name` | No       | The name that will appear in the browser tab.                                                                                                      |
+| Variable Name   | Required | Description                                                 |
+| --------------- | -------- | ----------------------------------------------------------- |
+| `port`          | Yes      | The port that the second Radarr's webUI will be running on. |
+| `instance_name` | No       | The name that will appear in the browser tab.               |
 
 #### sonarr
 
-| Variable Name   | Required | Description                                                                                                                                        |
-| --------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `port`          | Yes      | The port that Sonarr's webUI will be running on.                                                                                                   |
-| `mounts`        | Yes      | A list of UNRAID shares that will be mounted to the container. Each mount **MUST** match one of the `share_name`s in the [Shares](#shares) section |
-| `instance_name` | No       | The name that will appear in the browser tab.                                                                                                      |
+| Variable Name   | Required | Description                                      |
+| --------------- | -------- | ------------------------------------------------ |
+| `port`          | Yes      | The port that Sonarr's webUI will be running on. |
+| `instance_name` | No       | The name that will appear in the browser tab.    |
 
 #### sonarr_2
 
-| Variable Name   | Required | Description                                                                                                                                        |
-| --------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `port`          | Yes      | The port that the second Sonarr's webUI will be running on.                                                                                        |
-| `mounts`        | Yes      | A list of UNRAID shares that will be mounted to the container. Each mount **MUST** match one of the `share_name`s in the [Shares](#shares) section |
-| `instance_name` | No       | The name that will appear in the browser tab.                                                                                                      |
+| Variable Name   | Required | Description                                                 |
+| --------------- | -------- | ----------------------------------------------------------- |
+| `port`          | Yes      | The port that the second Sonarr's webUI will be running on. |
+| `instance_name` | No       | The name that will appear in the browser tab.               |
 
 #### huntarr
 
@@ -277,58 +417,51 @@ shares:
 
 #### readarr_audiobooks
 
-| Variable Name   | Required | Description                                                                                                                                        |
-| --------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `port`          | Yes      | The port that readarr_audiobooks's webUI will be running on.                                                                                       |
-| `mounts`        | Yes      | A list of UNRAID shares that will be mounted to the container. Each mount **MUST** match one of the `share_name`s in the [Shares](#shares) section |
-| `instance_name` | Yes      | The name that will appear in the browser tab.                                                                                                      |
+| Variable Name   | Required | Description                                                  |
+| --------------- | -------- | ------------------------------------------------------------ |
+| `port`          | Yes      | The port that readarr_audiobooks's webUI will be running on. |
+| `instance_name` | Yes      | The name that will appear in the browser tab.                |
 
 #### readarr_ebooks
 
-| Variable Name   | Required | Description                                                                                                                                        |
-| --------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `port`          | Yes      | The port that readarr_ebooks's webUI will be running on.                                                                                           |
-| `mounts`        | Yes      | A list of UNRAID shares that will be mounted to the container. Each mount **MUST** match one of the `share_name`s in the [Shares](#shares) section |
-| `instance_name` | Yes      | The name that will appear in the browser tab.                                                                                                      |
+| Variable Name   | Required | Description                                              |
+| --------------- | -------- | -------------------------------------------------------- |
+| `port`          | Yes      | The port that readarr_ebooks's webUI will be running on. |
+| `instance_name` | Yes      | The name that will appear in the browser tab.            |
 
 #### lazylibrarian
 
-| Variable Name | Required | Description                                                                                                                                        |
-| ------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `port`        | Yes      | The port that Lazylibrarian's webUI will be running on.                                                                                            |
-| `mounts`      | Yes      | A list of UNRAID shares that will be mounted to the container. Each mount **MUST** match one of the `share_name`s in the [Shares](#shares) section |
-| `docker_mods` | No       | The mods that will be used for Lazylibrarian. Default enables calibre-importer and ffmpeg                                                          |
+| Variable Name | Required | Description                                                                               |
+| ------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `port`        | Yes      | The port that Lazylibrarian's webUI will be running on.                                   |
+| `docker_mods` | No       | The mods that will be used for Lazylibrarian. Default enables calibre-importer and ffmpeg |
 
 #### bookbounty
 
-| Variable Name               | Required | Description                                                                                                                                        |
-| --------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `port`                      | Yes      | The port that Bookbounty's webUI will be running on.                                                                                               |
-| `mounts`                    | Yes      | A list of UNRAID shares that will be mounted to the container. Each mount **MUST** match one of the `share_name`s in the [Shares](#shares) section |
-| `sync_schedule`             | Yes      | The cron schedule that controls how often Bookbounty syncs. 24h format, comma seperated list                                                       |
-| `selected_language`         | Yes      | The language that Bookbounty will sync. Default is English                                                                                         |
-| `preferred_ext_fiction`     | Yes      | The preferred extensions for fiction. Comma sperated list.                                                                                         |
-| `preferred_ext_non_fiction` | Yes      | The preferred extensions for non-fiction. Comma sperated list.                                                                                     |
-| `selected_path_type`        | Yes      | The path type that Bookbounty will use. Either `file` or `folder`                                                                                  |
-| `download_path`             | Yes      | The path that Bookbounty will download to.                                                                                                         |
+| Variable Name               | Required | Description                                                                                  |
+| --------------------------- | -------- | -------------------------------------------------------------------------------------------- |
+| `port`                      | Yes      | The port that Bookbounty's webUI will be running on.                                         |
+| `sync_schedule`             | Yes      | The cron schedule that controls how often Bookbounty syncs. 24h format, comma seperated list |
+| `selected_language`         | Yes      | The language that Bookbounty will sync. Default is English                                   |
+| `preferred_ext_fiction`     | Yes      | The preferred extensions for fiction. Comma sperated list.                                   |
+| `preferred_ext_non_fiction` | Yes      | The preferred extensions for non-fiction. Comma sperated list.                               |
+| `selected_path_type`        | Yes      | The path type that Bookbounty will use. Either `file` or `folder`                            |
+| `download_path`             | Yes      | The path that Bookbounty will download to.                                                   |
 
 #### bazarr
 
-| Variable Name | Required | Description                                                                                                                                        |
-| ------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `port`        | Yes      | The port that Bazarr's webUI will be running on.                                                                                                   |
-| `mounts`      | Yes      | A list of UNRAID shares that will be mounted to the container. Each mount **MUST** match one of the `share_name`s in the [Shares](#shares) section |
+| Variable Name | Required | Description                                      |
+| ------------- | -------- | ------------------------------------------------ |
+| `port`        | Yes      | The port that Bazarr's webUI will be running on. |
 
 #### qbittorrent
 
-| Variable Name  | Required | Description                                                                                                                                                                 |
-| -------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `port`         | Yes      | The port that qBittorrent's webUI will be running on.                                                                                                                       |
-| `sub_dir_name` | Yes      | The sub directory name that will be used on the container side. Will be automatically created if not already present                                                        |
-| `mounts`       | Yes      | A list of UNRAID shares that will be mounted to the container. Each mount **MUST** match one of the `share_name`s in the [Shares](#shares) section                          |
-| `host`         | No       | The host ip that qBittorrent will be running on. Don't change this unless it different from the host IP. Only required if using the porthelper or managetorrents containers |
-| `username`     | No       | The username that will be used to connect to qBittorrent. Only required if using the porthelper or managetorrents containers                                                |
-| `password`     | No       | The password that will be used to connect to qBittorrent. Only required if using the porthelper or managetorrents containers                                                |
+| Variable Name | Required | Description                                                                                                                                                                 |
+| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `port`        | Yes      | The port that qBittorrent's webUI will be running on.                                                                                                                       |
+| `host`        | No       | The host ip that qBittorrent will be running on. Don't change this unless it different from the host IP. Only required if using the porthelper or managetorrents containers |
+| `username`    | No       | The username that will be used to connect to qBittorrent. Only required if using the porthelper or managetorrents containers                                                |
+| `password`    | No       | The password that will be used to connect to qBittorrent. Only required if using the porthelper or managetorrents containers                                                |
 
 #### qbittorrent_porthelper
 
@@ -344,11 +477,9 @@ shares:
 
 #### sabnzbd
 
-| Variable Name  | Required | Description                                                                                                                                        |
-| -------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `port`         | Yes      | The port that SABnzbd's webUI will be running on.                                                                                                  |
-| `sub_dir_name` | Yes      | The sub directory name that will be used on the container side. Will be automatically created if not already present                               |
-| `mounts`       | Yes      | A list of UNRAID shares that will be mounted to the container. Each mount **MUST** match one of the `share_name`s in the [Shares](#shares) section |
+| Variable Name | Required | Description                                       |
+| ------------- | -------- | ------------------------------------------------- |
+| `port`        | Yes      | The port that SABnzbd's webUI will be running on. |
 
 #### firefox
 
@@ -417,6 +548,10 @@ Below is a list of all of the containers that are available to be enabled/disabl
 | `watchtower`                 | Automatically updates the containers to their latest versions. Runs on a cron schedule                                                                                                                     |
 | `autoheal`                   | Automatically restarts any container that becomes unhealthy                                                                                                                                                |
 | `syncthing`                  | Add the ability to sync files with a remote server                                                                                                                                                         |
+
+## Post-Installation Configuration
+
+All instances of Sonarr and Radarr should be configured under `Media Management` to set the file perms to `774` and the group to `1001`.
 
 ## Disclaimer
 
