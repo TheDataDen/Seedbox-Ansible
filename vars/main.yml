@@ -44,6 +44,11 @@ containers:
   autoheal: true
   syncthing: true
 
+downloaders:
+  staging:
+    enabled: true
+    share_name: staging
+
 extras:
   # If you use MAM as one of your trackers and use the pia container. Runs a script that sets your IP in your MAM account when the VPN connects
   mam:
@@ -178,6 +183,8 @@ bazarr:
 qbittorrent:
   port: 8081
 
+  sub_dir_name: Torrents
+
   # host, username, and password: Only required if using the porthelper or managetorrents containers
   host: "{{ host_ip }}"
   username: REPLACEME
@@ -191,6 +198,8 @@ qbittorrent_managetorrents:
 
 sabnzbd:
   port: 8181
+
+  sub_dir_name: Usenet
 
 firefox:
   port: 3001

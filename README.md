@@ -17,6 +17,7 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
     - [Miscellaneous Settings](#miscellaneous-settings)
     - [Logging Settings](#logging-settings)
     - [Container Settings](#container-settings)
+    - [Downloader Settings](#downloader-settings)
     - [Extras](#extras)
       - [MAM](#mam)
     - [Indiviual Container Settings](#indiviual-container-settings)
@@ -355,6 +356,13 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `autoheal`                   | No       | Enable/Disable the Autoheal container.                   |
 | `syncthing`                  | No       | Enable/Disable the Syncthing container.                  |
 
+### Downloader Settings
+
+| Variable Name                    | Required | Description                                                       |
+| -------------------------------- | -------- | ----------------------------------------------------------------- |
+| `downloaders.staging.enabled`    | Yes      | Enable/Disable the staging share                                  |
+| `downloaders.staging.share_name` | Yes      | The name of the share that will be used for the staging downloads |
+
 ### Extras
 
 #### MAM
@@ -500,12 +508,13 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 #### qbittorrent
 
-| Variable Name | Required | Description                                                                                                                                                                 |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `port`        | Yes      | The port that qBittorrent's webUI will be running on.                                                                                                                       |
-| `host`        | No       | The host ip that qBittorrent will be running on. Don't change this unless it different from the host IP. Only required if using the porthelper or managetorrents containers |
-| `username`    | No       | The username that will be used to connect to qBittorrent. Only required if using the porthelper or managetorrents containers                                                |
-| `password`    | No       | The password that will be used to connect to qBittorrent. Only required if using the porthelper or managetorrents containers                                                |
+| Variable Name  | Required | Description                                                                                                                                                                 |
+| -------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `port`         | Yes      | The port that qBittorrent's webUI will be running on.                                                                                                                       |
+| `sub_dir_name` | Yes      | The name of the sub directory that will be created under the staging share.                                                                                                 |
+| `host`         | No       | The host ip that qBittorrent will be running on. Don't change this unless it different from the host IP. Only required if using the porthelper or managetorrents containers |
+| `username`     | No       | The username that will be used to connect to qBittorrent. Only required if using the porthelper or managetorrents containers                                                |
+| `password`     | No       | The password that will be used to connect to qBittorrent. Only required if using the porthelper or managetorrents containers                                                |
 
 #### qbittorrent_porthelper
 
@@ -521,9 +530,11 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 #### sabnzbd
 
-| Variable Name | Required | Description                                       |
-| ------------- | -------- | ------------------------------------------------- |
-| `port`        | Yes      | The port that SABnzbd's webUI will be running on. |
+| Variable Name  | Required | Description                                                                 |
+| -------------- | -------- | --------------------------------------------------------------------------- |
+| `port`         | Yes      | The port that SABnzbd's webUI will be running on.                           |
+| `sub_dir_name` | Yes      | The name of the sub directory that will be created under the staging share. |
+
 
 #### firefox
 

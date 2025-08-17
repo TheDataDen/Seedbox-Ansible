@@ -68,3 +68,15 @@
   become: true
   tags:
     - share
+
+- name: Create {{ sabnzbd.sub_dir_name }} and {{ qbittorrent.sub_dir_name }} under Staging
+  ansible.builtin.file:
+    path: "/shares/{{ downloaders.staging.share_name }}/{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ sabnzbd.sub_dir_name }}"
+    - "{{ qbittorrent.sub_dir_name }}"
+  when: downloaders.staging.enabled
+  tags:
+    - share

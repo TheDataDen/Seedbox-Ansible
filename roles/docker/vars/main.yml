@@ -1,0 +1,6 @@
+---
+docker_remap_user: dockremap
+docker_subid_start: 165536
+docker_subid_count: 65536
+docker_daemon_json_path: /etc/docker/daemon.json
+docker_daemon_backup_dir: /etc/docker/backups
