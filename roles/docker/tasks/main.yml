@@ -164,9 +164,10 @@
 
     - name: Verify profile is loaded
       ansible.builtin.command: aa-status
+      
       register: aa_status
       changed_when: false
 
     - name: Display AppArmor status
       ansible.builtin.debug:
-        msg: "AppArmor docker-media profile status: {{ 'LOADED' if 'docker-media' in aa_status.stdout else 'NOT LOADED' }}"
+        msg: "AppArmor docker-media-restrict profile status: {{ 'LOADED' if 'docker-media-restrict' in aa_status.stdout else 'NOT LOADED' }}"
