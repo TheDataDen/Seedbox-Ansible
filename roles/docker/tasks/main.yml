@@ -136,11 +136,6 @@
 
 - name: Setup AppArmor
   tags: apparmor
-  handlers:
-    - name: reload apparmor
-      systemd:
-        name: apparmor
-        state: reloaded
   block:
     - name: Enable AppArmor
       ansible.builtin.systemd:
@@ -155,8 +150,11 @@
         owner: root
         group: root
         mode: "0644"
-      notify:
-        - reload apparmor
+
+    - name: Restart AppArmor
+      ansible.builtin.service:
+        name: apparmor
+        state: restarted
 
     - name: Load and enforce AppArmor profile
       ansible.builtin.command: aa-enforce docker-media
