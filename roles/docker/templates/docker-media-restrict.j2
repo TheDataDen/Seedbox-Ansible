@@ -86,6 +86,14 @@ profile docker-media-restrict {
   /tini ix,
   /usr/bin/tini ix,
   /s6-overlay/** ix,
+
+  # Container entrypoint scripts
+  /entrypoint.sh ix,
+  /docker-entrypoint.sh ix,
+  /usr/local/bin/entrypoint.sh ix,
+  /usr/local/bin/docker-entrypoint.sh ix,
+  /app/entrypoint.sh ix,
+  /scripts/** ix,
   
   # /data directory listing only
   /data/ r,
