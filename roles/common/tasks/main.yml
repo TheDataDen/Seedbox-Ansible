@@ -56,7 +56,7 @@
     state: directory
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
-    mode: "0755"
+    mode: "0775"
   tags:
     - share
 
@@ -74,7 +74,7 @@
   ansible.builtin.file:
     path: "/shares/{{ downloaders.staging.share_name }}/{{ item }}"
     state: directory
-    mode: "0755"
+    mode: "0775"
   loop:
     - "{{ sabnzbd.sub_dir_name }}"
     - "{{ qbittorrent.sub_dir_name }}"
