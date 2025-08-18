@@ -164,7 +164,6 @@
 
     - name: Verify profile is loaded
       ansible.builtin.command: aa-status
-      
       register: aa_status
       changed_when: false
 
