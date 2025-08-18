@@ -1,0 +1,68 @@
+# AppArmor profile for docker-media-restrict restricted /data access
+# Simple approach: allow system operations, restrict only /data
+# 
+# To use this profile:
+# 1. Save as /etc/apparmor.d/docker-media
+# 2. Load with: sudo apparmor_parser -r /etc/apparmor.d/docker-media
+# 3. Apply to Docker containers with: --security-opt apparmor=docker-media
+
+profile docker-media-restict {
+  # Basic file operations
+  capability,
+  
+  # Network access
+  network inet,
+  network inet6,
+  
+  # Allow full access to all system directories (but not /data)
+  /bin/ r,
+  /bin/** rwlix,
+  /sbin/ r,
+  /sbin/** rwlix,
+  /usr/ r,
+  /usr/** rwlix,
+  /lib/ r,
+  /lib/** rwlix,
+  /lib64/ r,
+  /lib64/** rwlix,
+  /etc/ r,
+  /etc/** rwl,
+  /dev/ r,
+  /dev/** rwl,
+  /proc/ r,
+  /proc/** rwl,
+  /sys/ r,
+  /sys/** rwl,
+  /tmp/ r,
+  /tmp/** rwl,
+  /var/ r,
+  /var/** rwl,
+  /run/ r,
+  /run/** rwl,
+  /home/ r,
+  /home/** rwl,
+  /root/ r,
+  /root/** rwl,
+  /boot/ r,
+  /boot/** rwl,
+  /opt/ r,
+  /opt/** rwl,
+  /srv/ r,
+  /srv/** rwl,
+  /mnt/ r,
+  /mnt/** rwl,
+  /media/ r,
+  /media/** rwl,
+  /** m,
+  / r,
+  
+  # /data directory listing only
+  /data/ r,
+  
+  # Allow access ONLY to specified folders in /data
+{% for share in shares %}
+  /data/{{ share }}/ r,
+  /data/{{ share }}/** rwl,
+  /data/{{ share }}/** ix,
+{% endfor %}
+}

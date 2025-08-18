@@ -124,136 +124,6 @@
   tags:
     - docker
 
-- name: Enable Docker user namespace remapping (userns-remap)
-  become: true
-  tags:
-    - docker
-  block:
-    - name: Ensure remap user exists (system account, no home)
-      ansible.builtin.user:
-        name: "{{ docker_remap_user }}"
-        system: true
-        createhome: false
-        shell: /usr/sbin/nologin
-      register: remap_user_result
-
-    - name: Ensure /etc/subuid contains remap entry
-      ansible.builtin.lineinfile:
-        path: /etc/subuid
-        regexp: '^{{ docker_remap_user }}:'
-        line: '{{ docker_remap_user }}:{{ docker_subid_start }}:{{ docker_subid_count }}'
-        create: true
-        backup: true
-        mode: '0644'
-
-    - name: Ensure /etc/subgid contains remap entry
-      ansible.builtin.lineinfile:
-        path: /etc/subgid
-        regexp: '^{{ docker_remap_user }}:'
-        line: '{{ docker_remap_user }}:{{ docker_subid_start }}:{{ docker_subid_count }}'
-        create: true
-        backup: true
-        mode: '0644'
-
-    - name: Ensure daemon backup directory exists
-      ansible.builtin.file:
-        path: "{{ docker_daemon_backup_dir }}"
-        state: directory
-        mode: '0755'
-
-    - name: Stat daemon.json
-      ansible.builtin.stat:
-        path: "{{ docker_daemon_json_path }}"
-      register: daemon_json_stat
-
-    - name: Backup existing daemon.json if present
-      ansible.builtin.copy:
-        src: "{{ docker_daemon_json_path }}"
-        dest: "{{ docker_daemon_backup_dir }}/daemon.json.bak.{{ lookup('pipe', 'date +%s') }}"
-        remote_src: true
-        mode: '0644'
-      when: daemon_json_stat.stat.exists
-
-    - name: Read existing daemon.json (if present)
-      ansible.builtin.slurp:
-        path: "{{ docker_daemon_json_path }}"
-      register: daemon_json_slurp
-      when: daemon_json_stat.stat.exists
-
-    - name: Parse existing daemon.json to JSON (or fail if invalid)
-      vars:
-        raw: "{{ daemon_json_slurp.content | b64decode | default('{}') }}"
-      ansible.builtin.set_fact:
-        existing_daemon_json: "{{ raw | from_json }}"
-      when: daemon_json_stat.stat.exists
-      failed_when: existing_daemon_json is not defined
-      # If from_json fails (invalid JSON), this task will error out — safe guard.
-
-    - name: Prepare merged daemon.json dict (adds userns-remap if missing or different)
-      ansible.builtin.set_fact:
-        merged_daemon_json: >-
-          {{
-            (
-              existing_daemon_json
-              if (existing_daemon_json is defined) else {}
-            )
-            | combine({'userns-remap': docker_remap_user}, recursive=True)
-          }}
-
-    - name: Write merged daemon.json when needed
-      ansible.builtin.copy:
-        dest: "{{ docker_daemon_json_path }}"
-        content: "{{ merged_daemon_json | to_nice_json }}"
-        mode: '0644'
-      when:
-        - not daemon_json_stat.stat.exists or
-          (daemon_json_stat.stat.exists and (merged_daemon_json != (existing_daemon_json | default({}))))
-      notify: Restart docker
-
-    - name: Ensure daemon.json exists with userns-remap (create minimal if missing)
-      ansible.builtin.block:
-        - name: Create minimal daemon.json with userns-remap (if file missing)
-          ansible.builtin.copy:
-            dest: "{{ docker_daemon_json_path }}"
-            content: "{{ {'userns-remap': docker_remap_user} | to_nice_json }}"
-            mode: '0644'
-          when: not daemon_json_stat.stat.exists
-      when: daemon_json_stat is defined
-
-    - name: Ensure docker service is enabled and started
-      ansible.builtin.service:
-        name: docker
-        state: started
-        enabled: true
-
-    - name: Wait for Docker socket to be available
-      ansible.builtin.wait_for:
-        path: /var/run/docker.sock
-        state: present
-        timeout: 30
-
-    - name: Query Docker security options
-      ansible.builtin.command: docker info --format '{{ json.SecurityOptions }}'
-      register: docker_security
-      failed_when: false
-      changed_when: false
-
-    - name: Debug Docker security options
-      ansible.builtin.debug:
-        var: docker_security.stdout
-
-    - name: Check that userns remap appears in docker info (best effort)
-      ansible.builtin.assert:
-        that:
-          - >-
-            'userns' in (docker_security.stdout | default('')) or
-            'name=userns' in (docker_security.stdout | default('')) or
-            ('userns-remap' in (merged_daemon_json | default({})))
-        fail_msg: >
-          Docker user namespace remapping does not appear active after change.
-          Check /var/log/docker for errors and inspect {{ docker_daemon_json_path }}.
-
-
 - name: Create the dockers directory
   ansible.builtin.file:
     path: "/home/{{ docker_user }}/dockers"
@@ -263,3 +133,42 @@
     mode: "0755"
   tags:
     - docker
+
+- name: Setup AppArmor
+  tags: apparmor
+  handlers:
+    - name: reload apparmor
+      systemd:
+        name: apparmor
+        state: reloaded
+  block:
+    - name: Enable AppArmor
+      ansible.builtin.systemd:
+        name: apparmor
+        enabled: true
+        state: started
+
+    - name: Install AppArmor Profile
+      ansible.builtin.template:
+        src: docker-media-restrict.j2
+        dest: /etc/apparmor.d/docker-media-restrict
+        owner: root
+        group: root
+        mode: "0644"
+      notify:
+        - reload apparmor
+
+    - name: Load and enforce AppArmor profile
+      ansible.builtin.command: aa-enforce docker-media
+      register: aa_enforce_result
+      changed_when: aa_enforce_result.rc == 0
+      failed_when: aa_enforce_result.rc != 0
+
+    - name: Verify profile is loaded
+      ansible.builtin.command: aa-status
+      register: aa_status
+      changed_when: false
+
+    - name: Display AppArmor status
+      ansible.builtin.debug:
+        msg: "AppArmor docker-media profile status: {{ 'LOADED' if 'docker-media' in aa_status.stdout else 'NOT LOADED' }}"

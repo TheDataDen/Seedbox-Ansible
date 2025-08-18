@@ -9,7 +9,6 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
   - [Features](#features)
   - [Usage](#usage)
     - [General UNRAID Setup](#general-unraid-setup)
-      - [UNRAID Share Permissions](#unraid-share-permissions)
     - [UNRAID VM Setup](#unraid-vm-setup)
     - [Ansible Setup](#ansible-setup)
     - [Run the playbook](#run-the-playbook)
@@ -18,6 +17,7 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
     - [Logging Settings](#logging-settings)
     - [Container Settings](#container-settings)
     - [Downloader Settings](#downloader-settings)
+    - [Shares](#shares)
     - [Extras](#extras)
       - [MAM](#mam)
     - [Indiviual Container Settings](#indiviual-container-settings)
@@ -68,6 +68,7 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
 - Watchtower for automatically updating containers
 - Portainer for a gui for managing all of the containers
 - Optional feature to automatically update your VPN IP in your MAM account
+- AppArmor for restricting access to only the media shares
 
 ## Usage
 
@@ -83,181 +84,6 @@ There are really only two ways that I have seen people do this.
 >   - You should add a share called `Staging` and set it to only use your cache/buffer pool. This is the share that your downloads should be configured to use for their temporary storage while they are downloading. Their completed download location should be set to the `Downloads` share
 >   - All of the other media shares should be set to use only the array
 >   - This is because hardlinks only work when the files are on the same filesystem, they do not work between the array and the cache/buffer pool. This does mean that your write speeds will be slower but things will hardlink rather than copy (which uses more space)
-
-#### UNRAID Share Permissions
-Since all of the shares are going to be mounted to the VM and passed to the containers, you will want to make sure that there are permissions set up on UNRAID's end to only allow the seedbox to access what it needs to.
-
-The following comamnds need to executed on UNRAID! Open a terminal in the web gui.
-
-1. Created a group called `media` with the command `groupadd media`
-2. Set the group id of the media group to `1001` with the command `groupmod -g 1001 media`
-3. Added my user and root to the group with the command `usermod -a -G media root` and `usermod -a -G media <username>`
-4. Created a group called `private` with the command `groupadd private`
-5. Added my user and root to the group with the command `usermod -a -G private root` and `usermod -a -G private <username>`
-6. In the `User Scripts` plugin (install if you don't have it) create a script called `fixPermssions` with the following contents:
-```bash
-#!/bin/bash
-
-name=""
-puid="nobody"
-pgid=""
-dir_perms=""
-file_perms=""
-
-og="$puid:$pgid"
-
-touched_shares=()
-
-function checkAlreadyUpdated() {
-    local needle=$1
-
-    for item in "${touched_shares[@]}"; do
-        if [[ "$item" == "$needle" ]]; then
-            return 0   # true
-        fi
-    done
-    return 1   # false
-}
-
-function setDirPerms() {
-    directory=$1
-    
-    echo "[$name] Setting directory perms for $directory to $dir_perms..."
-    find "$directory" -type d -exec chmod $dir_perms {} +
-}
-
-function setFilePerms() {
-    directory=$1
-    
-    echo "[$name] Setting file perms for $directory to $file_perms..."
-    find "$directory" -type f -exec chmod $file_perms {} +
-}
-
-function setOwnerGroup() {
-    directory=$1
-    
-    echo "[$name] Setting owner:group for $directory to $og..."
-    chown -R $og "$directory"
-}
-
-function setPerms() {
-    setOwnerGroup "$1"
-
-    setDirPerms "$1"
-    
-    setFilePerms "$1"
-}
-
-function setSharePerms() {
-    directory=/mnt/user/$1
-    
-    if checkAlreadyUpdated "$1"; then
-        echo "Share $1 already had its perms set! Please remove the duplication!"
-    else
-        setPerms "$directory"
-        
-        touched_shares+=("$1")
-    fi
-}
-
-function setVars() {
-    name=$1
-    pgid=$2
-    dir_perms=$3
-    file_perms=$4
-    
-    og="$puid:$pgid"
-    
-    echo -e "\n"
-}
-
-function checkShares() {
-    for folder in /mnt/user/*/; do
-        folder_name=$(basename "$folder")
-        found=false
-    
-        # Check if the folder_name is in the touched_shares array
-        for item in "${touched_shares[@]}"; do
-            if [[ "$folder_name" == "$item" ]]; then
-                found=true
-                break
-            fi
-        done
-    
-        # If not found, report it
-        if [[ "$found" == false ]]; then
-            echo "Share '$folder_name' is not being updated, please edit the script and add the share"
-        fi
-    done
-}
-
-
-# Media Shares (special permissions)
-setVars "Media" "media" "775" "774"
-
-setSharePerms "movies"
-
-setSharePerms "movie_editions"
-
-setSharePerms "tv"
-
-setSharePerms "anime"
-
-setSharePerms "downloads"
-
-setSharePerms "staging"
-
-setSharePerms "audiobooks"
-
-setSharePerms "books"
-
-setSharePerms "podcasts"
-
-
-# Normal Shares (no special permissions)
-setVars "Normal" "users" "775" "774"
-
-setSharePerms "Games"
-
-setSharePerms "Manga"
-
-setSharePerms "Programming"
-
-
-# Public Shares (everyone can access)
-setVars "Public" "users" "777" "776"
-
-setSharePerms "guest"
-
-
-#Private Shares (only the private group can access)
-setVars "Private" "private" "770" "774"
-
-setSharePerms "Emails"
-
-setSharePerms "Important Files"
-
-
-#System Shares
-setVars "System" "users" "775" "664"
-
-setSharePerms "system"
-
-setSharePerms "appdata"
-
-setSharePerms "domains"
-
-
-checkShares
-
-echo "Done Setting Permissions!"
-```
-
-Make sure to set your share names in the `setSharePerms` function calls under the right section. You can also add more sections if you want to. There is a `setPerms` function that you can use to set the permissions for a directory rather than the whole share.
-
-The script will let you know if you are missing any shares as well as if you have duplicate shares.
-
-I have `User Scripts` set to run the `fixPermssions` script every hour which is probably overkill, but it ensure that nothing is setting the permissions to something that should not be.
 
 ### UNRAID VM Setup
 
@@ -311,14 +137,13 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 ### Miscellaneous Settings
 
-| Variable Name      | Required | Description                                                                                                                                                                                                            |
-| ------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `docker_user`      | Yes      | The user that you created on the Ubuntu VM                                                                                                                                                                             |
-| `host_ip`          | Yes      | The IP address of the VM.                                                                                                                                                                                              |
-| `timezone`         | Yes      | The Timezone that you are in                                                                                                                                                                                           |
-| `puid`             | Yes      | The UID of the user that will run the docker containers. (Probably doesn't need to be changed)                                                                                                                         |
-| `pgid`             | Yes      | The GID of the user that will run the docker containers. This needs to be set to the group id of the `media` group. The [instructions](#unraid-share-permissions) set it to `1001` unless you set it to something else |
-| `shares_mount_tag` | Yes      | The tag that will be used for the UNRAID shares when passed to VM.                                                                                                                                                     |
+| Variable Name | Required | Description                                                                                    |
+| ------------- | -------- | ---------------------------------------------------------------------------------------------- |
+| `docker_user` | Yes      | The user that you created on the Ubuntu VM                                                     |
+| `host_ip`     | Yes      | The IP address of the VM.                                                                      |
+| `timezone`    | Yes      | The Timezone that you are in                                                                   |
+| `puid`        | Yes      | The UID of the user that will run the docker containers. (Probably doesn't need to be changed) |
+| `pgid`        | Yes      | The GID of the user that will run the docker containers. (Probably doesn't need to be changed) |
 
 ### Logging Settings
 
@@ -362,6 +187,13 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | -------------------------------- | -------- | ----------------------------------------------------------------- |
 | `downloaders.staging.enabled`    | Yes      | Enable/Disable the staging share                                  |
 | `downloaders.staging.share_name` | Yes      | The name of the share that will be used for the staging downloads |
+
+### Shares
+
+| Variable Name      | Required | Description                                                                                                                                         |
+| ------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `shares.mount_tag` | Yes      | The tag that will be used for the UNRAID shares when passed to VM.                                                                                  |
+| `shares.names`     | Yes      | A list of your media share names. Make sure in to include staging if you are using it. All other shares will be restricted access in the containers |
 
 ### Extras
 
@@ -606,7 +438,9 @@ Below is a list of all of the containers that are available to be enabled/disabl
 
 ## Post-Installation Configuration
 
-All instances of Sonarr and Radarr should be configured under `Media Management` to set the file perms to `774` and the group to `1001`.
+All instances of Sonarr and Radarr should be configured under `Media Management` to set the file perms to `774` and the group to `100`.
+
+Sabnzbd should be configured to set the perms to `774`.
 
 ## Disclaimer
 

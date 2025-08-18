@@ -6,7 +6,7 @@ docker_directory_name: seedbox
 host_ip: REPLACEME
 timezone: America/New_York
 puid: 1000
-pgid: 1001
+pgid: 1000
 shares_mount_tag: Shares
 
 logging:
@@ -49,6 +49,19 @@ downloaders:
     enabled: true
     share_name: staging
 
+shares:
+  mount_tag: Shares
+  names:
+    - anime
+    - audiobooks
+    - books
+    - downloads
+    - staging
+    - movies
+    - movie_editions
+    - tv
+    - podcasts
+
 extras:
   # If you use MAM as one of your trackers and use the pia container. Runs a script that sets your IP in your MAM account when the VPN connects
   mam:
@@ -70,10 +83,6 @@ pia_vpn:
   port_persist: false
 
 cleanuparr:
-  # The name of the share that will be mounted to the container, the dir_name will be used on the container side
-  mounts:
-    - Downloads
-
   # Change to false after you confirm that the setup is correct
   dry_run: true
   ignored:
