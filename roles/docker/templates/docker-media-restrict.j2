@@ -7,25 +7,17 @@
 # 3. Apply to Docker containers with: --security-opt apparmor=docker-media
 
 profile docker-media-restrict {
-# Basic file operations
+  # All capabilities
   capability,
   
-  # Signal and process control for Docker
+  # All network access
+  network,
+  
+  # Signal and process control
   signal,
   ptrace,
   
-  # Additional capabilities for network tools
-  capability net_raw,
-  capability setuid,
-  capability setgid,
-  
-  # Network access
-  network inet,
-  network inet6,
-  network netlink,
-  network packet,
-  
-  # Allow full access to all system directories (but not /data)
+  # Allow all system directories (everything except /data)
   /bin/ r,
   /bin/** rwlix,
   /sbin/ r,
@@ -38,24 +30,12 @@ profile docker-media-restrict {
   /lib64/** rwlix,
   /etc/ r,
   /etc/** rwl,
-  
-  # DNS and SSL/TLS support for curl/wget
-  /etc/resolv.conf r,
-  /etc/hosts r,
-  /etc/nsswitch.conf r,
-  /etc/ssl/** r,
-  /usr/share/ca-certificates/** r,
-  /etc/ca-certificates/** r,
   /dev/ r,
   /dev/** rwl,
   /proc/ r,
   /proc/** rwl,
   /sys/ r,
   /sys/** rwl,
-  
-  # Network configuration
-  /proc/sys/net/** r,
-  /sys/class/net/** r,
   /tmp/ r,
   /tmp/** rwl,
   /var/ r,
@@ -76,24 +56,39 @@ profile docker-media-restrict {
   /mnt/** rwl,
   /media/ r,
   /media/** rwl,
+  
+  # Memory mapping and root directory
   /** m,
   / r,
-
+  
+  # Additional top-level paths commonly used by containers
+  /app/ r,
+  /app/** rwl,
+  /config/ r,
+  /config/** rwl,
+  /logs/ r,
+  /logs/** rwl,
+  /work/ r,
+  /work/** rwl,
+  /workspace/ r,
+  /workspace/** rwl,
+  
   # Init system support
   /init ix,
-  /sbin/init ix,
-  /usr/bin/init ix,
   /tini ix,
-  /usr/bin/tini ix,
-  /s6-overlay/** ix,
-
-  # Container entrypoint scripts
   /entrypoint.sh ix,
   /docker-entrypoint.sh ix,
   /usr/local/bin/entrypoint.sh ix,
   /usr/local/bin/docker-entrypoint.sh ix,
   /app/entrypoint.sh ix,
   /scripts/** ix,
+  
+  # Additional common container patterns
+  /docker-entrypoint-initdb.d/** ix,
+  
+  # Docker socket access
+  /var/run/docker.sock rw,
+  /run/docker.sock rw,
   
   # /data directory listing only
   /data/ r,
