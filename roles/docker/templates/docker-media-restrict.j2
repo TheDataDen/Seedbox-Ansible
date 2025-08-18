@@ -78,6 +78,14 @@ profile docker-media-restrict {
   /media/** rwl,
   /** m,
   / r,
+
+  # Init system support
+  /init ix,
+  /sbin/init ix,
+  /usr/bin/init ix,
+  /tini ix,
+  /usr/bin/tini ix,
+  /s6-overlay/** ix,
   
   # /data directory listing only
   /data/ r,
