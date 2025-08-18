@@ -136,6 +136,7 @@
 
 - name: Setup AppArmor
   tags: apparmor
+  when: shares.enable_apparmor
   block:
     - name: Enable AppArmor
       ansible.builtin.systemd:

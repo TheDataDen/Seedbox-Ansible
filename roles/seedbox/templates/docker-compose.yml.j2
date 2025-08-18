@@ -121,8 +121,10 @@ services:
     container_name: cleanuparr
     restart: unless-stopped
     logging: *default-logging
+{% if shares.enable_apparmor %}
     security_opt:
       - apparmor=docker-media-restrict
+{% endif %}
     volumes:
       - /shares:/data
       - ./cleanuparr/ignored.txt:/ignored.txt
@@ -258,8 +260,10 @@ services:
     container_name: radarr
     restart: unless-stopped
     logging: *default-logging
+{% if shares.enable_apparmor %}
     security_opt:
       - apparmor=docker-media-restrict
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -305,8 +309,10 @@ services:
     container_name: radarr_2
     restart: unless-stopped
     logging: *default-logging
+{% if shares.enable_apparmor %}
     security_opt:
       - apparmor=docker-media-restrict
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -352,8 +358,10 @@ services:
     container_name: sonarr
     restart: unless-stopped
     logging: *default-logging
+{% if shares.enable_apparmor %}
     security_opt:
       - apparmor=docker-media-restrict
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -399,8 +407,10 @@ services:
     container_name: sonarr_2
     restart: unless-stopped
     logging: *default-logging
+{% if shares.enable_apparmor %}
     security_opt:
       - apparmor=docker-media-restrict
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -633,8 +643,10 @@ services:
     container_name: readarr_audiobooks
     restart: unless-stopped
     logging: *default-logging
+{% if shares.enable_apparmor %}
     security_opt:
       - apparmor=docker-media-restrict
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -680,8 +692,10 @@ services:
     container_name: readarr_ebooks
     restart: unless-stopped
     logging: *default-logging
+{% if shares.enable_apparmor %}
     security_opt:
       - apparmor=docker-media-restrict
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -727,8 +741,10 @@ services:
     container_name: lazylibrarian
     restart: unless-stopped
     logging: *default-logging
+{% if shares.enable_apparmor %}
     security_opt:
       - apparmor=docker-media-restrict
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -812,8 +828,10 @@ services:
     container_name: bazarr
     restart: unless-stopped
     logging: *default-logging
+{% if shares.enable_apparmor %}
     security_opt:
       - apparmor=docker-media-restrict
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -869,8 +887,10 @@ services:
     tmpfs:
       - /tmp
     tty: true
+{% if shares.enable_apparmor %}
     security_opt:
       - apparmor=docker-media-restrict
+{% endif %}
     volumes:
       - ./qbittorrent/config:/config
       - /shares:/data
@@ -935,8 +955,10 @@ services:
     container_name: sabnzbd
     restart: unless-stopped
     logging: *default-logging
+{% if shares.enable_apparmor %}
     security_opt:
       - apparmor=docker-media-restrict
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}

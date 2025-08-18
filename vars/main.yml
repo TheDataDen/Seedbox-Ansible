@@ -50,6 +50,7 @@ downloaders:
 
 shares:
   mount_tag: Shares
+  enable_apparmor: true
   names:
     - anime
     - audiobooks
