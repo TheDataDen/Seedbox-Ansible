@@ -7,16 +7,23 @@
 # 3. Apply to Docker containers with: --security-opt apparmor=docker-media
 
 profile docker-media-restrict {
-  # Basic file operations
+# Basic file operations
   capability,
-
+  
   # Signal and process control for Docker
   signal,
   ptrace,
   
+  # Additional capabilities for network tools
+  capability net_raw,
+  capability setuid,
+  capability setgid,
+  
   # Network access
   network inet,
   network inet6,
+  network netlink,
+  network packet,
   
   # Allow full access to all system directories (but not /data)
   /bin/ r,
@@ -31,12 +38,24 @@ profile docker-media-restrict {
   /lib64/** rwlix,
   /etc/ r,
   /etc/** rwl,
+  
+  # DNS and SSL/TLS support for curl/wget
+  /etc/resolv.conf r,
+  /etc/hosts r,
+  /etc/nsswitch.conf r,
+  /etc/ssl/** r,
+  /usr/share/ca-certificates/** r,
+  /etc/ca-certificates/** r,
   /dev/ r,
   /dev/** rwl,
   /proc/ r,
   /proc/** rwl,
   /sys/ r,
   /sys/** rwl,
+  
+  # Network configuration
+  /proc/sys/net/** r,
+  /sys/class/net/** r,
   /tmp/ r,
   /tmp/** rwl,
   /var/ r,
