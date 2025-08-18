@@ -9,6 +9,10 @@
 profile docker-media-restict {
   # Basic file operations
   capability,
+
+  # Signal and process control for Docker
+  signal,
+  ptrace,
   
   # Network access
   network inet,
