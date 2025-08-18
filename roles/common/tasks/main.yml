@@ -63,7 +63,7 @@
 - name: Mount UNRAID shares
   ansible.posix.mount:
     path: "/shares"
-    src: "{{ shares_mount_tag }}"
+    src: "{{ shares.mount_tag }}"
     fstype: virtiofs
     state: mounted
   become: true
