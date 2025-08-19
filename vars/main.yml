@@ -50,7 +50,7 @@ downloaders:
 
 shares:
   mount_tag: Shares
-  enable_apparmor: true
+  enable_selinux: true
   names:
     - anime
     - audiobooks
@@ -78,7 +78,7 @@ pia_vpn:
   # Comment out if using Dedicated IP
   server_loc: ca_ontario
   # Comment out if not using Dedicated IP
-  #dip_token: REPLACEME
+  # dip_token: REPLACEME
   port_fatal: true
   port_persist: false
 

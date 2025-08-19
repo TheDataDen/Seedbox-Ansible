@@ -1,0 +1,2 @@
+docker_scanner_script_path: /usr/local/bin/selinux-media-scanner
+docker_scanner_log_file: /var/log/selinux-media-scanner.log

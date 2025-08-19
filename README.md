@@ -9,6 +9,7 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
   - [Features](#features)
   - [Usage](#usage)
     - [General UNRAID Setup](#general-unraid-setup)
+      - [UNRAID Permissions](#unraid-permissions)
     - [UNRAID VM Setup](#unraid-vm-setup)
     - [Ansible Setup](#ansible-setup)
     - [Run the playbook](#run-the-playbook)
@@ -68,7 +69,7 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
 - Watchtower for automatically updating containers
 - Portainer for a gui for managing all of the containers
 - Optional feature to automatically update your VPN IP in your MAM account
-- AppArmor for restricting access to only the media shares
+- SELinux for restricting access to only the media shares
 
 ## Usage
 
@@ -84,6 +85,129 @@ There are really only two ways that I have seen people do this.
 >   - You should add a share called `Staging` and set it to only use your cache/buffer pool. This is the share that your downloads should be configured to use for their temporary storage while they are downloading. Their completed download location should be set to the `Downloads` share
 >   - All of the other media shares should be set to use only the array
 >   - This is because hardlinks only work when the files are on the same filesystem, they do not work between the array and the cache/buffer pool. This does mean that your write speeds will be slower but things will hardlink rather than copy (which uses more space)
+
+#### UNRAID Permissions
+
+I have the `User Scripts` plugin installed in UNRAID running the following script hourly. This ensures that there are no permission issues with the media files.
+
+I know that this not "best practice" but it works for me.
+
+The script is a bit overengineered but it allows me to quickly change permissions of my shares if I need to. It sets all of the media shares to `777` and has the option to set the rest of the shares to `775`/`774` if you need to.
+
+```bash
+#!/bin/bash
+
+name=""
+puid="nobody"
+pgid=""
+dir_perms=""
+file_perms=""
+
+og="$puid:$pgid"
+
+updated_shares=()
+
+function isShareUpdated() {
+    local share
+    for share in "${updated_shares[@]}"; do
+        [[ "$share" == "$1" ]] && return 0
+    done
+    return 1
+}
+
+function setDirPerms() {
+    directory=$1
+    
+    echo "[$name] Setting directory perms for $directory to $dir_perms..."
+    find "$directory" -type d -exec chmod $dir_perms {} +
+}
+
+function setFilePerms() {
+    directory=$1
+    
+    echo "[$name] Setting file perms for $directory to $file_perms..."
+    find "$directory" -type f -exec chmod $file_perms {} +
+}
+
+function setOwnerGroup() {
+    directory=$1
+    
+    echo "[$name] Setting owner:group for $directory to $og..."
+    chown -R $og "$directory"
+}
+
+function setBothPerms() {
+    directory=$1
+    
+    echo "[$name] Setting perms for $directory to $dir_perms..."
+    chmod -R $dir_perms "$directory"
+}
+
+function setPerms() {
+    setOwnerGroup "$1"
+    
+    if [ "$dir_perms" == "$file_perms" ]; then
+        setBothPerms "$1"
+    else
+        setDirPerms "$1"
+    
+        setFilePerms "$1"
+    fi
+}
+
+function setSharePerms() {
+    directory=/mnt/user/$1
+    
+    if isShareUpdated "$1"; then
+        echo "Share $1 has already been updated!! Remove the the duplicate from the script"
+    else
+        updated_shares+=("$1")
+    
+        setPerms "$directory"
+    fi
+}
+
+function setVars() {
+    name=$1
+    pgid=$2
+    dir_perms=$3
+    file_perms=$4
+    
+    og="$puid:$pgid"
+    
+    echo -e "\n"
+}
+
+function updateAllRemainingShares() {
+    for folder in /mnt/user/*/; do
+        folder_name=$(basename "$folder")
+        
+        if ! isShareUpdated "$1"; then
+            setSharePerms "$folder_name"
+        fi
+    done
+}
+
+# Media Shares
+setVars "Media" "users" "777" "777"
+
+setSharePerms "movies"
+setSharePerms "movie_editions"
+setSharePerms "tv"
+setSharePerms "anime"
+setSharePerms "downloads"
+setSharePerms "staging"
+setSharePerms "audiobooks"
+setSharePerms "books"
+setSharePerms "podcasts"
+
+
+# Defaults
+# setVars "Share" "users" "775" "774"
+# updateAllShares
+
+echo "Done Setting Permissions!"
+```
 
 ### UNRAID VM Setup
 
@@ -128,6 +252,11 @@ To re-attach to the tmux session run the following script: `./attach.sh`
 
 > [!NOTE]
 > The Create Seedbox Docker stack step may look like it is hanging. This is because the docker images need to be downloaded. If you are on a slow internet connection, this may take a while.
+>
+> If it hangs on `Gathering Facts` then you most likely entered your password incorrectly. Ctrl+C to exit and try again.
+
+> [!IMPORTANT]
+> If you are running this for the first time, or don't have SELinux installed/enabled, the playbook will trigger a reboot. The playbook will automatically start continuing after the reboot. To check the status of the run, run the `attach.sh` script.
 
 ## Configuration
 
@@ -190,10 +319,11 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 ### Shares
 
-| Variable Name      | Required | Description                                                                                                                                         |
-| ------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `shares.mount_tag` | Yes      | The tag that will be used for the UNRAID shares when passed to VM.                                                                                  |
-| `shares.names`     | Yes      | A list of your media share names. Make sure in to include staging if you are using it. All other shares will be restricted access in the containers |
+| Variable Name           | Required | Description                                                                                                                                         |
+| ----------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `shares.mount_tag`      | Yes      | The tag that will be used for the UNRAID shares when passed to VM.                                                                                  |
+| `shares.enable_selinux` | Yes      | Enable/Disable SELinux for the shares. If enabled, the containers will only have access to the shares that are listed in `shares.names`             |
+| `shares.names`          | Yes      | A list of your media share names. Make sure in to include staging if you are using it. All other shares will be restricted access in the containers |
 
 ### Extras
 

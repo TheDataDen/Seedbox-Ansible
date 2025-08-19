@@ -1,0 +1,115 @@
+---
+- name: Check current SELinux status
+  ansible.builtin.command: sestatus
+  register: selinux_check
+  failed_when: false
+  changed_when: false
+
+- name: Parse SELinux status
+  ansible.builtin.set_fact:
+    selinux_available: "{{ selinux_check.rc == 0 }}"
+    selinux_status: "{{ selinux_check.stdout | regex_search('SELinux status:\\s*(\\w+)', '\\1') | first if selinux_check.rc == 0 else 'unavailable' }}"
+    selinux_mode: "{{ selinux_check.stdout | regex_search('Current mode:\\s*(\\w+)', '\\1') | first if selinux_check.rc == 0 else 'unavailable' }}"
+
+- name: Display current SELinux status
+  ansible.builtin.debug:
+    msg: "SELinux Status: {{ selinux_status }}, Mode: {{ selinux_mode }}"
+
+- name: Install SELinux packages
+  ansible.builtin.apt:
+    name:
+      - selinux-utils
+      - policycoreutils
+      - selinux-policy-dev
+      - auditd
+    state: present
+    update_cache: true
+
+- name: Check if SELinux activation is needed
+  ansible.builtin.set_fact:
+    selinux_needs_activation: "{{ not selinux_available or selinux_status == 'disabled' }}"
+
+- name: Activate SELinux (requires reboot)
+  ansible.builtin.command: selinux-activate
+  when: selinux_needs_activation
+  register: selinux_activated
+  changed_when: selinux_activated.rc == 0
+
+- name: Enable and start auditd service
+  ansible.builtin.systemd:
+    name: auditd
+    enabled: true
+    state: started
+
+- name: Reboot system after SELinux activation # noqa no-handler
+  ansible.builtin.reboot:
+    reboot_timeout: 300
+    connect_timeout: 60
+    test_command: sestatus
+  when: selinux_activated is changed
+
+- name: Verify SELinux is properly enabled
+  ansible.builtin.command: sestatus
+  register: selinux_final_status
+  changed_when: false
+
+- name: Display final SELinux status
+  ansible.builtin.debug:
+    msg: "{{ selinux_final_status.stdout_lines }}"
+
+- name: Parse current SELinux mode
+  ansible.builtin.set_fact:
+    current_selinux_mode: "{{ selinux_final_status.stdout | regex_search('Current mode:\\s*(\\w+)', '\\1') | first | default('unknown') }}"
+
+- name: Set SELinux to permissive mode if needed
+  ansible.builtin.command: setenforce 0
+  when: current_selinux_mode != "permissive"
+  register: selinux_mode_change
+  failed_when: false
+  changed_when: selinux_mode_change.rc == 0
+
+- name: Create SELinux media scanner script from template
+  ansible.builtin.template:
+    src: selinux-media-scanner.sh.j2
+    dest: "{{ docker_scanner_script_path }}"
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Create scanner log file
+  ansible.builtin.file:
+    path: "{{ docker_scanner_log_file }}"
+    state: touch
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Setup hourly cron job for SELinux scanner
+  ansible.builtin.cron:
+    name: "SELinux Media Directory Scanner"
+    minute: "0"
+    job: "{{ docker_scanner_script_path }} scan"
+    user: root
+
+- name: Run initial SELinux media directory scan
+  ansible.builtin.command: "{{ docker_scanner_script_path }} scan"
+  register: initial_scan
+  failed_when: false
+  changed_when: "'Made 0 changes' not in initial_scan.stdout"
+
+- name: Display initial scan results
+  ansible.builtin.debug:
+    var: initial_scan.stdout_lines
+  when: initial_scan.stdout_lines is defined
+
+- name: Check Docker SELinux integration
+  ansible.builtin.shell: |
+    set -o pipefail
+    docker info 2>/dev/null | grep -i selinux || echo "Docker not found or no SELinux support"
+  register: docker_selinux_check
+  changed_when: false
+  failed_when: false
+
+- name: Display Docker SELinux status
+  ansible.builtin.debug:
+    msg: "Docker SELinux status: {{ docker_selinux_check.stdout }}"

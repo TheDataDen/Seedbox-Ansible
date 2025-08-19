@@ -134,40 +134,8 @@
   tags:
     - docker
 
-- name: Setup AppArmor
-  tags: apparmor
-  when: shares.enable_apparmor
-  block:
-    - name: Enable AppArmor
-      ansible.builtin.systemd:
-        name: apparmor
-        enabled: true
-        state: started
-
-    - name: Install AppArmor Profile
-      ansible.builtin.template:
-        src: docker-media-restrict.j2
-        dest: /etc/apparmor.d/docker-media-restrict
-        owner: root
-        group: root
-        mode: "0644"
-
-    - name: Restart AppArmor
-      ansible.builtin.service:
-        name: apparmor
-        state: restarted
-
-    - name: Load and enforce AppArmor profile
-      ansible.builtin.command: aa-enforce docker-media
-      register: aa_enforce_result
-      changed_when: aa_enforce_result.rc == 0
-      failed_when: aa_enforce_result.rc != 0
-
-    - name: Verify profile is loaded
-      ansible.builtin.command: aa-status
-      register: aa_status
-      changed_when: false
-
-    - name: Display AppArmor status
-      ansible.builtin.debug:
-        msg: "AppArmor docker-media-restrict profile status: {{ 'LOADED' if 'docker-media-restrict' in aa_status.stdout else 'NOT LOADED' }}"
+- name: Setup SELinux
+  tags: selinux
+  when: shares.enable_selinux
+  ansible.builtin.include_tasks:
+    file: setupSELinux.yml

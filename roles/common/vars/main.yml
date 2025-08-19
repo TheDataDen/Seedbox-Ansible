@@ -4,6 +4,3 @@ common_packages:
   - git
   - htop
   - openssh-server
-  - apparmor
-  - apparmor-utils
-  - apparmor-profiles

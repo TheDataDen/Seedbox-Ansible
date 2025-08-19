@@ -121,12 +121,12 @@ services:
     container_name: cleanuparr
     restart: unless-stopped
     logging: *default-logging
-{% if shares.enable_apparmor %}
+{% if shares.enable_selinux %}
     security_opt:
-      - apparmor=docker-media-restrict
+      - label=type:container_t
 {% endif %}
     volumes:
-      - /shares:/data
+      - /shares:/data:z
       - ./cleanuparr/ignored.txt:/ignored.txt
     environment:
       - PUID={{ puid }}
@@ -260,9 +260,9 @@ services:
     container_name: radarr
     restart: unless-stopped
     logging: *default-logging
-{% if shares.enable_apparmor %}
+{% if shares.enable_selinux %}
     security_opt:
-      - apparmor=docker-media-restrict
+      - label=type:container_t
 {% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
@@ -274,7 +274,7 @@ services:
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
       - ./radarr/config:/config
-      - /shares:/data
+      - /shares:/data:z
 {% if not containers.pia_vpn %}
     ports:
       - {{ radarr.port }}:7878
@@ -309,9 +309,9 @@ services:
     container_name: radarr_2
     restart: unless-stopped
     logging: *default-logging
-{% if shares.enable_apparmor %}
+{% if shares.enable_selinux %}
     security_opt:
-      - apparmor=docker-media-restrict
+      - label=type:container_t
 {% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
@@ -323,7 +323,7 @@ services:
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
       - ./radarr_2/config:/config
-      - /shares:/data
+      - /shares:/data:z
 {% if not containers.pia_vpn %}
     ports:
       - {{ radarr_2.port }}:7878
@@ -358,9 +358,9 @@ services:
     container_name: sonarr
     restart: unless-stopped
     logging: *default-logging
-{% if shares.enable_apparmor %}
+{% if shares.enable_selinux %}
     security_opt:
-      - apparmor=docker-media-restrict
+      - label=type:container_t
 {% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
@@ -372,7 +372,7 @@ services:
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
       - ./sonarr/config:/config
-      - /shares:/data
+      - /shares:/data:z
 {% if not containers.pia_vpn %}
     ports:
       - {{ sonarr.port }}:8989
@@ -407,9 +407,9 @@ services:
     container_name: sonarr_2
     restart: unless-stopped
     logging: *default-logging
-{% if shares.enable_apparmor %}
+{% if shares.enable_selinux %}
     security_opt:
-      - apparmor=docker-media-restrict
+      - label=type:container_t
 {% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
@@ -421,7 +421,7 @@ services:
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
       - ./sonarr_2/config:/config
-      - /shares:/data
+      - /shares:/data:z
 {% if not containers.pia_vpn %}
     ports:
       - {{ sonarr_2.port }}:8989
@@ -643,9 +643,9 @@ services:
     container_name: readarr_audiobooks
     restart: unless-stopped
     logging: *default-logging
-{% if shares.enable_apparmor %}
+{% if shares.enable_selinux %}
     security_opt:
-      - apparmor=docker-media-restrict
+      - label=type:container_t
 {% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
@@ -657,7 +657,7 @@ services:
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
       - ./readarr_audiobooks/config:/config
-      - /shares:/data
+      - /shares:/data:z
 {% if not containers.pia_vpn %}
     ports:
       - {{ readarr_audiobooks.port }}:8787
@@ -692,9 +692,9 @@ services:
     container_name: readarr_ebooks
     restart: unless-stopped
     logging: *default-logging
-{% if shares.enable_apparmor %}
+{% if shares.enable_selinux %}
     security_opt:
-      - apparmor=docker-media-restrict
+      - label=type:container_t
 {% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
@@ -706,7 +706,7 @@ services:
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
       - ./readarr_ebooks/config:/config
-      - /shares:/data
+      - /shares:/data:z
 {% if not containers.pia_vpn %}
     ports:
       - {{ readarr_ebooks.port }}:8787      
@@ -741,9 +741,9 @@ services:
     container_name: lazylibrarian
     restart: unless-stopped
     logging: *default-logging
-{% if shares.enable_apparmor %}
+{% if shares.enable_selinux %}
     security_opt:
-      - apparmor=docker-media-restrict
+      - label=type:container_t
 {% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
@@ -757,7 +757,7 @@ services:
 {% endif %}
     volumes:
       - ./lazylibrarian/config:/config
-      - /shares:/data
+      - /shares:/data:z
 {% if not containers.pia_vpn %}
     ports:
       - {{ lazylibrarian.port }}:5299
@@ -828,9 +828,9 @@ services:
     container_name: bazarr
     restart: unless-stopped
     logging: *default-logging
-{% if shares.enable_apparmor %}
+{% if shares.enable_selinux %}
     security_opt:
-      - apparmor=docker-media-restrict
+      - label=type:container_t
 {% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
@@ -841,7 +841,7 @@ services:
       - TZ={{ timezone }}
     volumes:
       - ./bazarr/config:/config
-      - /shares:/data
+      - /shares:/data:z
 {% if not containers.pia_vpn %}
     ports:
       - {{ bazarr.port }}:6767
@@ -887,13 +887,13 @@ services:
     tmpfs:
       - /tmp
     tty: true
-{% if shares.enable_apparmor %}
+{% if shares.enable_selinux %}
     security_opt:
-      - apparmor=docker-media-restrict
+      - label=type:container_t
 {% endif %}
     volumes:
       - ./qbittorrent/config:/config
-      - /shares:/data
+      - /shares:/data:z
 {% if not containers.pia_vpn %}
     ports:
       - {{ qbittorrent.port }}:{{ qbittorrent.port }}
@@ -955,9 +955,9 @@ services:
     container_name: sabnzbd
     restart: unless-stopped
     logging: *default-logging
-{% if shares.enable_apparmor %}
+{% if shares.enable_selinux %}
     security_opt:
-      - apparmor=docker-media-restrict
+      - label=type:container_t
 {% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
@@ -968,7 +968,7 @@ services:
       - TZ={{ timezone }}
     volumes:
       - ./sabnzbd/config:/config
-      - /shares:/data
+      - /shares:/data:z
 {% if not containers.pia_vpn %}
     ports:
       - {{ sabnzbd.port }}:8080
