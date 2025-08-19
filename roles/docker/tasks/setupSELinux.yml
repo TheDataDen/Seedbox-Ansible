@@ -131,7 +131,7 @@
 
 - name: Reboot system after SELinux activation # noqa no-handler
   ansible.builtin.reboot:
-    reboot_timeout: 300
+    reboot_timeout: 600
     connect_timeout: 60
     test_command: sestatus
   when: >-
