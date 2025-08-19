@@ -6,7 +6,7 @@ docker_directory_name: seedbox
 host_ip: REPLACEME
 timezone: America/New_York
 puid: 1000
-pgid: 1000
+pgid: 100
 
 logging:
   driver: local
@@ -50,17 +50,6 @@ downloaders:
 
 shares:
   mount_tag: Shares
-  enable_selinux: true
-  names:
-    - anime
-    - audiobooks
-    - books
-    - downloads
-    - staging
-    - movies
-    - movie_editions
-    - tv
-    - podcasts
 
 extras:
   # If you use MAM as one of your trackers and use the pia container. Runs a script that sets your IP in your MAM account when the VPN connects

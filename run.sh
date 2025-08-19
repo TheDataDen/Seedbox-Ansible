@@ -8,9 +8,6 @@ echo "PRESS ENTER TO IF YOU ARE READY TO RUN THE PLAYBOOK OTHERWISE PRESS CTRL+C
 read
 
 PLAYBOOK_CMD="ansible-playbook playbook.yml -vvv"
-SESSION_NAME="Seedbox-Ansible"
-FLAG_FILE="/tmp/ansible-running.flag"
-LOG_FILE="/tmp/ansible-run.log"
 
 APT_UPDATED=false
 
@@ -44,30 +41,14 @@ set -g default-terminal "screen-256color"
 set -g history-limit 10000
 EOF
 
-# Create flag file to indicate playbook is running
-echo "Ansible playbook started at $(date)" > "$FLAG_FILE"
-
-# Clean up any existing log file
-> "$LOG_FILE"
-
+SESSION_NAME="Seedbox-Ansible"
 
 tmux new-session -d -s "$SESSION_NAME" "
-echo 'Starting Ansible playbook...' | tee -a '$LOG_FILE';
-  echo 'Log file: $LOG_FILE' | tee -a '$LOG_FILE';
-  echo '========================' | tee -a '$LOG_FILE';
-  
-  $PLAYBOOK_CMD 2>&1 | tee -a '$LOG_FILE';
-  
-  # Capture exit code
-  EXIT_CODE=\${PIPESTATUS[0]};
-  
-  # Clean up flag file
-  rm -f '$FLAG_FILE';
-  
-  if [ \$EXIT_CODE -eq 0 ]; then
-    echo 'Playbook completed successfully. Press Enter to exit.' | tee -a '$LOG_FILE';
+  $PLAYBOOK_CMD;
+  if [ \$? -eq 0 ]; then
+    echo 'Playbook completed successfully. Press Enter to exit.';
   else
-    echo 'Playbook failed. Check the above output for errors. Make sure to check the vars/main.yml for any typos. If you are still receiving the error create a new issue on the Github repo. Press Enter to exit.' | tee -a '$LOG_FILE';
+    echo 'Playbook failed. Check the above output for errors. Make sure to check the vars/main.yml for any typos. If you are still receiving the error create a new issue on the Github repo. Press Enter to exit.';
   fi
   read
 "

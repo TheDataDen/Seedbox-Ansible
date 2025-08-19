@@ -133,9 +133,3 @@
     mode: "0755"
   tags:
     - docker
-
-- name: Setup SELinux
-  tags: selinux
-  when: shares.enable_selinux
-  ansible.builtin.include_tasks:
-    file: setupSELinux.yml

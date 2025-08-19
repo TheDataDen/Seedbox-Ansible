@@ -69,7 +69,6 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
 - Watchtower for automatically updating containers
 - Portainer for a gui for managing all of the containers
 - Optional feature to automatically update your VPN IP in your MAM account
-- SELinux for restricting access to only the media shares
 
 ## Usage
 
@@ -215,7 +214,7 @@ echo "Done Setting Permissions!"
 2. Give it a name, assign the logical CPUs (Id recommend atleast 4 if have the resources), and assign the memory (4GB probably would be enough but I recommend 8GB)
 3. Select the OS iso from the list. If you don't have any isos in the list, you will need to download one and add it to the isos share
 4. For the vdisk, select `Auto` and then specify the size of the vdisk (I recommend at least 50GB)
-5. Add a Manual Share with the source path of `/mnt/user` and a mount tag of something like `Shares`. Rememeber what you set the mount tag to, you will need it later.
+5. Add a Manual Share with the source path of `/mnt/user` (`mnt/user/media` if its all under a single share) and a mount tag of something like `Shares`. Rememeber what you set the mount tag to, you will need it later.
    - Make sure to set the mode to `virtiofs` (9p is the default but virtiofs is better)
 6. Turn on `VM Console enable Copy/paste` this will make it a lot easier for filling in some of the settings
 7. Create the VM and go through the Ubuntu install process (I recommend using the default settings)
@@ -258,9 +257,6 @@ To re-attach to the tmux session run the following script: `./attach.sh`
 > The Create Seedbox Docker stack step may look like it is hanging. This is because the docker images need to be downloaded. If you are on a slow internet connection, this may take a while.
 >
 > If it hangs on `Gathering Facts` then you most likely entered your password incorrectly. Ctrl+C to exit and try again.
-
-> [!IMPORTANT]
-> If you are running this for the first time, or don't have SELinux installed/enabled, the playbook will trigger a reboot. The playbook will automatically start continuing after the reboot. To check the status of the run, run the `attach.sh` script.
 
 ## Configuration
 
@@ -323,11 +319,9 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 ### Shares
 
-| Variable Name           | Required | Description                                                                                                                                         |
-| ----------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `shares.mount_tag`      | Yes      | The tag that will be used for the UNRAID shares when passed to VM.                                                                                  |
-| `shares.enable_selinux` | Yes      | Enable/Disable SELinux for the shares. If enabled, the containers will only have access to the shares that are listed in `shares.names`             |
-| `shares.names`          | Yes      | A list of your media share names. Make sure in to include staging if you are using it. All other shares will be restricted access in the containers |
+| Variable Name      | Required | Description                                                        |
+| ------------------ | -------- | ------------------------------------------------------------------ |
+| `shares.mount_tag` | Yes      | The tag that will be used for the UNRAID shares when passed to VM. |
 
 ### Extras
 
@@ -572,9 +566,9 @@ Below is a list of all of the containers that are available to be enabled/disabl
 
 ## Post-Installation Configuration
 
-All instances of Sonarr and Radarr should be configured under `Media Management` to set the file perms to `774` and the group to `100`.
+All instances of Sonarr and Radarr should be configured under `Media Management` to set the file perms to `777` and the group to `100`.
 
-Sabnzbd should be configured to set the perms to `774`.
+Sabnzbd should be configured to set the perms to `777`.
 
 ## Disclaimer
 
