@@ -88,7 +88,6 @@
     - >-
       (docker_selinux_activated_cmd is not defined or
        docker_selinux_activated_cmd.rc != 0)
-  register: docker_selinux_manual_config
   block:
     - name: Create SELinux config directory
       ansible.builtin.file:
@@ -103,7 +102,7 @@
         regexp: "^SELINUX="
         create: true
         mode: "0644"
-      register: docker_selinux_config_created
+      register: docker_selinux_manual_config
 
     - name: Set SELinux type in config file
       ansible.builtin.lineinfile:
