@@ -32,14 +32,14 @@
       ansible.builtin.apt:
         name: virtiofsd
         state: present
-      register: virtiofsd_result
+      register: common_virtiofsd_result
       failed_when: false
 
     - name: Fallback to qemu-system if virtiofsd is unavailable
       ansible.builtin.apt:
         name: qemu-system
         state: present
-      when: virtiofsd_result is failed
+      when: common_virtiofsd_result is failed
 
 - name: Restart SSH service
   ansible.builtin.service:
@@ -51,35 +51,32 @@
 
 - name: Create mountpoint for UNRAID shares
   ansible.builtin.file:
-    path: "/data"
+    path: "/shares"
     state: directory
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
-    mode: "0755"
+    mode: "0777"
   tags:
     - share
 
 - name: Mount UNRAID shares
   ansible.posix.mount:
-    path: "/data/{{ item.mediaType }}"
-    src: "{{ item.shareName }}"
+    path: "/shares"
+    src: "{{ shares.mount_tag }}"
     fstype: virtiofs
     state: mounted
   become: true
-  loop: "{{ media_shares }}"
   tags:
     - share
 
-- name: Create the Torrent and Usenet directories for Staging
+- name: Create {{ sabnzbd.sub_dir_name }} and {{ qbittorrent.sub_dir_name }} under Staging
   ansible.builtin.file:
-    path: "/data/{{ downloaders.staging.directory_name }}/{{ item }}"
+    path: "/shares/{{ downloaders.staging.share_name }}/{{ item }}"
     state: directory
-    owner: "{{ docker_user }}"
-    group: "{{ docker_user }}"
-    mode: "0755"
+    mode: "0777"
   loop:
-    - Torrents
-    - Usenet
+    - "{{ sabnzbd.sub_dir_name }}"
+    - "{{ qbittorrent.sub_dir_name }}"
   when: downloaders.staging.enabled
   tags:
     - share

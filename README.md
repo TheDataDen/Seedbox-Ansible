@@ -2,10 +2,56 @@
 
 This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine running on UNRAID. All you have to do is create a new Ubuntu VM in UNRAID, add the appriopriate shares to the VM and run the playbook!
 
-## Requirements
+## Table of Contents
 
-- Ubuntu 20.04 or higher (preferably an LTS version) iso
-- UNRAID (with virtualization enabled in the BIOS)
+- [Seedbox-Ansible](#seedbox-ansible)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Usage](#usage)
+    - [General UNRAID Setup](#general-unraid-setup)
+      - [UNRAID Permissions](#unraid-permissions)
+    - [UNRAID VM Setup](#unraid-vm-setup)
+    - [Ansible Setup](#ansible-setup)
+    - [Run the playbook](#run-the-playbook)
+  - [Configuration](#configuration)
+    - [Miscellaneous Settings](#miscellaneous-settings)
+    - [Logging Settings](#logging-settings)
+    - [Container Settings](#container-settings)
+    - [Downloader Settings](#downloader-settings)
+    - [Shares](#shares)
+    - [Extras](#extras)
+      - [MAM](#mam)
+    - [Indiviual Container Settings](#indiviual-container-settings)
+      - [pia\_vpn](#pia_vpn)
+      - [cleanuparr](#cleanuparr)
+      - [radarr](#radarr)
+      - [radarr\_2](#radarr_2)
+      - [sonarr](#sonarr)
+      - [sonarr\_2](#sonarr_2)
+      - [huntarr](#huntarr)
+      - [recyclarr](#recyclarr)
+      - [notifiarr](#notifiarr)
+      - [prowlarr](#prowlarr)
+      - [flaresolverr](#flaresolverr)
+      - [readarr\_audiobooks](#readarr_audiobooks)
+      - [readarr\_ebooks](#readarr_ebooks)
+      - [lazylibrarian](#lazylibrarian)
+      - [bookbounty](#bookbounty)
+      - [bazarr](#bazarr)
+      - [qbittorrent](#qbittorrent)
+      - [qbittorrent\_porthelper](#qbittorrent_porthelper)
+      - [qbittorrent\_managetorrents](#qbittorrent_managetorrents)
+      - [sabnzbd](#sabnzbd)
+      - [firefox](#firefox)
+      - [portainer](#portainer)
+      - [watchtower](#watchtower)
+      - [syncthing](#syncthing)
+      - [Health Check Settings](#health-check-settings)
+  - [Containers](#containers)
+  - [Post-Installation Configuration](#post-installation-configuration)
+  - [Disclaimer](#disclaimer)
+  - [License](#license)
+  - [Support](#support)
 
 ## Features
 
@@ -26,19 +72,150 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
 
 ## Usage
 
+### General UNRAID Setup
+
+There are really only two ways that I have seen people do this.
+1. Create a share for each of the media folders that you have. For example: downloads, anime, audiobooks, ebooks, movies, tv shows, etc.
+   -  This is the way I do it. I like having the separation
+2. Create a single media share and then create a sub-directory for each of the media folders that you have.
+
+> [!IMPORTANT]
+> **If you have a cache/buffer pool:**
+>   - You should add a share called `Staging` and set it to only use your cache/buffer pool. This is the share that your downloads should be configured to use for their temporary storage while they are downloading. Their completed download location should be set to the `Downloads` share
+>   - All of the other media shares should be set to use only the array
+>   - This is because hardlinks only work when the files are on the same filesystem, they do not work between the array and the cache/buffer pool. This does mean that your write speeds will be slower but things will hardlink rather than copy (which uses more space)
+
+#### UNRAID Permissions
+
+I have the `User Scripts` plugin installed in UNRAID running the following script hourly. This ensures that there are no permission issues with the media files.
+
+I know that this not "best practice" but it works for me.
+
+The script is a bit overengineered but it allows me to quickly change permissions of my shares if I need to. It sets all of the media shares to `777` and has the option to set the rest of the shares to `775`/`774` if you need to.
+
+```bash
+#!/bin/bash
+
+name=""
+puid="nobody"
+pgid=""
+dir_perms=""
+file_perms=""
+
+og="$puid:$pgid"
+
+updated_shares=()
+
+function isShareUpdated() {
+    local share
+    for share in "${updated_shares[@]}"; do
+        [[ "$share" == "$1" ]] && return 0
+    done
+    return 1
+}
+
+function setDirPerms() {
+    directory=$1
+    
+    echo "[$name] Setting directory perms for $directory to $dir_perms..."
+    find "$directory" -type d -exec chmod $dir_perms {} +
+}
+
+function setFilePerms() {
+    directory=$1
+    
+    echo "[$name] Setting file perms for $directory to $file_perms..."
+    find "$directory" -type f -exec chmod $file_perms {} +
+}
+
+function setOwnerGroup() {
+    directory=$1
+    
+    echo "[$name] Setting owner:group for $directory to $og..."
+    chown -R $og "$directory"
+}
+
+function setBothPerms() {
+    directory=$1
+    
+    echo "[$name] Setting perms for $directory to $dir_perms..."
+    chmod -R $dir_perms "$directory"
+}
+
+function setPerms() {
+    setOwnerGroup "$1"
+    
+    if [ "$dir_perms" == "$file_perms" ]; then
+        setBothPerms "$1"
+    else
+        setDirPerms "$1"
+    
+        setFilePerms "$1"
+    fi
+}
+
+function setSharePerms() {
+    directory=/mnt/user/$1
+    
+    if isShareUpdated "$1"; then
+        echo "Share $1 has already been updated!! Remove the the duplicate from the script"
+    else
+        updated_shares+=("$1")
+    
+        setPerms "$directory"
+    fi
+}
+
+function setVars() {
+    name=$1
+    pgid=$2
+    dir_perms=$3
+    file_perms=$4
+    
+    og="$puid:$pgid"
+    
+    echo -e "\n"
+}
+
+function updateAllRemainingShares() {
+    for folder in /mnt/user/*/; do
+        folder_name=$(basename "$folder")
+        
+        if ! isShareUpdated "$1"; then
+            setSharePerms "$folder_name"
+        fi
+    done
+}
+
+# Media Shares
+setVars "Media" "users" "777" "777"
+
+setSharePerms "movies"
+setSharePerms "movie_editions"
+setSharePerms "tv"
+setSharePerms "anime"
+setSharePerms "downloads"
+setSharePerms "staging"
+setSharePerms "audiobooks"
+setSharePerms "books"
+setSharePerms "podcasts"
+
+
+# Defaults
+# setVars "Share" "users" "775" "774"
+# updateAllShares
+
+echo "Done Setting Permissions!"
+```
+
 ### UNRAID VM Setup
 
 1. Create a new VM and pick Ubuntu as the OS
 2. Give it a name, assign the logical CPUs (Id recommend atleast 4 if have the resources), and assign the memory (4GB probably would be enough but I recommend 8GB)
 3. Select the OS iso from the list. If you don't have any isos in the list, you will need to download one and add it to the isos share
 4. For the vdisk, select `Auto` and then specify the size of the vdisk (I recommend at least 50GB)
-5. For UNRAID shares, add a new share for each of the media folders that you have. For example, anime, audiobooks, ebooks, downloads, movies, tv shows, etc.
-   - For each of the UNRAID shares, select the `virtiofs` mode (9p is the default but virtiofs is better)
-   - You can either use the drop down menu to select the share or type it in manually
-   - **IMPORTANT!!!**: If you have a cache/buffer pool:
-     - You should add a share called `Staging` and set it to only use your cache/buffer pool. This is the share that your downloads should be configured to use for their temporary storage while they are downloading. Their completed download locatio should be set to the `Downloads` share
-     - All of the other media shares should be set to use only the array
-     - This is because hardlinks only work when the files are on the same filesystem, they do not work between the array and the cache/buffer pool. This does mean that your write speeds will be slower but things will hardlink rather than copy (which uses more space)
+5. Add a Manual Share with the source path of `/mnt/user` (`mnt/user/media` if its all under a single share) and a mount tag of something like `Shares`. Rememeber what you set the mount tag to, you will need it later.
+   - Make sure to set the mode to `virtiofs` (9p is the default but virtiofs is better)
 6. Turn on `VM Console enable Copy/paste` this will make it a lot easier for filling in some of the settings
 7. Create the VM and go through the Ubuntu install process (I recommend using the default settings)
 
@@ -58,6 +235,10 @@ git clone https://github.com/TheDataDen/Seedbox-Ansible.git
 cd Seedbox-Ansible
 ```
 
+> [!NOTE]
+> If you already have run this playbook before and are updating, you probably wouldn't be able to run `git pull` because of the changes you made to the `vars/main.yml` file.
+> To fix this, run `git stash` to stash your changes, then run `git pull` and then run `git stash pop` to restore your changes. There may be merge conflicts for the `vars/main.yml` file, make sure to scan through the file and fix any conflicts.
+
 3. Modify the [vars/main.yml](vars/main.yml) file to match your setup. Check out the [Configuration](#configuration) section for more information
 
 ### Run the playbook
@@ -74,6 +255,8 @@ To re-attach to the tmux session run the following script: `./attach.sh`
 
 > [!NOTE]
 > The Create Seedbox Docker stack step may look like it is hanging. This is because the docker images need to be downloaded. If you are on a slow internet connection, this may take a while.
+>
+> If it hangs on `Gathering Facts` then you most likely entered your password incorrectly. Ctrl+C to exit and try again.
 
 ## Configuration
 
@@ -129,11 +312,16 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 ### Downloader Settings
 
-| Variable Name            | Required | Description                                                                                           |
-| ------------------------ | -------- | ----------------------------------------------------------------------------------------------------- |
-| `staging`                | Yes      | Enable/Disable the staging directory. See the important note in item 5 of [here](#unraid-vm-setup)    |
-| `staging.enabled`        | Yes      | Enable/Disable the staging directory.                                                                 |
-| `staging.directory_name` | Yes      | The same as the mediaType that you use to add the share in the [Media Shares](#media-shares) section. |
+| Variable Name                    | Required | Description                                                       |
+| -------------------------------- | -------- | ----------------------------------------------------------------- |
+| `downloaders.staging.enabled`    | Yes      | Enable/Disable the staging share                                  |
+| `downloaders.staging.share_name` | Yes      | The name of the share that will be used for the staging downloads |
+
+### Shares
+
+| Variable Name      | Required | Description                                                        |
+| ------------------ | -------- | ------------------------------------------------------------------ |
+| `shares.mount_tag` | Yes      | The tag that will be used for the UNRAID shares when passed to VM. |
 
 ### Extras
 
@@ -280,12 +468,13 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 #### qbittorrent
 
-| Variable Name | Required | Description                                                                                                                                                                 |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `port`        | Yes      | The port that qBittorrent's webUI will be running on.                                                                                                                       |
-| `host`        | No       | The host ip that qBittorrent will be running on. Don't change this unless it different from the host IP. Only required if using the porthelper or managetorrents containers |
-| `username`    | No       | The username that will be used to connect to qBittorrent. Only required if using the porthelper or managetorrents containers                                                |
-| `password`    | No       | The password that will be used to connect to qBittorrent. Only required if using the porthelper or managetorrents containers                                                |
+| Variable Name  | Required | Description                                                                                                                                                                 |
+| -------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `port`         | Yes      | The port that qBittorrent's webUI will be running on.                                                                                                                       |
+| `sub_dir_name` | Yes      | The name of the sub directory that will be created under the staging share.                                                                                                 |
+| `host`         | No       | The host ip that qBittorrent will be running on. Don't change this unless it different from the host IP. Only required if using the porthelper or managetorrents containers |
+| `username`     | No       | The username that will be used to connect to qBittorrent. Only required if using the porthelper or managetorrents containers                                                |
+| `password`     | No       | The password that will be used to connect to qBittorrent. Only required if using the porthelper or managetorrents containers                                                |
 
 #### qbittorrent_porthelper
 
@@ -301,9 +490,11 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 #### sabnzbd
 
-| Variable Name | Required | Description                                       |
-| ------------- | -------- | ------------------------------------------------- |
-| `port`        | Yes      | The port that SABnzbd's webUI will be running on. |
+| Variable Name  | Required | Description                                                                 |
+| -------------- | -------- | --------------------------------------------------------------------------- |
+| `port`         | Yes      | The port that SABnzbd's webUI will be running on.                           |
+| `sub_dir_name` | Yes      | The name of the sub directory that will be created under the staging share. |
+
 
 #### firefox
 
@@ -341,22 +532,6 @@ Used for all of the health checks except for the pia_vpn health check
 | `retries`      | Yes      | The number of retries before the container is marked as unhealthy            |
 | `start_period` | Yes      | The delay after the container start until the healthcheck starts             |
 
-#### Media Shares
-
-This is a list of all of the media shares that will be mounted to the VM.
-
-Format:
-
-```yaml
-media_shares:
-  - mediaType: tv
-    shareName: TV Shows
-```
-
-`mediaType` is the name of the folder in /data (will be created if it doesn't exist)
-
-`shareName` is the name of the virtiofs share tag in UNRAID
-
 ## Containers
 
 Below is a list of all of the containers that are available to be enabled/disabled with a description of what they do.
@@ -388,6 +563,12 @@ Below is a list of all of the containers that are available to be enabled/disabl
 | `watchtower`                 | Automatically updates the containers to their latest versions. Runs on a cron schedule                                                                                                                     |
 | `autoheal`                   | Automatically restarts any container that becomes unhealthy                                                                                                                                                |
 | `syncthing`                  | Add the ability to sync files with a remote server                                                                                                                                                         |
+
+## Post-Installation Configuration
+
+All instances of Sonarr and Radarr should be configured under `Media Management` to set the file perms to `777` and the group to `100`.
+
+Sabnzbd should be configured to set the perms to `777`.
 
 ## Disclaimer
 

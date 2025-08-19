@@ -122,7 +122,7 @@ services:
     restart: unless-stopped
     logging: *default-logging
     volumes:
-      - /data/downloads:/data/downloads
+      - /shares:/data
       - ./cleanuparr/ignored.txt:/ignored.txt
     environment:
       - PUID={{ puid }}
@@ -193,26 +193,26 @@ services:
       - QBITTORRENT__USERNAME={{ qbittorrent.username }}
       - QBITTORRENT__PASSWORD={{ qbittorrent.password }}
 {% endif %}
-{% if containers.sonarr and sonarr_api_key is defined %}
+{% if containers.sonarr and seedbox_sonarr_api_key is defined %}
       - SONARR__ENABLED=true
       - SONARR__IMPORT_FAILED_MAX_STRIKES=-1
       - SONARR__SEARCHTYPE=Episode
       - SONARR__BLOCK__TYPE={{ cleanuparr.sonarr.list_type }}
       - SONARR__BLOCK__PATH={{ cleanuparr.sonarr.list }}
       - SONARR__INSTANCES__0__URL=http://{{ host_ip }}:{{ sonarr.port }}
-      - SONARR__INSTANCES__0__APIKEY={{ sonarr_api_key }}
+      - SONARR__INSTANCES__0__APIKEY={{ seedbox_sonarr_api_key }}
 {% endif %}
 {% if containers.sonarr_2 and sonarr_2_api_key is defined %}
       - SONARR__INSTANCES__1__URL=http://{{ host_ip }}:{{ sonarr_2.port }}
       - SONARR__INSTANCES__1__APIKEY={{ sonarr_2_api_key }}
 {% endif %}
-{% if containers.radarr and radarr_api_key is defined %}
+{% if containers.radarr and seedbox_radarr_api_key is defined %}
       - RADARR__ENABLED=true
       - RADARR__IMPORT_FAILED_MAX_STRIKES=-1
       - RADARR__BLOCK__TYPE={{ cleanuparr.radarr.list_type }}
       - RADARR__BLOCK__PATH={{ cleanuparr.radarr.list }}
       - RADARR__INSTANCES__0__URL=http://{{ host_ip }}:{{ radarr.port }}
-      - RADARR__INSTANCES__0__APIKEY={{ radarr_api_key }}
+      - RADARR__INSTANCES__0__APIKEY={{ seedbox_radarr_api_key }}
 {% endif %}
 {% if containers.radarr_2 and radarr_2_api_key is defined %}
       - RADARR__INSTANCES__1__URL=http://{{ host_ip }}:{{ radarr_2.port }}
@@ -266,7 +266,7 @@ services:
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
       - ./radarr/config:/config
-      - /data:/data
+      - /shares:/data
 {% if not containers.pia_vpn %}
     ports:
       - {{ radarr.port }}:7878
@@ -311,7 +311,7 @@ services:
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
       - ./radarr_2/config:/config
-      - /data:/data
+      - /shares:/data
 {% if not containers.pia_vpn %}
     ports:
       - {{ radarr_2.port }}:7878
@@ -356,7 +356,7 @@ services:
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
       - ./sonarr/config:/config
-      - /data:/data
+      - /shares:/data
 {% if not containers.pia_vpn %}
     ports:
       - {{ sonarr.port }}:8989
@@ -401,7 +401,7 @@ services:
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
       - ./sonarr_2/config:/config
-      - /data:/data
+      - /shares:/data
 {% if not containers.pia_vpn %}
     ports:
       - {{ sonarr_2.port }}:8989
@@ -633,7 +633,7 @@ services:
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
       - ./readarr_audiobooks/config:/config
-      - /data:/data
+      - /shares:/data
 {% if not containers.pia_vpn %}
     ports:
       - {{ readarr_audiobooks.port }}:8787
@@ -678,7 +678,7 @@ services:
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
       - ./readarr_ebooks/config:/config
-      - /data:/data
+      - /shares:/data
 {% if not containers.pia_vpn %}
     ports:
       - {{ readarr_ebooks.port }}:8787      
@@ -725,7 +725,7 @@ services:
 {% endif %}
     volumes:
       - ./lazylibrarian/config:/config
-      - /data:/data
+      - /shares:/data
 {% if not containers.pia_vpn %}
     ports:
       - {{ lazylibrarian.port }}:5299
@@ -805,7 +805,7 @@ services:
       - TZ={{ timezone }}
     volumes:
       - ./bazarr/config:/config
-      - /data:/data
+      - /shares:/data
 {% if not containers.pia_vpn %}
     ports:
       - {{ bazarr.port }}:6767
@@ -853,10 +853,7 @@ services:
     tty: true
     volumes:
       - ./qbittorrent/config:/config
-      - /data/downloads/Torrents:/data/downloads/Torrents
-{% if downloaders.staging.enabled %}
-      - /data/{{ downloaders.staging.directory_name }}/Torrents:/data/staging/Torrents
-{% endif %}
+      - /shares:/data
 {% if not containers.pia_vpn %}
     ports:
       - {{ qbittorrent.port }}:{{ qbittorrent.port }}
@@ -927,10 +924,7 @@ services:
       - TZ={{ timezone }}
     volumes:
       - ./sabnzbd/config:/config
-      - /data/downloads/Usenet:/data/downloads/Usenet
-{% if downloaders.staging.enabled %}
-      - /data/{{ downloaders.staging.directory_name }}/Usenet:/data/staging/Usenet
-{% endif %}
+      - /shares:/data
 {% if not containers.pia_vpn %}
     ports:
       - {{ sabnzbd.port }}:8080

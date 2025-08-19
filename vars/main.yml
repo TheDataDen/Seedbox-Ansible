@@ -6,7 +6,7 @@ docker_directory_name: seedbox
 host_ip: REPLACEME
 timezone: America/New_York
 puid: 1000
-pgid: 1000
+pgid: 100
 
 logging:
   driver: local
@@ -46,7 +46,10 @@ containers:
 downloaders:
   staging:
     enabled: true
-    directory_name: staging
+    share_name: staging
+
+shares:
+  mount_tag: Shares
 
 extras:
   # If you use MAM as one of your trackers and use the pia container. Runs a script that sets your IP in your MAM account when the VPN connects
@@ -64,7 +67,7 @@ pia_vpn:
   # Comment out if using Dedicated IP
   server_loc: ca_ontario
   # Comment out if not using Dedicated IP
-  #dip_token: REPLACEME
+  # dip_token: REPLACEME
   port_fatal: true
   port_persist: false
 
@@ -144,21 +147,25 @@ flaresolverr:
 
 readarr_audiobooks:
   port: 8787
+
   # The name that will be displayed in the browser tab
   instance_name: Readarr Audiobooks
 
 readarr_ebooks:
   port: 8788
+
   # The name that will be displayed in the browser tab
   instance_name: Readarr Ebooks
 
 lazylibrarian:
   port: 5299
+
   # Comment out if you don't want to use mods
   docker_mods: linuxserver/mods:universal-calibre|linuxserver/mods:lazylibrarian-ffmpeg
 
 bookbounty:
   port: 5000
+
   # Comma separated list of 24h hours to check for books
   sync_schedule: 0,6,12,18
   selected_language: English
@@ -173,6 +180,9 @@ bazarr:
 
 qbittorrent:
   port: 8081
+
+  sub_dir_name: Torrents
+
   # host, username, and password: Only required if using the porthelper or managetorrents containers
   host: "{{ host_ip }}"
   username: REPLACEME
@@ -186,6 +196,8 @@ qbittorrent_managetorrents:
 
 sabnzbd:
   port: 8181
+
+  sub_dir_name: Usenet
 
 firefox:
   port: 3001
@@ -206,21 +218,3 @@ health_check:
   timeout: 10s
   retries: 3
   start_period: 60s
-
-# mediaType is the name of the folder in /data (will be created if it doesn't exist)
-# shareName is the name of the virtiofs share in UNRAID
-media_shares:
-  - mediaType: tv
-    shareName: TV Shows
-  - mediaType: movies
-    shareName: Movies
-  - mediaType: anime
-    shareName: Anime
-  - mediaType: audiobooks
-    shareName: Audiobooks
-  - mediaType: books
-    shareName: Books
-  - mediaType: downloads
-    shareName: Downloads
-  - mediaType: staging
-    shareName: Staging
