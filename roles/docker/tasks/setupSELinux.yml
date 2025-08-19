@@ -82,35 +82,43 @@
     enabled: true
     state: started
 
-- name: Configure SELinux manually (fallback method)
+- name: Create SELinux config directory (manual setup)
+  ansible.builtin.file:
+    path: /etc/selinux
+    state: directory
+    mode: "0755"
   when:
     - docker_selinux_needs_activation
     - >-
       (docker_selinux_activated_cmd is not defined or
        docker_selinux_activated_cmd.rc != 0)
-  block:
-    - name: Create SELinux config directory
-      ansible.builtin.file:
-        path: /etc/selinux
-        state: directory
-        mode: "0755"
 
-    - name: Set SELinux to permissive in config file
-      ansible.builtin.lineinfile:
-        path: /etc/selinux/config
-        line: "SELINUX=permissive"
-        regexp: "^SELINUX="
-        create: true
-        mode: "0644"
-      register: docker_selinux_manual_config
+- name: Set SELinux to permissive in config file
+  ansible.builtin.lineinfile:
+    path: /etc/selinux/config
+    line: "SELINUX=permissive"
+    regexp: "^SELINUX="
+    create: true
+    mode: "0644"
+  when:
+    - docker_selinux_needs_activation
+    - >-
+      (docker_selinux_activated_cmd is not defined or
+       docker_selinux_activated_cmd.rc != 0)
+  register: docker_selinux_manual_config
 
-    - name: Set SELinux type in config file
-      ansible.builtin.lineinfile:
-        path: /etc/selinux/config
-        line: "SELINUXTYPE=default"
-        regexp: "^SELINUXTYPE="
-        create: true
-        mode: "0644"
+- name: Set SELinux type in config file
+  ansible.builtin.lineinfile:
+    path: /etc/selinux/config
+    line: "SELINUXTYPE=default"
+    regexp: "^SELINUXTYPE="
+    create: true
+    mode: "0644"
+  when:
+    - docker_selinux_needs_activation
+    - >-
+      (docker_selinux_activated_cmd is not defined or
+       docker_selinux_activated_cmd.rc != 0)
 
 - name: Set activation flag
   ansible.builtin.set_fact:
