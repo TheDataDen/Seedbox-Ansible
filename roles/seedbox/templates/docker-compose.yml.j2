@@ -197,26 +197,26 @@ services:
       - QBITTORRENT__USERNAME={{ qbittorrent.username }}
       - QBITTORRENT__PASSWORD={{ qbittorrent.password }}
 {% endif %}
-{% if containers.sonarr and sonarr_api_key is defined %}
+{% if containers.sonarr and seedbox_sonarr_api_key is defined %}
       - SONARR__ENABLED=true
       - SONARR__IMPORT_FAILED_MAX_STRIKES=-1
       - SONARR__SEARCHTYPE=Episode
       - SONARR__BLOCK__TYPE={{ cleanuparr.sonarr.list_type }}
       - SONARR__BLOCK__PATH={{ cleanuparr.sonarr.list }}
       - SONARR__INSTANCES__0__URL=http://{{ host_ip }}:{{ sonarr.port }}
-      - SONARR__INSTANCES__0__APIKEY={{ sonarr_api_key }}
+      - SONARR__INSTANCES__0__APIKEY={{ seedbox_sonarr_api_key }}
 {% endif %}
 {% if containers.sonarr_2 and sonarr_2_api_key is defined %}
       - SONARR__INSTANCES__1__URL=http://{{ host_ip }}:{{ sonarr_2.port }}
       - SONARR__INSTANCES__1__APIKEY={{ sonarr_2_api_key }}
 {% endif %}
-{% if containers.radarr and radarr_api_key is defined %}
+{% if containers.radarr and seedbox_radarr_api_key is defined %}
       - RADARR__ENABLED=true
       - RADARR__IMPORT_FAILED_MAX_STRIKES=-1
       - RADARR__BLOCK__TYPE={{ cleanuparr.radarr.list_type }}
       - RADARR__BLOCK__PATH={{ cleanuparr.radarr.list }}
       - RADARR__INSTANCES__0__URL=http://{{ host_ip }}:{{ radarr.port }}
-      - RADARR__INSTANCES__0__APIKEY={{ radarr_api_key }}
+      - RADARR__INSTANCES__0__APIKEY={{ seedbox_radarr_api_key }}
 {% endif %}
 {% if containers.radarr_2 and radarr_2_api_key is defined %}
       - RADARR__INSTANCES__1__URL=http://{{ host_ip }}:{{ radarr_2.port }}

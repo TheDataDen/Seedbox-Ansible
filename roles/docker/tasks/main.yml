@@ -10,14 +10,14 @@
 
 - name: Set a fact to skip Docker installation if it exists
   ansible.builtin.set_fact:
-    skip_docker_install: "{{ docker_exists.rc == 0 }}"
+    docker_skip_docker_install: "{{ docker_exists.rc == 0 }}"
   tags:
     - docker
 
 - name: Update apt package index
   ansible.builtin.apt:
     update_cache: true
-  when: not skip_docker_install
+  when: not docker_skip_docker_install
   tags:
     - docker
 
@@ -28,7 +28,7 @@
   loop:
     - ca-certificates
     - curl
-  when: not skip_docker_install
+  when: not docker_skip_docker_install
   tags:
     - docker
 
@@ -46,14 +46,14 @@
     state: directory
     mode: '0755'
   become: true
-  when: not skip_docker_install
+  when: not docker_skip_docker_install
 
 - name: Remove Docker GPG key if already exists
   ansible.builtin.file:
     path: /etc/apt/keyrings/docker.asc
     state: absent
   become: true
-  when: not skip_docker_install
+  when: not docker_skip_docker_install
   tags:
     - docker
 
@@ -63,7 +63,7 @@
     dest: /etc/apt/keyrings/docker.asc
     mode: '0644'
   become: true
-  when: not skip_docker_install
+  when: not docker_skip_docker_install
   tags:
     - docker
 
@@ -73,14 +73,14 @@
     state: present
   become: true
   when:
-    - not skip_docker_install
+    - not docker_skip_docker_install
   tags:
     - docker
 
 - name: Update apt package index again after adding Docker repo
   ansible.builtin.apt:
     update_cache: true
-  when: not skip_docker_install
+  when: not docker_skip_docker_install
   tags:
     - docker
 
@@ -94,7 +94,7 @@
     - containerd.io
     - docker-buildx-plugin
     - docker-compose-plugin
-  when: not skip_docker_install
+  when: not docker_skip_docker_install
   tags:
     - docker
 
@@ -103,7 +103,7 @@
     name: docker
     state: started
     enabled: true
-  when: not skip_docker_install
+  when: not docker_skip_docker_install
   tags:
     - docker
 
@@ -111,7 +111,7 @@
   ansible.builtin.group:
     name: docker
     state: present
-  when: not skip_docker_install
+  when: not docker_skip_docker_install
   tags:
     - docker
 
@@ -120,7 +120,7 @@
     name: "{{ docker_user }}"
     groups: docker
     append: true
-  when: not skip_docker_install
+  when: not docker_skip_docker_install
   tags:
     - docker
 

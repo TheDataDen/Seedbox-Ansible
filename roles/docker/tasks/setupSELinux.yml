@@ -1,24 +1,36 @@
 ---
+# SELinux Media Security Setup Tasks
+# Include this file from your main playbook with include_tasks
+
 - name: Check current SELinux status
   ansible.builtin.command: sestatus
-  register: selinux_check
+  register: docker_selinux_check_cmd
   failed_when: false
   changed_when: false
 
 - name: Parse SELinux status
   ansible.builtin.set_fact:
-    selinux_available: "{{ selinux_check.rc == 0 }}"
-    selinux_status: "{{ selinux_check.stdout | regex_search('SELinux status:\\s*(\\w+)', '\\1') | first if selinux_check.rc == 0 else 'unavailable' }}"
-    selinux_mode: "{{ selinux_check.stdout | regex_search('Current mode:\\s*(\\w+)', '\\1') | first if selinux_check.rc == 0 else 'unavailable' }}"
+    docker_selinux_available: "{{ docker_selinux_check_cmd.rc == 0 }}"
+    docker_selinux_status: >-
+      {{ docker_selinux_check_cmd.stdout |
+         regex_search('SELinux status:\\s*(\\w+)', '\\1') |
+         first if docker_selinux_check_cmd.rc == 0 else 'unavailable' }}
+    docker_selinux_mode: >-
+      {{ docker_selinux_check_cmd.stdout |
+         regex_search('Current mode:\\s*(\\w+)', '\\1') |
+         first if docker_selinux_check_cmd.rc == 0 else 'unavailable' }}
 
 - name: Display current SELinux status
   ansible.builtin.debug:
-    msg: "SELinux Status: {{ selinux_status }}, Mode: {{ selinux_mode }}"
+    msg: >-
+      SELinux Status: {{ docker_selinux_status }},
+      Mode: {{ docker_selinux_mode }}
 
-- name: Install SELinux packages
+- name: Install SELinux packages (including selinux-basics)
   ansible.builtin.apt:
     name:
       - selinux-utils
+      - selinux-basics
       - policycoreutils
       - selinux-policy-dev
       - auditd
@@ -27,13 +39,42 @@
 
 - name: Check if SELinux activation is needed
   ansible.builtin.set_fact:
-    selinux_needs_activation: "{{ not selinux_available or selinux_status == 'disabled' }}"
+    docker_selinux_needs_activation: "{{ not docker_selinux_available or docker_selinux_status == 'disabled' }}"
 
-- name: Activate SELinux (requires reboot)
-  ansible.builtin.command: selinux-activate
-  when: selinux_needs_activation
-  register: selinux_activated
-  changed_when: selinux_activated.rc == 0
+- name: Check if selinux-activate command exists
+  ansible.builtin.shell: |
+    command -v selinux-activate || which selinux-activate ||
+    find /usr -name "selinux-activate" 2>/dev/null || echo "not found"
+  when: docker_selinux_needs_activation
+  register: docker_selinux_activate_check
+  failed_when: false
+  changed_when: false
+
+- name: Debug selinux-activate location
+  ansible.builtin.debug:
+    msg: >-
+      selinux-activate search result:
+      {{ docker_selinux_activate_check.stdout }}
+  when: docker_selinux_needs_activation
+
+- name: Activate SELinux using available command
+  ansible.builtin.shell: |
+    if command -v selinux-activate >/dev/null 2>&1; then
+      selinux-activate
+    elif command -v /usr/sbin/selinux-activate >/dev/null 2>&1; then
+      /usr/sbin/selinux-activate
+    elif command -v selinux-config-enforcing >/dev/null 2>&1; then
+      selinux-config-enforcing
+    else
+      echo "No SELinux activation command found, using manual config"
+      exit 1
+    fi
+  when:
+    - docker_selinux_needs_activation
+    - "'not found' not in docker_selinux_activate_check.stdout"
+  register: docker_selinux_activated_cmd
+  changed_when: docker_selinux_activated_cmd.rc == 0
+  failed_when: false
 
 - name: Enable and start auditd service
   ansible.builtin.systemd:
@@ -41,32 +82,75 @@
     enabled: true
     state: started
 
+- name: Configure SELinux manually (fallback method)
+  when:
+    - docker_selinux_needs_activation
+    - >-
+      (docker_selinux_activated_cmd is not defined or
+       docker_selinux_activated_cmd.rc != 0)
+  register: docker_selinux_manual_config
+  block:
+    - name: Create SELinux config directory
+      ansible.builtin.file:
+        path: /etc/selinux
+        state: directory
+        mode: "0755"
+
+    - name: Set SELinux to permissive in config file
+      ansible.builtin.lineinfile:
+        path: /etc/selinux/config
+        line: "SELINUX=permissive"
+        regexp: "^SELINUX="
+        create: true
+        mode: "0644"
+      register: docker_selinux_config_created
+
+    - name: Set SELinux type in config file
+      ansible.builtin.lineinfile:
+        path: /etc/selinux/config
+        line: "SELINUXTYPE=default"
+        regexp: "^SELINUXTYPE="
+        create: true
+        mode: "0644"
+
+- name: Set activation flag
+  ansible.builtin.set_fact:
+    docker_selinux_activated: >-
+      {{ docker_selinux_activated_cmd if
+         (docker_selinux_activated_cmd is defined and
+          docker_selinux_activated_cmd.rc == 0)
+         else docker_selinux_manual_config }}
+  when: docker_selinux_needs_activation
+
 - name: Reboot system after SELinux activation # noqa no-handler
   ansible.builtin.reboot:
     reboot_timeout: 300
     connect_timeout: 60
     test_command: sestatus
-  when: selinux_activated is changed
+  when: docker_selinux_activated is changed
 
 - name: Verify SELinux is properly enabled
   ansible.builtin.command: sestatus
-  register: selinux_final_status
+  register: docker_selinux_final_status
   changed_when: false
 
 - name: Display final SELinux status
   ansible.builtin.debug:
-    msg: "{{ selinux_final_status.stdout_lines }}"
+    msg: "{{ docker_selinux_final_status.stdout_lines }}"
 
 - name: Parse current SELinux mode
   ansible.builtin.set_fact:
-    current_selinux_mode: "{{ selinux_final_status.stdout | regex_search('Current mode:\\s*(\\w+)', '\\1') | first | default('unknown') }}"
+    docker_current_selinux_mode: >-
+      {{ docker_selinux_final_status.stdout |
+         regex_search('Current mode:\\s*(\\w+)', '\\1') |
+         first | default('unknown') }}
 
 - name: Set SELinux to permissive mode if needed
   ansible.builtin.command: setenforce 0
-  when: current_selinux_mode != "permissive"
-  register: selinux_mode_change
+  when: docker_current_selinux_mode != "permissive"
+  register: docker_selinux_mode_change
   failed_when: false
-  changed_when: selinux_mode_change.rc == 0
+  changed_when: docker_selinux_mode_change.rc == 0
 
 - name: Create SELinux media scanner script from template
   ansible.builtin.template:
@@ -93,23 +177,26 @@
 
 - name: Run initial SELinux media directory scan
   ansible.builtin.command: "{{ docker_scanner_script_path }} scan"
-  register: initial_scan
+  register: docker_initial_scan
   failed_when: false
-  changed_when: "'Made 0 changes' not in initial_scan.stdout"
+  changed_when: "'Made 0 changes' not in docker_initial_scan.stdout"
 
 - name: Display initial scan results
   ansible.builtin.debug:
-    var: initial_scan.stdout_lines
-  when: initial_scan.stdout_lines is defined
+    var: docker_initial_scan.stdout_lines
+  when: docker_initial_scan.stdout_lines is defined
 
 - name: Check Docker SELinux integration
   ansible.builtin.shell: |
     set -o pipefail
-    docker info 2>/dev/null | grep -i selinux || echo "Docker not found or no SELinux support"
+    docker info 2>/dev/null | grep -i selinux ||
+    echo "Docker not found or no SELinux support"
   register: docker_selinux_check
   changed_when: false
   failed_when: false
 
 - name: Display Docker SELinux status
   ansible.builtin.debug:
-    msg: "Docker SELinux status: {{ docker_selinux_check.stdout }}"
+    msg: >-
+      Docker SELinux status:
+      {{ docker_selinux_check.stdout }}
