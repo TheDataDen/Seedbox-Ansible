@@ -5,8 +5,9 @@ docker_user: REPLACEME
 docker_directory_name: seedbox
 host_ip: REPLACEME
 timezone: America/New_York
-puid: 1000
+puid: 99
 pgid: 100
+umask: 000
 
 logging:
   driver: local

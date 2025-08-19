@@ -127,6 +127,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - TZ={{ timezone }}
       - DRY_RUN={{ cleanuparr.dry_run }}
       - HTTP_MAX_RETRIES=0
@@ -262,6 +263,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - TZ={{ timezone }}
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
@@ -307,6 +309,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - TZ={{ timezone }}
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
@@ -352,6 +355,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - TZ={{ timezone }}
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
@@ -397,6 +401,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - TZ={{ timezone }}
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
@@ -491,6 +496,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - TZ={{ timezone }}
       - CRON_SCHEDULE={{ recyclarr.cron_schedule }}
       - RECYCLARR_CREATE_CONFIG=true
@@ -524,6 +530,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - DN_API_KEY={{ notifiarr.api_key }}
     volumes:
       - ./notifiarr/config:/config
@@ -557,6 +564,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - TZ={{ timezone }}
     volumes:
       - ./prowlarr/config:/config
@@ -600,6 +608,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - LOG_LEVEL=info
 {% if not containers.pia_vpn %}
     ports:
@@ -629,6 +638,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - TZ={{ timezone }}
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
@@ -674,6 +684,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - TZ={{ timezone }}
       - DOCKER_MODS=linuxserver/mods:universal-cron
     volumes:
@@ -719,6 +730,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - TZ={{ timezone }}
 {% if lazylibrarian.docker_mods is defined %}
       - DOCKER_MODS={{ lazylibrarian.docker_mods }}
@@ -762,6 +774,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - readarr_address=http://{{ host_ip }}:{{ readarr_ebooks.port }}
       - sync_schedule={{ bookbounty.sync_schedule }}
       - selected_language={{ bookbounty.selected_language }}
@@ -802,6 +815,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - TZ={{ timezone }}
     volumes:
       - ./bazarr/config:/config
@@ -842,6 +856,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - QBT_LEGAL_NOTICE=confirm
       - QBT_VERSION=latest
       - QBT_WEBUI_PORT={{ qbittorrent.port }}
@@ -878,6 +893,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - QBITTORRENT_HOST={{ qbittorrent.host }}
       - QBITTORRENT_PORT={{ qbittorrent.port }}
       - QBITTORRENT_USERNAME={{ qbittorrent.username }}
@@ -899,6 +915,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - QBITTORRENT_HOST={{ qbittorrent.host }}
       - QBITTORRENT_PORT={{ qbittorrent.port }}
       - QBITTORRENT_USERNAME={{ qbittorrent.username }}
@@ -921,6 +938,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - TZ={{ timezone }}
     volumes:
       - ./sabnzbd/config:/config
@@ -955,6 +973,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - TZ={{ timezone }}
 {% if not containers.pia_vpn %}
     ports:
@@ -1013,6 +1032,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
       - AUTOHEAL_CONTAINER_LABEL=all
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -1031,6 +1051,7 @@ services:
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
+      - UMASK={{ umask }}
     volumes:
       - ./:/dockers
 {% endif %}

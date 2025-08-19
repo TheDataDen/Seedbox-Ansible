@@ -273,6 +273,7 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `timezone`    | Yes      | The Timezone that you are in                                                                   |
 | `puid`        | Yes      | The UID of the user that will run the docker containers. (Probably doesn't need to be changed) |
 | `pgid`        | Yes      | The GID of the user that will run the docker containers. (Probably doesn't need to be changed) |
+| `umask`       | Yes      | The umask that will be used for the docker containers. (Probably doesn't need to be changed)   |
 
 ### Logging Settings
 
