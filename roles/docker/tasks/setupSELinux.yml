@@ -12,13 +12,13 @@
   ansible.builtin.set_fact:
     docker_selinux_available: "{{ docker_selinux_check_cmd.rc == 0 }}"
     docker_selinux_status: >-
-      {{ docker_selinux_check_cmd.stdout |
-         regex_search('SELinux status:\\s*(\\w+)', '\\1') |
-         first if docker_selinux_check_cmd.rc == 0 else 'unavailable' }}
+      {{ docker_selinux_check_cmd.stdout | 
+         regex_findall('SELinux status:\\s*(\\w+)') | 
+         first | default('unavailable') if docker_selinux_check_cmd.rc == 0 else 'unavailable' }}
     docker_selinux_mode: >-
-      {{ docker_selinux_check_cmd.stdout |
-         regex_search('Current mode:\\s*(\\w+)', '\\1') |
-         first if docker_selinux_check_cmd.rc == 0 else 'unavailable' }}
+      {{ docker_selinux_check_cmd.stdout | 
+         regex_findall('Current mode:\\s*(\\w+)') | 
+         first | default('unavailable') if docker_selinux_check_cmd.rc == 0 else 'unavailable' }}
 
 - name: Display current SELinux status
   ansible.builtin.debug:
@@ -149,7 +149,7 @@
   ansible.builtin.set_fact:
     docker_current_selinux_mode: >-
       {{ docker_selinux_final_status.stdout |
-         regex_search('Current mode:\\s*(\\w+)', '\\1') |
+         regex_findall('Current mode:\\s*(\\w+)') |
          first | default('unknown') }}
 
 - name: Set SELinux to permissive mode if needed
