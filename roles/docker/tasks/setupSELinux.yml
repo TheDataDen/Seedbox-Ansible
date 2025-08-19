@@ -134,7 +134,9 @@
     reboot_timeout: 300
     connect_timeout: 60
     test_command: sestatus
-  when: docker_selinux_activated is changed
+  when: >-
+    (docker_selinux_activated_cmd is defined and docker_selinux_activated_cmd is changed) or
+    (docker_selinux_manual_config is defined and docker_selinux_manual_config is changed)
 
 - name: Verify SELinux is properly enabled
   ansible.builtin.command: sestatus
