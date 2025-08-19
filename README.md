@@ -236,6 +236,10 @@ git clone https://github.com/TheDataDen/Seedbox-Ansible.git
 cd Seedbox-Ansible
 ```
 
+> [!NOTE]
+> If you already have run this playbook before and are updating, you probably wouldn't be able to run `git pull` because of the changes you made to the `vars/main.yml` file.
+> To fix this, run `git stash` to stash your changes, then run `git pull` and then run `git stash pop` to restore your changes. There may be merge conflicts for the `vars/main.yml` file, make sure to scan through the file and fix any conflicts.
+
 3. Modify the [vars/main.yml](vars/main.yml) file to match your setup. Check out the [Configuration](#configuration) section for more information
 
 ### Run the playbook
