@@ -38,6 +38,7 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
       - [lazylibrarian](#lazylibrarian)
       - [bookbounty](#bookbounty)
       - [bazarr](#bazarr)
+      - [kapowarr](#kapowarr)
       - [qbittorrent](#qbittorrent)
       - [qbittorrent\_porthelper](#qbittorrent_porthelper)
       - [qbittorrent\_managetorrents](#qbittorrent_managetorrents)
@@ -116,52 +117,52 @@ function isShareUpdated() {
 
 function setDirPerms() {
     directory=$1
-    
+
     echo "[$name] Setting directory perms for $directory to $dir_perms..."
     find "$directory" -type d -exec chmod $dir_perms {} +
 }
 
 function setFilePerms() {
     directory=$1
-    
+
     echo "[$name] Setting file perms for $directory to $file_perms..."
     find "$directory" -type f -exec chmod $file_perms {} +
 }
 
 function setOwnerGroup() {
     directory=$1
-    
+
     echo "[$name] Setting owner:group for $directory to $og..."
     chown -R $og "$directory"
 }
 
 function setBothPerms() {
     directory=$1
-    
+
     echo "[$name] Setting perms for $directory to $dir_perms..."
     chmod -R $dir_perms "$directory"
 }
 
 function setPerms() {
     setOwnerGroup "$1"
-    
+
     if [ "$dir_perms" == "$file_perms" ]; then
         setBothPerms "$1"
     else
         setDirPerms "$1"
-    
+
         setFilePerms "$1"
     fi
 }
 
 function setSharePerms() {
     directory=/mnt/user/$1
-    
+
     if isShareUpdated "$1"; then
         echo "Share $1 has already been updated!! Remove the the duplicate from the script"
     else
         updated_shares+=("$1")
-    
+
         setPerms "$directory"
     fi
 }
@@ -171,16 +172,16 @@ function setVars() {
     pgid=$2
     dir_perms=$3
     file_perms=$4
-    
+
     og="$puid:$pgid"
-    
+
     echo -e "\n"
 }
 
 function updateAllRemainingShares() {
     for folder in /mnt/user/*/; do
         folder_name=$(basename "$folder")
-        
+
         if ! isShareUpdated "$1"; then
             setSharePerms "$folder_name"
         fi
@@ -303,6 +304,7 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `lazylibrarian`              | No       | Enable/Disable the Lazylibrarian container.              |
 | `bookbounty`                 | No       | Enable/Disable the Bookbounty container.                 |
 | `bazarr`                     | No       | Enable/Disable the Bazarr container.                     |
+| `kapowarr`                   | No       | Enable/Disable the Kapowarr container.                   |
 | `qbittorrent`                | No       | Enable/Disable the qBittorrent container.                |
 | `qbittorrent_managetorrents` | No       | Enable/Disable the qBittorrent manageTorrents container. |
 | `sabnzbd`                    | No       | Enable/Disable the SABnzbd container.                    |
@@ -467,6 +469,12 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | ------------- | -------- | ------------------------------------------------ |
 | `port`        | Yes      | The port that Bazarr's webUI will be running on. |
 
+#### kapowarr
+
+| Variable Name | Required | Description                                        |
+| ------------- | -------- | -------------------------------------------------- |
+| `port`        | Yes      | The port that Kapowarr's webUI will be running on. |
+
 #### qbittorrent
 
 | Variable Name  | Required | Description                                                                                                                                                                 |
@@ -555,6 +563,7 @@ Below is a list of all of the containers that are available to be enabled/disabl
 | `lazylibrarian`              | For managing your ebooks and audiobooks. An alternative to readarr                                                                                                                                         |
 | `bookbounty`                 | For downloading ebooks that Readarr can't find                                                                                                                                                             |
 | `bazarr`                     | Automatically downloads external subtitles for your movies, TV Shows, and Anime                                                                                                                            |
+| `kapowarr`                   | For managing your comics                                                                                                                                                                                   |
 | `qbittorrent`                | Downloads torrents                                                                                                                                                                                         |
 | `qbittorrent_porthelper`     | Used with the PIA VPN and qBittorrent to set the qBittorrent port used for incoming connection to the port that is forwarded by PIA                                                                        |
 | `qbittorrent_managetorrents` | Used with qBittorrent to automatically send torrents that are slow/hanging to the bottom of the queue; then eventually removes them                                                                        |
