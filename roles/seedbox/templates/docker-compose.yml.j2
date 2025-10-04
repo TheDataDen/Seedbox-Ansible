@@ -30,6 +30,10 @@ services:
       # Bazarr
       - {{ bazarr.port }}:6767
 {% endif %}
+{% if containers.kapowarr %}
+      # Kapowarr
+      - {{ kapowarr.port }}:5656
+{% endif %}
 {% if containers.qbittorrent %}
       # qBittorrent
       - {{ qbittorrent.port }}:{{ qbittorrent.port }}
@@ -692,7 +696,7 @@ services:
       - /shares:/data
 {% if not containers.pia_vpn %}
     ports:
-      - {{ readarr_ebooks.port }}:8787      
+      - {{ readarr_ebooks.port }}:8787
 {% endif %}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:{{ readarr_ebooks.port }} || exit 1"]
@@ -844,6 +848,44 @@ services:
         condition: service_started
 {% endif %}
 {% endif %}
+{% if containers.kapowarr %}
+  kapowarr:
+    image: mrcas/kapowarr:latest
+    container_name: kapowarr
+    restart: unless-stopped
+    logging: *default-logging
+{% if containers.pia_vpn %}
+    network_mode: "service:vpn"
+{% endif %}
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - UMASK={{ umask }}
+      - TZ={{ timezone }}
+    volumes:
+      - ./kapowarr/config/db:/app/db
+      - /shares:/data
+{% if not containers.pia_vpn %}
+    ports:
+      - {{ kapowarr.port }}:5656
+{% endif %}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:{{ kapowarr.port }} || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+{% if containers.pia_vpn %}
+      vpn:
+        condition: service_healthy
+{% endif %}
+{% if containers.qbittorrent %}
+      qbittorrent:
+        condition: service_started
+{% endif %}
+{% endif %}
+
 {% if containers.qbittorrent %}
   qbittorrent:
     image: qbittorrentofficial/qbittorrent-nox:latest

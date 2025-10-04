@@ -34,6 +34,7 @@ containers:
   lazylibrarian: false
   bookbounty: false
   bazarr: true
+  kapowarr: false
   qbittorrent: true
   qbittorrent_managetorrents: false
   qbittorrent_porthelper: true
@@ -178,6 +179,9 @@ bookbounty:
 
 bazarr:
   port: 6767
+
+kapowarr:
+  port: 5656
 
 qbittorrent:
   port: 8081
