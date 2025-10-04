@@ -870,7 +870,7 @@ services:
       - {{ kapowarr.port }}:5656
 {% endif %}
     healthcheck:
-      test: ["CMD-SHELL", "for pid in /proc/[0-9]*; do grep -qa 'kapowarr' $pid/cmdline 2>/dev/null && exit 0; done; exit 1"]
+      test: ["CMD-SHELL", "for pid in /proc/[0-9]*; do grep -qia 'kapowarr' $pid/cmdline 2>/dev/null && exit 0; done; exit 1"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}
