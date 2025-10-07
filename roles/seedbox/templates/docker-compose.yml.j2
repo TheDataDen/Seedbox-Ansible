@@ -1063,7 +1063,10 @@ services:
     logging: *default-logging
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: --schedule "{{ watchtower.cron_schedule }}"
+    environment:
+      - TZ={{ timezone }}
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_SCHEDULE={{ watchtower.cron_schedule }}
 {% endif %}
 {% if containers.autoheal %}
   autoheal:

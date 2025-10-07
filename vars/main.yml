@@ -212,7 +212,7 @@ portainer:
   port: 9443
 
 watchtower:
-  cron_schedule: "0 5 * * *"
+  cron_schedule: "0 0 5 * * *"
 
 syncthing:
   gui_port: 8384
