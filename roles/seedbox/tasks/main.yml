@@ -158,6 +158,27 @@
     - seedbox
   when: extras.mam.enabled and containers.pia_vpn
 
+- name: Setup Prometheus
+  when: containers.telemetry
+  tags:
+    - seedbox
+  block:
+    - name: Create prometheus directory
+      ansible.builtin.file:
+        path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/prometheus"
+        state: directory
+        owner: "{{ docker_user }}"
+        group: "{{ docker_user }}"
+        mode: "0755"
+
+    - name: Create prometheus.yml
+      ansible.builtin.template:
+        src: prometheus.yml.j2
+        dest: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/prometheus/prometheus.yml"
+        owner: "{{ docker_user }}"
+        group: "{{ docker_user }}"
+        mode: "0644"
+
 - name: Create docker-compose.yml
   ansible.builtin.template:
     src: docker-compose.yml.j2
@@ -279,7 +300,7 @@
       when: not seedbox_mam_cookies.stat.exists
 
 - name: Regenerate Docker Compose File for Cleanuperr API Keys
-  when: containers.cleanuparr
+  when: containers.cleanuparr or containers.telemetry
   tags: seedbox
   block:
     - name: Get Sonarr API Key
@@ -309,6 +330,20 @@
       ansible.builtin.include_tasks: getApiKey.yml
       vars:
         app_name: "radarr_2"
+
+    - name: Get Readarr Audiobooks API Key
+      when: containers.readarr_audiobooks
+      tags: seedbox
+      ansible.builtin.include_tasks: getApiKey.yml
+      vars:
+        app_name: "readarr_audiobooks"
+
+    - name: Get Readarr Ebooks API Key
+      when: containers.readarr_ebooks
+      tags: seedbox
+      ansible.builtin.include_tasks: getApiKey.yml
+      vars:
+        app_name: "readarr_ebooks"
 
     - name: Create docker-compose.yml
       ansible.builtin.template:

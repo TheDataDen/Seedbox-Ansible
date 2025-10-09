@@ -1,0 +1,62 @@
+global:
+  scrape_interval: {{ telemetry.prometheus.scrape_interval }}
+  evaluation_interval: {{ telemetry.prometheus.evaluation_interval }}
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:{{ telemetry.prometheus.port }}']
+
+{% if containers.sonarr and telemetry.apps.sonarr.enabled %}
+  - job_name: 'exportarr_sonarr'
+    static_configs:
+      - targets: ['exportarr_sonarr:{{ telemetry.apps.sonarr.port }}']
+{% endif %}
+
+{% if containers.sonarr_2 and telemetry.apps.sonarr_2.enabled %}
+  - job_name: 'exportarr_sonarr_2'
+    static_configs:
+      - targets: ['exportarr_sonarr_2:{{ telemetry.apps.sonarr_2.port }}']
+{% endif %}
+
+{% if containers.radarr and telemetry.apps.radarr.enabled %}
+  - job_name: 'exportarr_radarr'
+    static_configs:
+      - targets: ['exportarr_radarr:{{ telemetry.apps.radarr.port }}']
+{% endif %}
+
+{% if containers.radarr_2 and telemetry.apps.radarr_2.enabled %}
+  - job_name: 'exportarr_radarr_2'
+    static_configs:
+      - targets: ['exportarr_radarr_2:{{ telemetry.apps.radarr_2.port }}']
+{% endif %}
+
+{% if containers.prowlarr and telemetry.apps.prowlarr.enabled %}
+  - job_name: 'exportarr_prowlarr'
+    static_configs:
+      - targets: ['exportarr_prowlarr:{{ telemetry.apps.prowlarr.port }}']
+{% endif %}
+
+{% if containers.readarr_audiobooks and telemetry.apps.readarr_audiobooks.enabled %}
+  - job_name: 'exportarr_readarr_audiobooks'
+    static_configs:
+      - targets: ['exportarr_readarr_audiobooks:{{ telemetry.apps.readarr_audiobooks.port }}']
+{% endif %}
+
+{% if containers.readarr_ebooks and telemetry.apps.readarr_ebooks.enabled %}
+  - job_name: 'exportarr_readarr_ebooks'
+    static_configs:
+      - targets: ['exportarr_readarr_ebooks:{{ telemetry.apps.readarr_ebooks.port }}']
+{% endif %}
+
+{% if containers.bazarr and telemetry.apps.bazarr.enabled %}
+  - job_name: 'exportarr_bazarr'
+    static_configs:
+      - targets: ['exportarr_bazarr:{{ telemetry.apps.bazarr.port }}']
+{% endif %}
+
+{% if containers.sabnzbd and telemetry.apps.sabnzbd.enabled %}
+  - job_name: 'exportarr_sabnzbd'
+    static_configs:
+      - targets: ['exportarr_sabnzbd:{{ telemetry.apps.sabnzbd.port }}']
+{% endif %}

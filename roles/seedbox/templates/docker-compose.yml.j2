@@ -1078,6 +1078,7 @@ services:
       - PUID={{ puid }}
       - PGID={{ pgid }}
       - UMASK={{ umask }}
+      - TZ={{ timezone }}
       - AUTOHEAL_CONTAINER_LABEL=all
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -1100,8 +1101,338 @@ services:
     volumes:
       - ./:/dockers
 {% endif %}
+{% if containers.telemetry %}
+{% if telemetry.grafana.enabled %}
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - {{ telemetry.grafana.port }}:3000
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+{% if telemetry.grafana.plugins is defined %}
+      - GF_INSTALL_PLUGINS={{ telemetry.grafana.plugins | join(',') }}
+{% endif %}
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+      prometheus:
+        condition: service_healthy
+{% endif %}
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - {{ telemetry.prometheus.port }}:9090
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-storage:/prometheus
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:9090/-/healthy || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+{% if telemetry.apps.sonarr.enabled and containers.sonarr %}
+      exportarr_sonarr:
+        condition: service_healthy
+{% endif %}
+{% if telemetry.apps.sonarr_2.enabled and containers.sonarr_2 %}
+      exportarr_sonarr_2:
+        condition: service_healthy
+{% endif %}
+{% if telemetry.apps.radarr.enabled and containers.radarr %}
+      exportarr_radarr:
+        condition: service_healthy
+{% endif %}
+{% if telemetry.apps.radarr_2.enabled and containers.radarr_2 %}
+      exportarr_radarr_2:
+        condition: service_healthy
+{% endif %}
+{% if telemetry.apps.prowlarr.enabled and containers.prowlarr %}
+      exportarr_prowlarr:
+        condition: service_healthy
+{% endif %}
+{% if telemetry.apps.readarr_audiobooks.enabled and containers.readarr_audiobooks %}
+      exportarr_readarr_audiobooks:
+        condition: service_healthy
+{% endif %}
+{% if telemetry.apps.readarr_ebooks.enabled and containers.readarr_ebooks %}
+      exportarr_readarr_ebooks:
+        condition: service_healthy
+{% endif %}
+{% if telemetry.apps.bazarr.enabled and containers.bazarr %}
+      exportarr_bazarr:
+        condition: service_healthy
+{% endif %}
+{% if telemetry.apps.sabnzbd.enabled and containers.sabnzbd %}
+      exportarr_sabnzbd:
+        condition: service_healthy
+{% endif %}
+{% if telemetry.apps.sonarr.enabled and containers.sonarr %}
+  exportarr_sonarr:
+    image: ghcr.io/onedr0p/exportarr:latest
+    container_name: exportarr_sonarr
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - {{ telemetry.apps.sonarr.port }}:{{ telemetry.apps.sonarr.port }}
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - TZ={{ timezone }}
+      - PORT={{ telemetry.apps.sonarr.port }}
+      - URL="http://{{ host_ip }}:{{ sonarr.port }}"
+      - ENABLE_ADDITIONAL_METRICS={{ telemetry.apps.sonarr.additional_metrics }}
+      - CONFIG="/config.xml"
+    volumes:
+      - ./sonarr/config/config.xml:/config.xml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:{{telemetry.apps.sonarr.port}}/healthz || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+      sonarr:
+        condition: service_healthy
+{% endif %}
+{% if telemetry.apps.sonarr_2.enabled and containers.sonarr_2 %}
+  exportarr_sonarr_2:
+    image: ghcr.io/onedr0p/exportarr:latest
+    container_name: exportarr_sonarr_2
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - {{ telemetry.apps.sonarr_2.port }}:{{ telemetry.apps.sonarr_2.port }}
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - TZ={{ timezone }}
+      - PORT={{ telemetry.apps.sonarr_2.port }}
+      - URL="http://{{ host_ip }}:{{ sonarr_2.port }}"
+      - ENABLE_ADDITIONAL_METRICS={{ telemetry.apps.sonarr_2.additional_metrics }}
+      - CONFIG="/config.xml"
+    volumes:
+      - ./sonarr_2/config/config.xml:/config.xml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:{{telemetry.apps.sonarr_2.port}}/healthz || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+      sonarr_2:
+        condition: service_healthy
+{% endif %}
+{% if telemetry.apps.radarr.enabled and containers.radarr %}
+  exportarr_radarr:
+    image: ghcr.io/onedr0p/exportarr:latest
+    container_name: exportarr_radarr
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - {{ telemetry.apps.radarr.port }}:{{ telemetry.apps.radarr.port }}
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - TZ={{ timezone }}
+      - PORT={{ telemetry.apps.radarr.port }}
+      - URL="http://{{ host_ip }}:{{ radarr.port }}"
+      - ENABLE_ADDITIONAL_METRICS={{ telemetry.apps.radarr.additional_metrics }}
+      - CONFIG="/config.xml"
+    volumes:
+      - ./radarr/config/config.xml:/config.xml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:{{telemetry.apps.radarr.port}}/healthz || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+      radarr:
+        condition: service_healthy
+{% endif %}
+{% if telemetry.apps.radarr_2.enabled and containers.radarr_2 %}
+  exportarr_radarr_2:
+    image: ghcr.io/onedr0p/exportarr:latest
+    container_name: exportarr_radarr_2
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - {{ telemetry.apps.radarr_2.port }}:{{ telemetry.apps.radarr_2.port }}
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - TZ={{ timezone }}
+      - PORT={{ telemetry.apps.radarr_2.port }}
+      - URL="http://{{ host_ip }}:{{ radarr_2.port }}"
+      - ENABLE_ADDITIONAL_METRICS={{ telemetry.apps.radarr_2.additional_metrics }}
+      - CONFIG="/config.xml"
+    volumes:
+      - ./radarr_2/config/config.xml:/config.xml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:{{telemetry.apps.radarr_2.port}}/healthz || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+      radarr_2:
+        condition: service_healthy
+{% endif %}
+{% if telemetry.apps.prowlarr.enabled and containers.prowlarr and telemetry.apps.prowlarr.api_key is defined and telemetry.apps.prowlarr.api_key != "REPLACEME" %}
+  exportarr_prowlarr:
+    image: ghcr.io/onedr0p/exportarr:latest
+    container_name: exportarr_prowlarr
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - {{ telemetry.apps.prowlarr.port }}:{{ telemetry.apps.prowlarr.port }}
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - TZ={{ timezone }}
+      - PORT={{ telemetry.apps.prowlarr.port }}
+      - URL="http://{{ host_ip }}:{{ prowlarr.port }}"
+      - API_KEY={{ telemetry.apps.prowlarr.api_key }}
+      - ENABLE_ADDITIONAL_METRICS={{ telemetry.apps.prowlarr.additional_metrics }}
+      - PROWLARR__BACKFILL=true
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:{{telemetry.apps.prowlarr.port}}/healthz || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+      prowlarr:
+        condition: service_healthy
+{% endif %}
+{% if telemetry.apps.readarr_audiobooks.enabled and containers.readarr_audiobooks %}
+  exportarr_readarr_audiobooks:
+    image: ghcr.io/onedr0p/exportarr:latest
+    container_name: exportarr_readarr_audiobooks
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - {{ telemetry.apps.readarr_audiobooks.port }}:{{ telemetry.apps.readarr_audiobooks.port }}
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - TZ={{ timezone }}
+      - PORT={{ telemetry.apps.readarr_audiobooks.port }}
+      - URL="http://{{ host_ip }}:{{ readarr_audiobooks.port }}"
+      - API_KEY={{ seedbox_readarr_audiobooks_api_key }}
+      - ENABLE_ADDITIONAL_METRICS={{ telemetry.apps.readarr_audiobooks.additional_metrics }}
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:{{telemetry.apps.readarr_audiobooks.port}}/healthz || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+      readarr_audiobooks:
+        condition: service_healthy
+{% endif %}
+{% if telemetry.apps.readarr_ebooks.enabled and containers.readarr_ebooks %}
+  exportarr_readarr_ebooks:
+    image: ghcr.io/onedr0p/exportarr:latest
+    container_name: exportarr_readarr_ebooks
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - {{ telemetry.apps.readarr_ebooks.port }}:{{ telemetry.apps.readarr_ebooks.port }}
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - TZ={{ timezone }}
+      - PORT={{ telemetry.apps.readarr_ebooks.port }}
+      - URL="http://{{ host_ip }}:{{ readarr_ebooks.port }}"
+      - API_KEY={{ seedbox_readarr_ebooks_api_key }}
+      - ENABLE_ADDITIONAL_METRICS={{ telemetry.apps.readarr_ebooks.additional_metrics }}
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:{{telemetry.apps.readarr_ebooks.port}}/healthz || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+      readarr_ebooks:
+        condition: service_healthy
+{% endif %}
+{% if telemetry.apps.bazarr.enabled and containers.bazarr and telemetry.apps.bazarr.api_key is defined and telemetry.apps.bazarr.api_key != "REPLACEME" %}
+  exportarr_bazarr:
+    image: ghcr.io/onedr0p/exportarr:latest
+    container_name: exportarr_bazarr
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - {{ telemetry.apps.bazarr.port }}:{{ telemetry.apps.bazarr.port }}
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - TZ={{ timezone }}
+      - PORT={{ telemetry.apps.bazarr.port }}
+      - URL="http://{{ host_ip }}:{{ bazarr.port }}"
+      - API_KEY={{ telemetry.apps.bazarr.api_key }}
+      - ENABLE_ADDITIONAL_METRICS={{ telemetry.apps.bazarr.additional_metrics }}
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:{{telemetry.apps.bazarr.port}}/healthz || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+      bazarr:
+        condition: service_healthy
+{% endif %}
+{% if telemetry.apps.sabnzbd.enabled and containers.sabnzbd and telemetry.apps.sabnzbd.api_key is defined and telemetry.apps.sabnzbd.api_key != "REPLACEME" %}
+  exportarr_sabnzbd:
+    image: ghcr.io/onedr0p/exportarr:latest
+    container_name: exportarr_sabnzbd
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - {{ telemetry.apps.sabnzbd.port }}:{{ telemetry.apps.sabnzbd.port }}
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - TZ={{ timezone }}
+      - PORT={{ telemetry.apps.sabnzbd.port }}
+      - URL="http://{{ host_ip }}:{{ sabnzbd.port }}"
+      - API_KEY={{ telemetry.apps.sabnzbd.api_key }}
+      - ENABLE_ADDITIONAL_METRICS={{ telemetry.apps.sabnzbd.additional_metrics }}
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:{{telemetry.apps.sabnzbd.port}}/healthz || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+      sabnzbd:
+        condition: service_healthy
+{% endif %}
+{% endif %}
 
-{% if containers.portainer or containers.pia_vpn %}
+{% if containers.portainer or containers.pia_vpn or containers.telemetry or (containers.telemetry and telemetry.grafana.enabled) %}
 volumes:
 {% endif %}
 {% if containers.portainer %}
@@ -1109,4 +1440,10 @@ volumes:
 {% endif %}
 {% if containers.pia_vpn %}
   pia-dat:
+{% endif %}
+{% if containers.telemetry and telemetry.grafana.enabled %}
+  grafana-storage:
+{% endif %}
+{% if containers.telemetry %}
+  prometheus-storage:
 {% endif %}

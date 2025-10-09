@@ -44,6 +44,8 @@ containers:
   watchtower: true
   autoheal: true
   syncthing: true
+  # Enables a set of containers
+  telemetry: false
 
 downloaders:
   staging:
@@ -216,6 +218,62 @@ watchtower:
 
 syncthing:
   gui_port: 8384
+
+telemetry:
+  grafana:
+    # Can be disabled if you have a different grafana instance elsewhere
+    enabled: true
+    port: 3000
+    # Uncomment if you want to add plugins to the grafana instance (The clock is an example)
+    # plugins:
+    #   - grafana-clock-panel
+
+  prometheus:
+    port: 9090
+    scrape_interval: 15s
+    evaluation_interval: 15s
+
+  # If you don't have some of the following containers enabled, they will be ignored, no need to remove them from this list
+  apps:
+    sonarr:
+      enabled: true
+      port: 9701
+      additional_metrics: false
+    sonarr_2:
+      enabled: true
+      port: 9702
+      additional_metrics: false
+    radarr:
+      enabled: true
+      port: 9703
+      additional_metrics: false
+    radarr_2:
+      enabled: true
+      port: 9704
+      additional_metrics: false
+    prowlarr:
+      enabled: true
+      port: 9705
+      api_key: REPLACEME
+      additional_metrics: false
+    readarr_audiobooks:
+      enabled: true
+      port: 9706
+      additional_metrics: false
+    readarr_ebooks:
+      enabled: true
+      port: 9707
+      additional_metrics: false
+    bazarr:
+      enabled: true
+      port: 9708
+      api_key: REPLACEME
+      additional_metrics: false
+    sabnzbd:
+      enabled: true
+      port: 9709
+      api_key: REPLACEME
+      additional_metrics: false
 
 # Used for all of the health checks except for the pia_vpn health check
 health_check:
