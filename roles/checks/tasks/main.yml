@@ -12,6 +12,8 @@
   tags:
     - checks
 
+# TODO: Add check for the telemetry containers since the format of the vars is different
+
 - name: Fail if duplicate ports are found
   ansible.builtin.fail:
     msg: >-
