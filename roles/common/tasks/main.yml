@@ -69,14 +69,32 @@
   tags:
     - share
 
-- name: Create {{ sabnzbd.sub_dir_name }} and {{ qbittorrent.sub_dir_name }} under Staging
-  ansible.builtin.file:
-    path: "/shares/{{ downloaders.staging.share_name }}/{{ item }}"
-    state: directory
-    mode: "0777"
-  loop:
-    - "{{ sabnzbd.sub_dir_name }}"
-    - "{{ qbittorrent.sub_dir_name }}"
+- name: Mount staging share
   when: downloaders.staging.enabled
   tags:
     - share
+  block:
+    - name: Create staging mountpoint
+      ansible.builtin.file:
+        path: "/staging"
+        state: directory
+        owner: "{{ docker_user }}"
+        group: "{{ docker_user }}"
+        mode: "0777"
+
+    - name: Mount staging share
+      ansible.posix.mount:
+        path: "/staging"
+        src: "{{ downloaders.staging.mount_tag }}"
+        fstype: virtiofs
+        state: mounted
+      become: true
+
+    - name: Create {{ sabnzbd.sub_dir_name }} and {{ qbittorrent.sub_dir_name }} under Staging
+      ansible.builtin.file:
+        path: "/staging/{{ item }}"
+        state: directory
+        mode: "0777"
+      loop:
+        - "{{ sabnzbd.sub_dir_name }}"
+        - "{{ qbittorrent.sub_dir_name }}"

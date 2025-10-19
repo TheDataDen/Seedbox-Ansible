@@ -48,7 +48,7 @@ containers:
 downloaders:
   staging:
     enabled: true
-    share_name: staging
+    mount_tag: Staging
 
 shares:
   mount_tag: Shares

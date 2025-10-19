@@ -217,8 +217,10 @@ echo "Done Setting Permissions!"
 4. For the vdisk, select `Auto` and then specify the size of the vdisk (I recommend at least 50GB)
 5. Add a Manual Share with the source path of `/mnt/user` (`mnt/user/media` if its all under a single share) and a mount tag of something like `Shares`. Rememeber what you set the mount tag to, you will need it later.
    - Make sure to set the mode to `virtiofs` (9p is the default but virtiofs is better)
-6. Turn on `VM Console enable Copy/paste` this will make it a lot easier for filling in some of the settings
-7. Create the VM and go through the Ubuntu install process (I recommend using the default settings)
+6. If you have the staging share on a cache/buffer drive: Add a Manual Share with the source path of (change to match your system) `/mnt/buffer/staging` and a mount tag of `Staging`.
+   - Again, make sure to set the mode to `virtiofs`
+7. Turn on `VM Console enable Copy/paste` this will make it a lot easier for filling in some of the settings
+8. Create the VM and go through the Ubuntu install process (I recommend using the default settings)
 
 ### Ansible Setup
 
@@ -315,10 +317,10 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 ### Downloader Settings
 
-| Variable Name                    | Required | Description                                                       |
-| -------------------------------- | -------- | ----------------------------------------------------------------- |
-| `downloaders.staging.enabled`    | Yes      | Enable/Disable the staging share                                  |
-| `downloaders.staging.share_name` | Yes      | The name of the share that will be used for the staging downloads |
+| Variable Name                   | Required | Description                                                                          |
+| ------------------------------- | -------- | ------------------------------------------------------------------------------------ |
+| `downloaders.staging.enabled`   | Yes      | Enable/Disable the staging share                                                     |
+| `downloaders.staging.mount_tag` | Yes      | The name of the tag that will be used for the UNRAID staging share passed to the VM. |
 
 ### Shares
 
