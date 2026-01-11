@@ -19,4 +19,5 @@
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
     mode: "0755"
+    create: yes
   tags: seedbox
