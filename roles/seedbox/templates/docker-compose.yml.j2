@@ -1104,6 +1104,7 @@ services:
       - PGID={{ pgid }}
       - UMASK={{ umask }}
     volumes:
+      - ./syncthing/config:/var/syncthing
       - ./:/dockers
 {% endif %}
 
