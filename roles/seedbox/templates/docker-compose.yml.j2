@@ -784,8 +784,6 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - BINDERY_PUID={{ puid }}
-      - BINDERY_PGID={{ pgid }}
       - TZ={{ timezone }}
       - BINDERY_PORT={{ bindery_ebooks.port }}
       - BINDERY_LOG_LEVEL={{ bindery_ebooks.logLevel }}
@@ -831,8 +829,6 @@ services:
     network_mode: "service:vpn"
 {% endif %}
     environment:
-      - BINDERY_PUID={{ puid }}
-      - BINDERY_PGID={{ pgid }}
       - TZ={{ timezone }}
       - BINDERY_PORT={{ bindery_audiobooks.port }}
       - BINDERY_LOG_LEVEL={{ bindery_audiobooks.logLevel }}
