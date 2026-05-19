@@ -730,6 +730,8 @@ services:
       - TZ={{ timezone }}
       - BINDERY_PORT={{ bindery.port }}
       - BINDERY_LOG_LEVEL={{ bindery.logLevel }}
+      - BINDERY_PUID={{ puid }}
+      - BINDERY_PGID={{ pgid }}
 {% if bindery.ebookShareName is defined %}
       - BINDERY_LIBRARY_DIR=/data/{{ bindery.ebookShareName }}
 {% if bindery.audiobookShareName is defined %}
