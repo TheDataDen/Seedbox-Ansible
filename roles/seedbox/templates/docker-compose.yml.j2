@@ -82,13 +82,9 @@ services:
       # Huntarr
       - {{ huntarr.port }}:9705
 {% endif %}
-{% if containers.bindery_audiobooks %}
-      # Bindery Audiobooks
-      - {{ bindery_audiobooks.port }}:{{ bindery_audiobooks.port }}
-{% endif %}
-{% if containers.bindery_ebooks %}
-      # Bindery Ebooks
-      - {{ bindery_ebooks.port }}:{{ bindery_ebooks.port }}
+{% if containers.bindery %}
+      # Bindery
+      - {{ bindery.port }}:{{ bindery.port }}
 {% endif %}
     cap_add:
       - NET_ADMIN
@@ -774,10 +770,10 @@ services:
         condition: service_started
 {% endif %}
 {% endif %}
-{% if containers.bindery_ebooks %}
-  bindery_ebooks:
+{% if containers.bindery %}
+  bindery:
     image: ghcr.io/vavallee/bindery:latest
-    container_name: bindery_ebooks
+    container_name: bindery
     restart: unless-stopped
     logging: *default-logging
 {% if containers.pia_vpn %}
@@ -785,64 +781,24 @@ services:
 {% endif %}
     environment:
       - TZ={{ timezone }}
-      - BINDERY_PORT={{ bindery_ebooks.port }}
-      - BINDERY_LOG_LEVEL={{ bindery_ebooks.logLevel }}
-{% if bindery_ebooks.ebooksAndAudiobooks %}
-      - BINDERY_AUDIOBOOK_DIR=/data/{{ bindery_ebooks.audiobookShareName }}
+      - BINDERY_PORT={{ bindery.port }}
+      - BINDERY_LOG_LEVEL={{ bindery.logLevel }}
+{% if bindery.audiobookShareName is defined %}
+      - BINDERY_AUDIOBOOK_DIR=/data/{{ bindery.audiobookShareName }}
 {% endif %}
-      - BINDERY_DOWNLOAD_DIR=/data/{{ bindery_ebooks.downloadsShareName }}
-      - BINDERY_LIBRARY_DIR=/data/{{ bindery_ebooks.ebookShareName }}
+{% if bindery.ebookShareName is defined %}
+      - BINDERY_EBOOK_DIR=/data/{{ bindery.ebookShareName }}
+{% endif %}
+      - BINDERY_DOWNLOAD_DIR=/data/{{ bindery.downloadsShareName }}
 {% if not containers.pia_vpn %}
     ports:
-      - {{ bindery_ebooks.port }}:{{ bindery_ebooks.port }}
+      - {{ bindery.port }}:{{ bindery.port }}
 {% endif %}
     volumes:
-      - ./bindery_ebooks/config:/config
+      - ./bindery/config:/config
       - /shares:/data
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:{{ bindery_ebooks.port }} || exit 1"]
-      interval: {{ health_check.interval }}
-      timeout: {{ health_check.timeout }}
-      retries: {{ health_check.retries }}
-      start_period: {{ health_check.start_period }}
-    depends_on:
-{% if containers.pia_vpn %}
-      vpn:
-        condition: service_healthy
-{% endif %}
-{% if containers.qbittorrent %}
-      qbittorrent:
-        condition: service_started
-{% endif %}
-{% if containers.sabnzbd %}
-      sabnzbd:
-        condition: service_started
-{% endif %}
-{% endif %}
-{% if containers.bindery_audiobooks %}
-  bindery_audiobooks:
-    image: ghcr.io/vavallee/bindery:latest
-    container_name: bindery_audiobooks
-    restart: unless-stopped
-    logging: *default-logging
-{% if containers.pia_vpn %}
-    network_mode: "service:vpn"
-{% endif %}
-    environment:
-      - TZ={{ timezone }}
-      - BINDERY_PORT={{ bindery_audiobooks.port }}
-      - BINDERY_LOG_LEVEL={{ bindery_audiobooks.logLevel }}
-      - BINDERY_DOWNLOAD_DIR=/data/{{ bindery_audiobooks.downloadsShareName }}
-      - BINDERY_LIBRARY_DIR=/data/{{ bindery_audiobooks.audiobookShareName }}
-{% if not containers.pia_vpn %}
-    ports:
-      - {{ bindery_audiobooks.port }}:{{ bindery_audiobooks.port }}
-{% endif %}
-    volumes:
-      - ./bindery_audiobooks/config:/config
-      - /shares:/data
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:{{ bindery_audiobooks.port }} || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:{{ bindery.port }} || exit 1"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}

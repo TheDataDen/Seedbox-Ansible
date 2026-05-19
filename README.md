@@ -36,8 +36,7 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
       - [readarr\_audiobooks](#readarr_audiobooks)
       - [readarr\_ebooks](#readarr_ebooks)
       - [lazylibrarian](#lazylibrarian)
-      - [bindery\_ebooks](#bindery_ebooks)
-      - [bindery\_audiobooks](#bindery_audiobooks)
+      - [bindery](#bindery)
       - [bookbounty](#bookbounty)
       - [bazarr](#bazarr)
       - [kapowarr](#kapowarr)
@@ -306,8 +305,7 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `readarr_audiobooks`         | No       | Enable/Disable the readarr_audiobooks container.         |
 | `readarr_ebooks`             | No       | Enable/Disable the readarr_ebooks container.             |
 | `lazylibrarian`              | No       | Enable/Disable the Lazylibrarian container.              |
-| `bindery_ebooks`             | No       | Enable/Disable the Bindery Ebooks container.             |
-| `bindery_audiobooks`         | No       | Enable/Disable the Bindery Audiobooks container.         |
+| `bindery`                    | No       | Enable/Disable the Bindery container.                    |
 | `bookbounty`                 | No       | Enable/Disable the Bookbounty container.                 |
 | `bazarr`                     | No       | Enable/Disable the Bazarr container.                     |
 | `kapowarr`                   | No       | Enable/Disable the Kapowarr container.                   |
@@ -457,25 +455,15 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `port`        | Yes      | The port that Lazylibrarian's webUI will be running on.                                   |
 | `docker_mods` | No       | The mods that will be used for Lazylibrarian. Default enables calibre-importer and ffmpeg |
 
-#### bindery_ebooks
+#### bindery
 
-| Variable Name         | Required | Description                                                                                         |
-| --------------------- | -------- | --------------------------------------------------------------------------------------------------- |
-| `port`                | Yes      | The port that Bindery Ebooks's webUI will be running on.                                            |
-| `logLevel`            | Yes      | The log level that Bindery Ebooks will use. (debug, info, warn, error)                              |
-| `ebooksAndAudiobooks` | Yes      | If true, the container will be used for both ebooks and audiobooks.                                 |
-| `downloadsShareName`  | Yes      | The name of the share that will be used for downloads.                                              |
-| `ebookShareName`      | Yes      | The name of the share that will be used for ebooks.                                                 |
-| `audiobookShareName`  | Yes      | The name of the share that will be used for audiobooks. Only used if `ebooksAndAudiobooks` is true. |
-
-#### bindery_audiobooks
-
-| Variable Name        | Required | Description                                                                |
-| -------------------- | -------- | -------------------------------------------------------------------------- |
-| `port`               | Yes      | The port that Bindery Audiobooks's webUI will be running on.               |
-| `logLevel`           | Yes      | The log level that Bindery Audiobooks will use. (debug, info, warn, error) |
-| `downloadsShareName` | Yes      | The name of the share that will be used for downloads.                     |
-| `audiobookShareName` | Yes      | The name of the share that will be used for audiobooks.                    |
+| Variable Name        | Required | Description                                                                                              |
+| -------------------- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `port`               | Yes      | The port that Bindery Ebooks's webUI will be running on.                                                 |
+| `logLevel`           | Yes      | The log level that Bindery Ebooks will use. (debug, info, warn, error)                                   |
+| `downloadsShareName` | Yes      | The name of the share that will be used for downloads.                                                   |
+| `ebookShareName`     | Yes      | The name of the share that will be used for ebooks. Comment out if not using Bindery for ebooks.         |
+| `audiobookShareName` | Yes      | The name of the share that will be used for audiobooks. Comment out if not using Bindery for audiobooks. |
 
 #### bookbounty
 
@@ -587,8 +575,7 @@ Below is a list of all of the containers that are available to be enabled/disabl
 | `readarr_audiobooks`         | For managing your audiobooks                                                                                                                                                                               |
 | `readarr_ebooks`             | For managing your ebooks                                                                                                                                                                                   |
 | `lazylibrarian`              | For managing your ebooks and audiobooks. An alternative to readarr                                                                                                                                         |
-| `bindery_ebooks`             | Since Readarr is dead, this is the newest thing                                                                                                                                                            |
-| `bindery_audiobooks`         | Since Readarr is dead, this is the newest thing                                                                                                                                                            |
+| `bindery`                    | Since Readarr is dead, this is the newest thing. It is not enabled by default over Readarr.                                                                                                                |
 | `bookbounty`                 | For downloading ebooks that Readarr can't find                                                                                                                                                             |
 | `bazarr`                     | Automatically downloads external subtitles for your movies, TV Shows, and Anime                                                                                                                            |
 | `kapowarr`                   | For managing your comics                                                                                                                                                                                   |

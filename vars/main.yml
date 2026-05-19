@@ -28,13 +28,12 @@ containers:
   notifiarr: true
   prowlarr: true
   flaresolverr: true
-  readarr_audiobooks: true
-  readarr_ebooks: true
+  readarr_audiobooks: false
+  readarr_ebooks: false
   # Available as an alternative to Readarr
   lazylibrarian: false
   # Available as an alternative to Readarr
-  bindery_ebooks: false
-  bindery_audiobooks: false
+  bindery: true
   bookbounty: false
   bazarr: true
   kapowarr: false
@@ -168,22 +167,14 @@ lazylibrarian:
   # Comment out if you don't want to use mods
   docker_mods: linuxserver/mods:universal-calibre|linuxserver/mods:lazylibrarian-ffmpeg
 
-bindery_ebooks:
+bindery:
   port: 8789
   logLevel: info
-  # If you want to use one instance for both ebooks and audiobooks, set this to true (You won't be able to have both formats for the same book)
-  # If you enable this, disable bindery_audiobooks
-  ebooksAndAudiobooks: false
   downloadsShareName: downloads
+  # Comment out the line below if you are not using Bindery for audiobooks
+  audiobookShareName: audiobooks
+  # Comment out the line below if you are not using Bindery for ebooks
   ebookShareName: books
-  # Only used if ebooksAndAudiobooks is true
-  audiobookShareName: audiobooks
-
-bindery_audiobooks:
-  port: 8790
-  logLevel: info
-  downloadsShareName: downloads
-  audiobookShareName: audiobooks
 
 bookbounty:
   port: 5000

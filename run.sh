@@ -4,6 +4,9 @@ set -e
 
 echo "THERE HAVE BEEN SOME MAJOR CHANGES TO THIS PROJECT RECENTLY. PLEASE READ THE 'README.md' FILE AND CHECK THE CONTENTS OF THE 'vars/main.yml' FILE BEFORE RUNNING THIS SCRIPT."
 echo -e "\n"
+echo "RECENT CHANGES:"
+echo "  - The bindery containers have been merged. If you were using bindery previously you will need to move your ~/dockers/seedbox/bindery_ebooks (or ~/dockers/seedbox/bindery_audiobooks) directory to ~/dockers/seedbox/bindery and then run the playbook again."
+echo -e "\n"
 echo "PRESS ENTER TO IF YOU ARE READY TO RUN THE PLAYBOOK OTHERWISE PRESS CTRL+C TO EXIT."
 read
 
