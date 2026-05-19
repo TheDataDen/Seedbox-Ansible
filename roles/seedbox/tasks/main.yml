@@ -323,3 +323,13 @@
         cmd: "docker compose -f /home/{{ docker_user }}/dockers/{{ docker_directory_name }}/docker-compose.yml up -d"
       changed_when: true
       tags: seedbox
+
+- name: Setup Bindery Config Directory
+  when: containers.bindery
+  tags: seedbox
+  ansible.builtin.file:
+    path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/bindery"
+    state: directory
+    owner: "{{ puid }}"
+    group: "{{ pgid }}"
+    mode: "0755"
