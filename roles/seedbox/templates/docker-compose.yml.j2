@@ -682,6 +682,7 @@ services:
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
+    user: "{{ puid }}:{{ pgid }}"
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
