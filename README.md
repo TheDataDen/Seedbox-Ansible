@@ -341,20 +341,22 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 #### pia_vpn
 
-| Variable Name   | Required | Description                                                                                                        |
-| --------------- | -------- | ------------------------------------------------------------------------------------------------------------------ |
-| `local_network` | Yes      | The local network that the PIA VPN container will use.                                                             |
-| `username`      | Yes      | The username that will be used to connect to the PIA VPN container.                                                |
-| `password`      | Yes      | The password that will be used to connect to the PIA VPN container.                                                |
-| `server_loc`    | No       | The location of the PIA server. If using Dedicated IP, this should be commented out with a `#`.                    |
-| `dip_token`     | No       | The DIP token of the PIA server. If NOT using Dedicated IP, this should be commented out with a `#`.               |
-| `port_fatal`    | No       | Enables the port_fatal option for the PIA VPN container. If the VPN port forward fails, the container will exit.   |
-| `port_persist`  | No       | Enables the port_persist option for the PIA VPN container. The container will try to use the same port every time. |
+| Variable Name        | Required | Description                                                                                                        |
+| -------------------- | -------- | ------------------------------------------------------------------------------------------------------------------ |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.                                                                            |
+| `local_network`      | Yes      | The local network that the PIA VPN container will use.                                                             |
+| `username`           | Yes      | The username that will be used to connect to the PIA VPN container.                                                |
+| `password`           | Yes      | The password that will be used to connect to the PIA VPN container.                                                |
+| `server_loc`         | No       | The location of the PIA server. If using Dedicated IP, this should be commented out with a `#`.                    |
+| `dip_token`          | No       | The DIP token of the PIA server. If NOT using Dedicated IP, this should be commented out with a `#`.               |
+| `port_fatal`         | No       | Enables the port_fatal option for the PIA VPN container. If the VPN port forward fails, the container will exit.   |
+| `port_persist`       | No       | Enables the port_persist option for the PIA VPN container. The container will try to use the same port every time. |
 
 #### cleanuparr
 
 | Variable Name                  | Required | Description                                                                                        |
 | ------------------------------ | -------- | -------------------------------------------------------------------------------------------------- |
+| `disable_autoupdate`           | Yes      | Disables watchtower for this container.                                                            |
 | `dry_run`                      | Yes      | If true, the container will not actually clean up the files. Use this to verify your setup.        |
 | `ignored`                      | Yes      | A list of ignored tags, categories, and torrents. The file will be created if it doesn't exist.    |
 | `sonarr.list_type`             | Yes      | Either `blacklist` or `whitelist`. The type of list that will be used for blocking bad files.      |
@@ -374,84 +376,97 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 #### radarr
 
-| Variable Name   | Required | Description                                      |
-| --------------- | -------- | ------------------------------------------------ |
-| `port`          | Yes      | The port that Radarr's webUI will be running on. |
-| `instance_name` | No       | The name that will appear in the browser tab.    |
+| Variable Name        | Required | Description                                      |
+| -------------------- | -------- | ------------------------------------------------ |
+| `port`               | Yes      | The port that Radarr's webUI will be running on. |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.          |
+| `instance_name`      | No       | The name that will appear in the browser tab.    |
 
 #### radarr_2
 
-| Variable Name   | Required | Description                                                 |
-| --------------- | -------- | ----------------------------------------------------------- |
-| `port`          | Yes      | The port that the second Radarr's webUI will be running on. |
-| `instance_name` | No       | The name that will appear in the browser tab.               |
+| Variable Name        | Required | Description                                                 |
+| -------------------- | -------- | ----------------------------------------------------------- |
+| `port`               | Yes      | The port that the second Radarr's webUI will be running on. |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.                     |
+| `instance_name`      | No       | The name that will appear in the browser tab.               |
 
 #### sonarr
 
-| Variable Name   | Required | Description                                      |
-| --------------- | -------- | ------------------------------------------------ |
-| `port`          | Yes      | The port that Sonarr's webUI will be running on. |
-| `instance_name` | No       | The name that will appear in the browser tab.    |
+| Variable Name        | Required | Description                                      |
+| -------------------- | -------- | ------------------------------------------------ |
+| `port`               | Yes      | The port that Sonarr's webUI will be running on. |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.          |
+| `instance_name`      | No       | The name that will appear in the browser tab.    |
 
 #### sonarr_2
 
-| Variable Name   | Required | Description                                                 |
-| --------------- | -------- | ----------------------------------------------------------- |
-| `port`          | Yes      | The port that the second Sonarr's webUI will be running on. |
-| `instance_name` | No       | The name that will appear in the browser tab.               |
+| Variable Name        | Required | Description                                                 |
+| -------------------- | -------- | ----------------------------------------------------------- |
+| `port`               | Yes      | The port that the second Sonarr's webUI will be running on. |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.                     |
+| `instance_name`      | No       | The name that will appear in the browser tab.               |
 
 #### recyclarr
 
-| Variable Name   | Required | Description                                               |
-| --------------- | -------- | --------------------------------------------------------- |
-| `version`       | Yes      | The version of Recyclarr to use.                          |
-| `cron_schedule` | Yes      | The cron schedule that controls how often Recyclarr runs. |
+| Variable Name        | Required | Description                                               |
+| -------------------- | -------- | --------------------------------------------------------- |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.                   |
+| `version`            | Yes      | The version of Recyclarr to use.                          |
+| `cron_schedule`      | Yes      | The cron schedule that controls how often Recyclarr runs. |
 
 #### notifiarr
 
-| Variable Name | Required | Description                                         |
-| ------------- | -------- | --------------------------------------------------- |
-| `port`        | Yes      | The port that Notifiarr's webUI will be running on. |
-| `api_key`     | Yes      | The API key for your Notifiarr account.             |
+| Variable Name        | Required | Description                                         |
+| -------------------- | -------- | --------------------------------------------------- |
+| `port`               | Yes      | The port that Notifiarr's webUI will be running on. |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.             |
+| `api_key`            | Yes      | The API key for your Notifiarr account.             |
 
 #### prowlarr
 
-| Variable Name | Required | Description                                        |
-| ------------- | -------- | -------------------------------------------------- |
-| `port`        | Yes      | The port that Prowlarr's webUI will be running on. |
+| Variable Name        | Required | Description                                        |
+| -------------------- | -------- | -------------------------------------------------- |
+| `port`               | Yes      | The port that Prowlarr's webUI will be running on. |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.            |
+
 
 #### flaresolverr
 
-| Variable Name | Required | Description                                    |
-| ------------- | -------- | ---------------------------------------------- |
-| `port`        | Yes      | The port that FlareSolverr will be running on. |
+| Variable Name        | Required | Description                                    |
+| -------------------- | -------- | ---------------------------------------------- |
+| `port`               | Yes      | The port that FlareSolverr will be running on. |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.        |
 
 #### readarr_audiobooks
 
-| Variable Name   | Required | Description                                                  |
-| --------------- | -------- | ------------------------------------------------------------ |
-| `port`          | Yes      | The port that readarr_audiobooks's webUI will be running on. |
-| `instance_name` | Yes      | The name that will appear in the browser tab.                |
+| Variable Name        | Required | Description                                                  |
+| -------------------- | -------- | ------------------------------------------------------------ |
+| `port`               | Yes      | The port that readarr_audiobooks's webUI will be running on. |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.                      |
+| `instance_name`      | Yes      | The name that will appear in the browser tab.                |
 
 #### readarr_ebooks
 
-| Variable Name   | Required | Description                                              |
-| --------------- | -------- | -------------------------------------------------------- |
-| `port`          | Yes      | The port that readarr_ebooks's webUI will be running on. |
-| `instance_name` | Yes      | The name that will appear in the browser tab.            |
+| Variable Name        | Required | Description                                              |
+| -------------------- | -------- | -------------------------------------------------------- |
+| `port`               | Yes      | The port that readarr_ebooks's webUI will be running on. |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.                  |
+| `instance_name`      | Yes      | The name that will appear in the browser tab.            |
 
 #### lazylibrarian
 
-| Variable Name | Required | Description                                                                               |
-| ------------- | -------- | ----------------------------------------------------------------------------------------- |
-| `port`        | Yes      | The port that Lazylibrarian's webUI will be running on.                                   |
-| `docker_mods` | No       | The mods that will be used for Lazylibrarian. Default enables calibre-importer and ffmpeg |
+| Variable Name        | Required | Description                                                                               |
+| -------------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `port`               | Yes      | The port that Lazylibrarian's webUI will be running on.                                   |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.                                                   |
+| `docker_mods`        | No       | The mods that will be used for Lazylibrarian. Default enables calibre-importer and ffmpeg |
 
 #### bindery
 
 | Variable Name        | Required | Description                                                                                              |
 | -------------------- | -------- | -------------------------------------------------------------------------------------------------------- |
 | `port`               | Yes      | The port that Bindery Ebooks's webUI will be running on.                                                 |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.                                                                  |
 | `logLevel`           | Yes      | The log level that Bindery Ebooks will use. (debug, info, warn, error)                                   |
 | `downloadsShareName` | Yes      | The name of the share that will be used for downloads.                                                   |
 | `ebookShareName`     | Yes      | The name of the share that will be used for ebooks. Comment out if not using Bindery for ebooks.         |
@@ -462,6 +477,7 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | Variable Name               | Required | Description                                                                                  |
 | --------------------------- | -------- | -------------------------------------------------------------------------------------------- |
 | `port`                      | Yes      | The port that Bookbounty's webUI will be running on.                                         |
+| `disable_autoupdate`        | Yes      | Disables watchtower for this container.                                                      |
 | `sync_schedule`             | Yes      | The cron schedule that controls how often Bookbounty syncs. 24h format, comma seperated list |
 | `selected_language`         | Yes      | The language that Bookbounty will sync. Default is English                                   |
 | `preferred_ext_fiction`     | Yes      | The preferred extensions for fiction. Comma sperated list.                                   |
@@ -471,58 +487,66 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 #### bazarr
 
-| Variable Name | Required | Description                                      |
-| ------------- | -------- | ------------------------------------------------ |
-| `port`        | Yes      | The port that Bazarr's webUI will be running on. |
+| Variable Name        | Required | Description                                      |
+| -------------------- | -------- | ------------------------------------------------ |
+| `port`               | Yes      | The port that Bazarr's webUI will be running on. |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.          |
 
 #### kapowarr
 
-| Variable Name | Required | Description                                        |
-| ------------- | -------- | -------------------------------------------------- |
-| `port`        | Yes      | The port that Kapowarr's webUI will be running on. |
+| Variable Name        | Required | Description                                        |
+| -------------------- | -------- | -------------------------------------------------- |
+| `port`               | Yes      | The port that Kapowarr's webUI will be running on. |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.            |
 
 #### qbittorrent
 
-| Variable Name  | Required | Description                                                                                                                                                                 |
-| -------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `port`         | Yes      | The port that qBittorrent's webUI will be running on.                                                                                                                       |
-| `sub_dir_name` | Yes      | The name of the sub directory that will be created under the staging share.                                                                                                 |
-| `host`         | No       | The host ip that qBittorrent will be running on. Don't change this unless it different from the host IP. Only required if using the porthelper or managetorrents containers |
-| `username`     | No       | The username that will be used to connect to qBittorrent. Only required if using the porthelper or managetorrents containers                                                |
-| `password`     | No       | The password that will be used to connect to qBittorrent. Only required if using the porthelper or managetorrents containers                                                |
+| Variable Name        | Required | Description                                                                                                                                                                 |
+| -------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `port`               | Yes      | The port that qBittorrent's webUI will be running on.                                                                                                                       |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.                                                                                                                                     |
+| `sub_dir_name`       | Yes      | The name of the sub directory that will be created under the staging share.                                                                                                 |
+| `host`               | No       | The host ip that qBittorrent will be running on. Don't change this unless it different from the host IP. Only required if using the porthelper or managetorrents containers |
+| `username`           | No       | The username that will be used to connect to qBittorrent. Only required if using the porthelper or managetorrents containers                                                |
+| `password`           | No       | The password that will be used to connect to qBittorrent. Only required if using the porthelper or managetorrents containers                                                |
 
 #### qbittorrent_porthelper
 
-| Variable Name         | Required | Default | Description                                          |
-| --------------------- | -------- | ------- | ---------------------------------------------------- |
-| `update_time_seconds` | No       | `60`    | The time in seconds between each update of the port. |
+| Variable Name         | Required | Default                                 | Description                                          |
+| --------------------- | -------- | --------------------------------------- | ---------------------------------------------------- |
+| `disable_autoupdate`  | Yes      | Disables watchtower for this container. |
+| `update_time_seconds` | No       | `60`                                    | The time in seconds between each update of the port. |
 
 #### qbittorrent_managetorrents
 
-| Variable Name         | Required | Default | Description                                             |
-| --------------------- | -------- | ------- | ------------------------------------------------------- |
-| `update_time_seconds` | No       | `120`   | The time in seconds between each check of the torrents. |
+| Variable Name         | Required | Default                                 | Description                                             |
+| --------------------- | -------- | --------------------------------------- | ------------------------------------------------------- |
+| `disable_autoupdate`  | Yes      | Disables watchtower for this container. |
+| `update_time_seconds` | No       | `120`                                   | The time in seconds between each check of the torrents. |
 
 #### sabnzbd
 
-| Variable Name  | Required | Description                                                                 |
-| -------------- | -------- | --------------------------------------------------------------------------- |
-| `port`         | Yes      | The port that SABnzbd's webUI will be running on.                           |
-| `sub_dir_name` | Yes      | The name of the sub directory that will be created under the staging share. |
+| Variable Name        | Required | Description                                                                 |
+| -------------------- | -------- | --------------------------------------------------------------------------- |
+| `port`               | Yes      | The port that SABnzbd's webUI will be running on.                           |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.                                     |
+| `sub_dir_name`       | Yes      | The name of the sub directory that will be created under the staging share. |
 
 
 #### firefox
 
-| Variable Name | Required | Description                                       |
-| ------------- | -------- | ------------------------------------------------- |
-| `port`        | Yes      | The port that Firefox's webUI will be running on. |
-| `shm_size`    | Yes      | The size of the shared memory for Firefox.        |
+| Variable Name        | Required | Description                                       |
+| -------------------- | -------- | ------------------------------------------------- |
+| `port`               | Yes      | The port that Firefox's webUI will be running on. |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.           |
+| `shm_size`           | Yes      | The size of the shared memory for Firefox.        |
 
 #### portainer
 
-| Variable Name | Required | Description                                         |
-| ------------- | -------- | --------------------------------------------------- |
-| `port`        | Yes      | The port that Portainer's webUI will be running on. |
+| Variable Name        | Required | Description                                         |
+| -------------------- | -------- | --------------------------------------------------- |
+| `port`               | Yes      | The port that Portainer's webUI will be running on. |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.             |
 
 #### watchtower
 
@@ -532,9 +556,10 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 #### syncthing
 
-| Variable Name | Required | Description                                         |
-| ------------- | -------- | --------------------------------------------------- |
-| `gui_port`    | Yes      | The port that Syncthing's webUI will be running on. |
+| Variable Name        | Required | Description                                         |
+| -------------------- | -------- | --------------------------------------------------- |
+| `gui_port`           | Yes      | The port that Syncthing's webUI will be running on. |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.             |
 
 #### Health Check Settings
 

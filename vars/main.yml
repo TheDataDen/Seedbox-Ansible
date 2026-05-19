@@ -63,6 +63,7 @@ extras:
     session_cookie: REPLACEME
 
 pia_vpn:
+  disable_autoupdate: false
   username: REPLACEME
   password: REPLACEME
   local_network: 10.1.10.0/24
@@ -75,6 +76,7 @@ pia_vpn:
   port_persist: false
 
 cleanuparr:
+  disable_autoupdate: false
   # Change to false after you confirm that the setup is correct
   dry_run: true
   ignored:
@@ -106,29 +108,34 @@ cleanuparr:
 
 radarr:
   port: 7878
+  disable_autoupdate: false
 
   # The name that will be displayed in the browser tab. Uncomment the line below to change the name
   # instance_name: Radarr
 
 radarr_2:
   port: 7879
+  disable_autoupdate: false
 
   # The name that will be displayed in the browser tab. Uncomment the line below to change the name
   # instance_name: Radarr
 
 sonarr:
   port: 8989
+  disable_autoupdate: false
 
   # The name that will be displayed in the browser tab. Uncomment the line below to change the name
   # instance_name: Sonarr
 
 sonarr_2:
   port: 8990
+  disable_autoupdate: false
 
   # The name that will be displayed in the browser tab. Uncomment the line below to change the name
   # instance_name: Sonarr
 
 recyclarr:
+  disable_autoupdate: false
   # Should not use latest as when the major version changes there will be breaking changes
   # 7 is the latest version at the time of creating this
   version: 7
@@ -136,35 +143,42 @@ recyclarr:
 
 notifiarr:
   port: 5454
+  disable_autoupdate: false
   # If you do not have an API key, create an account at https://notifiarr.com and get an API key
   api_key: REPLACEME
 
 prowlarr:
   port: 9696
+  disable_autoupdate: false
 
 flaresolverr:
   port: 8191
+  disable_autoupdate: false
 
 readarr_audiobooks:
   port: 8787
+  disable_autoupdate: false
 
   # The name that will be displayed in the browser tab
   instance_name: Readarr Audiobooks
 
 readarr_ebooks:
   port: 8788
+  disable_autoupdate: false
 
   # The name that will be displayed in the browser tab
   instance_name: Readarr Ebooks
 
 lazylibrarian:
   port: 5299
+  disable_autoupdate: false
 
   # Comment out if you don't want to use mods
   docker_mods: linuxserver/mods:universal-calibre|linuxserver/mods:lazylibrarian-ffmpeg
 
 bindery:
   port: 8789
+  disable_autoupdate: false
   logLevel: info
   downloadsShareName: downloads
   # Comment out the line below if you are not using Bindery for audiobooks
@@ -174,6 +188,7 @@ bindery:
 
 bookbounty:
   port: 5000
+  disable_autoupdate: false
 
   # Comma separated list of 24h hours to check for books
   sync_schedule: 0,6,12,18
@@ -186,12 +201,15 @@ bookbounty:
 
 bazarr:
   port: 6767
+  disable_autoupdate: false
 
 kapowarr:
   port: 5656
+  disable_autoupdate: false
 
 qbittorrent:
   port: 8081
+  disable_autoupdate: false
 
   sub_dir_name: Torrents
 
@@ -201,27 +219,33 @@ qbittorrent:
   password: REPLACEME
 
 qbittorrent_porthelper:
+  disable_autoupdate: false
   update_time_seconds: 60
 
 qbittorrent_managetorrents:
+  disable_autoupdate: false
   update_time_seconds: 120
 
 sabnzbd:
   port: 8181
+  disable_autoupdate: false
 
   sub_dir_name: Usenet
 
 firefox:
   port: 3001
+  disable_autoupdate: false
   shm_size: "1gb"
 
 portainer:
   port: 9443
+  disable_autoupdate: false
 
 watchtower:
   cron_schedule: "0 0 5 * * *"
 
 syncthing:
+  disable_autoupdate: false
   gui_port: 8384
 
 # Used for all of the health checks except for the pia_vpn health check

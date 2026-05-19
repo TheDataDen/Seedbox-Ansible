@@ -11,6 +11,10 @@ services:
     container_name: pia_vpn
     restart: unless-stopped
     logging: *default-logging
+{% if pia_vpn.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
     volumes:
       - pia-dat:/pia
       - ./pia/port:/pia-port
@@ -125,6 +129,10 @@ services:
     container_name: cleanuparr
     restart: unless-stopped
     logging: *default-logging
+{% if cleanuparr.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
     volumes:
       - /shares:/data
       - ./cleanuparr/ignored.txt:/ignored.txt
@@ -261,6 +269,10 @@ services:
     container_name: radarr
     restart: unless-stopped
     logging: *default-logging
+{% if radarr.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -307,6 +319,10 @@ services:
     container_name: radarr_2
     restart: unless-stopped
     logging: *default-logging
+{% if radarr_2.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -353,6 +369,10 @@ services:
     container_name: sonarr
     restart: unless-stopped
     logging: *default-logging
+{% if sonarr.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -399,6 +419,10 @@ services:
     container_name: sonarr_2
     restart: unless-stopped
     logging: *default-logging
+{% if sonarr_2.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -445,6 +469,10 @@ services:
     container_name: recyclarr
     restart: unless-stopped
     logging: *default-logging
+{% if recyclarr.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
     user: {{ puid }}:{{ pgid }}
     volumes:
       - ./recyclarr/config:/config
@@ -480,6 +508,10 @@ services:
     hostname: notifiarr
     restart: unless-stopped
     logging: *default-logging
+{% if notifiarr.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
     ports:
       - {{ notifiarr.port }}:5454
     environment:
@@ -513,6 +545,10 @@ services:
     container_name: prowlarr
     restart: unless-stopped
     logging: *default-logging
+{% if prowlarr.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -557,6 +593,10 @@ services:
     container_name: flaresolverr
     restart: unless-stopped
     logging: *default-logging
+{% if flaresolverr.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -587,6 +627,10 @@ services:
     container_name: readarr_audiobooks
     restart: unless-stopped
     logging: *default-logging
+{% if readarr_audiobooks.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -633,6 +677,10 @@ services:
     container_name: readarr_ebooks
     restart: unless-stopped
     logging: *default-logging
+{% if readarr_ebooks.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -679,6 +727,10 @@ services:
     container_name: lazylibrarian
     restart: unless-stopped
     logging: *default-logging
+{% if lazylibrarian.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -723,6 +775,10 @@ services:
     container_name: bindery
     restart: unless-stopped
     logging: *default-logging
+{% if bindery.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -775,6 +831,10 @@ services:
     container_name: bookbounty
     restart: unless-stopped
     logging: *default-logging
+{% if bookbounty.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -816,6 +876,10 @@ services:
     container_name: bazarr
     restart: unless-stopped
     logging: *default-logging
+{% if bazarr.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -857,6 +921,10 @@ services:
     container_name: kapowarr
     restart: unless-stopped
     logging: *default-logging
+{% if kapowarr.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -895,6 +963,10 @@ services:
     container_name: qbittorrent
     restart: unless-stopped
     logging: *default-logging
+{% if qbittorrent.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -938,6 +1010,10 @@ services:
     container_name: qbittorrent-porthelper
     restart: unless-stopped
     logging: *default-logging
+{% if qbittorrent_porthelper.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
@@ -960,6 +1036,10 @@ services:
     container_name: qbittorrent-managetorrents
     restart: unless-stopped
     logging: *default-logging
+{% if qbittorrent_managetorrents.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
@@ -980,6 +1060,10 @@ services:
     container_name: sabnzbd
     restart: unless-stopped
     logging: *default-logging
+{% if sabnzbd.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -1016,6 +1100,10 @@ services:
     container_name: firefox
     restart: unless-stopped
     logging: *default-logging
+{% if firefox.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
 {% if containers.pia_vpn %}
     network_mode: "service:vpn"
 {% endif %}
@@ -1051,6 +1139,10 @@ services:
     container_name: portainer
     restart: unless-stopped
     logging: *default-logging
+{% if portainer.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
@@ -1083,6 +1175,10 @@ services:
     container_name: autoheal
     restart: unless-stopped
     logging: *default-logging
+{% if autoheal.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
@@ -1097,6 +1193,10 @@ services:
     container_name: syncthing
     restart: unless-stopped
     logging: *default-logging
+{% if syncthing.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
     ports:
       - {{ syncthing.gui_port }}:8384
       - 22000:22000/tcp
