@@ -1063,7 +1063,7 @@ services:
 {% endif %}
 {% if containers.watchtower %}
   watchtower:
-    image: containrrr/watchtower:latest
+    image: nickfedor/watchtower:latest
     container_name: watchtower
     restart: unless-stopped
     logging: *default-logging
