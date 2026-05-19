@@ -176,6 +176,17 @@
     group: "{{ docker_user }}"
     mode: "0755"
 
+- name: Setup Bindery Config Directory
+  when: containers.bindery
+  tags: seedbox
+  ansible.builtin.file:
+    path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/bindery"
+    state: directory
+    owner: "{{ puid }}"
+    group: "{{ pgid }}"
+    mode: "0755"
+    recurse: true
+
 - name: Setup Cleanuperr Ignored file
   when: containers.cleanuparr and cleanuparr.queue_cleaner.enabled and cleanuparr.ignored is defined
   tags: seedbox
@@ -323,14 +334,3 @@
         cmd: "docker compose -f /home/{{ docker_user }}/dockers/{{ docker_directory_name }}/docker-compose.yml up -d"
       changed_when: true
       tags: seedbox
-
-- name: Setup Bindery Config Directory
-  when: containers.bindery
-  tags: seedbox
-  ansible.builtin.file:
-    path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/bindery"
-    state: directory
-    owner: "{{ puid }}"
-    group: "{{ pgid }}"
-    mode: "0755"
-    recurse: true
