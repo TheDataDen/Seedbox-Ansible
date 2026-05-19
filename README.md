@@ -28,7 +28,6 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
       - [radarr\_2](#radarr_2)
       - [sonarr](#sonarr)
       - [sonarr\_2](#sonarr_2)
-      - [huntarr](#huntarr)
       - [recyclarr](#recyclarr)
       - [notifiarr](#notifiarr)
       - [prowlarr](#prowlarr)
@@ -297,7 +296,6 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `radarr_2`                   | No       | Enable/Disable the Second Radarr container.              |
 | `sonarr`                     | No       | Enable/Disable the Sonarr container.                     |
 | `sonarr_2`                   | No       | Enable/Disable the Second Sonarr container.              |
-| `huntarr`                    | No       | Enable/Disable the Huntarr container.                    |
 | `recyclarr`                  | No       | Enable/Disable the Recyclarr container.                  |
 | `notifiarr`                  | No       | Enable/Disable the Notifiarr container.                  |
 | `prowlarr`                   | No       | Enable/Disable the Prowlarr container.                   |
@@ -401,12 +399,6 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | --------------- | -------- | ----------------------------------------------------------- |
 | `port`          | Yes      | The port that the second Sonarr's webUI will be running on. |
 | `instance_name` | No       | The name that will appear in the browser tab.               |
-
-#### huntarr
-
-| Variable Name | Required | Description                                       |
-| ------------- | -------- | ------------------------------------------------- |
-| `port`        | Yes      | The port that Huntarr's webUI will be running on. |
 
 #### recyclarr
 
@@ -559,35 +551,34 @@ Used for all of the health checks except for the pia_vpn health check
 
 Below is a list of all of the containers that are available to be enabled/disabled with a description of what they do.
 
-| Container Name               | Description                                                                                                                                                                                                |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pia_vpn`                    | Runs a Private Internet Access VPN where all of the traffic for the neccessary containers are routed through the vpn. If the VPN loses connection, the containers lose access to the internet              |
-| `cleanuparr`                 | Automatically cleans up files from your downloads and prevents downloads from clogging up the queue                                                                                                        |
-| `radarr`                     | For managing your movies                                                                                                                                                                                   |
-| `radarr_2`                   | For managing your movies. Second instance. Possible uses: 4K versions, IMAX versions, multiple editions, etc.                                                                                              |
-| `sonarr`                     | For managing your TV shows/Anime                                                                                                                                                                           |
-| `sonarr_2`                   | For managing your TV shows/Anime. Second instance. Poissible uses: 4K versions, multiple editions, etc.                                                                                                    |
-| `huntarr`                    | For automatically search for Movies/Shows/Books that are not recently released. Sonarr/Radarr works off of RSS feeds so older content that might be added to an indexer is not automatically searched for. |
-| `recyclarr`                  | For automatically configuring your Sonarr and Radarr instances to follow the TRaSH guides                                                                                                                  |
-| `notifiarr`                  | For automatically configuring your Sonarr and Radarr instances to follow the TRaSH guides. As well as monitoring tools.                                                                                    |
-| `prowlarr`                   | For managing your torrents. As well as updating the indexers on Radarr, Sonarr, and Readarr                                                                                                                |
-| `flaresolverr`               | Used in Prowlarr as a proxy server to bypass Cloudflare and DDoS-GUARD protection                                                                                                                          |
-| `readarr_audiobooks`         | For managing your audiobooks                                                                                                                                                                               |
-| `readarr_ebooks`             | For managing your ebooks                                                                                                                                                                                   |
-| `lazylibrarian`              | For managing your ebooks and audiobooks. An alternative to readarr                                                                                                                                         |
-| `bindery`                    | Since Readarr is dead, this is the newest thing. It is not enabled by default over Readarr.                                                                                                                |
-| `bookbounty`                 | For downloading ebooks that Readarr can't find                                                                                                                                                             |
-| `bazarr`                     | Automatically downloads external subtitles for your movies, TV Shows, and Anime                                                                                                                            |
-| `kapowarr`                   | For managing your comics                                                                                                                                                                                   |
-| `qbittorrent`                | Downloads torrents                                                                                                                                                                                         |
-| `qbittorrent_porthelper`     | Used with the PIA VPN and qBittorrent to set the qBittorrent port used for incoming connection to the port that is forwarded by PIA                                                                        |
-| `qbittorrent_managetorrents` | Used with qBittorrent to automatically send torrents that are slow/hanging to the bottom of the queue; then eventually removes them                                                                        |
-| `sabnzbd`                    | Downloads NZBs (Usenet)                                                                                                                                                                                    |
-| `firefox`                    | A Firefox instance that is used for manually searching for torrents                                                                                                                                        |
-| `portainer`                  | A WebGUI for managing all of the docker containers                                                                                                                                                         |
-| `watchtower`                 | Automatically updates the containers to their latest versions. Runs on a cron schedule                                                                                                                     |
-| `autoheal`                   | Automatically restarts any container that becomes unhealthy                                                                                                                                                |
-| `syncthing`                  | Add the ability to sync files with a remote server                                                                                                                                                         |
+| Container Name               | Description                                                                                                                                                                                   |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pia_vpn`                    | Runs a Private Internet Access VPN where all of the traffic for the neccessary containers are routed through the vpn. If the VPN loses connection, the containers lose access to the internet |
+| `cleanuparr`                 | Automatically cleans up files from your downloads and prevents downloads from clogging up the queue                                                                                           |
+| `radarr`                     | For managing your movies                                                                                                                                                                      |
+| `radarr_2`                   | For managing your movies. Second instance. Possible uses: 4K versions, IMAX versions, multiple editions, etc.                                                                                 |
+| `sonarr`                     | For managing your TV shows/Anime                                                                                                                                                              |
+| `sonarr_2`                   | For managing your TV shows/Anime. Second instance. Poissible uses: 4K versions, multiple editions, etc.                                                                                       |
+| `recyclarr`                  | For automatically configuring your Sonarr and Radarr instances to follow the TRaSH guides                                                                                                     |
+| `notifiarr`                  | For automatically configuring your Sonarr and Radarr instances to follow the TRaSH guides. As well as monitoring tools.                                                                       |
+| `prowlarr`                   | For managing your torrents. As well as updating the indexers on Radarr, Sonarr, and Readarr                                                                                                   |
+| `flaresolverr`               | Used in Prowlarr as a proxy server to bypass Cloudflare and DDoS-GUARD protection                                                                                                             |
+| `readarr_audiobooks`         | For managing your audiobooks                                                                                                                                                                  |
+| `readarr_ebooks`             | For managing your ebooks                                                                                                                                                                      |
+| `lazylibrarian`              | For managing your ebooks and audiobooks. An alternative to readarr                                                                                                                            |
+| `bindery`                    | Since Readarr is dead, this is the newest thing. It is not enabled by default over Readarr.                                                                                                   |
+| `bookbounty`                 | For downloading ebooks that Readarr can't find                                                                                                                                                |
+| `bazarr`                     | Automatically downloads external subtitles for your movies, TV Shows, and Anime                                                                                                               |
+| `kapowarr`                   | For managing your comics                                                                                                                                                                      |
+| `qbittorrent`                | Downloads torrents                                                                                                                                                                            |
+| `qbittorrent_porthelper`     | Used with the PIA VPN and qBittorrent to set the qBittorrent port used for incoming connection to the port that is forwarded by PIA                                                           |
+| `qbittorrent_managetorrents` | Used with qBittorrent to automatically send torrents that are slow/hanging to the bottom of the queue; then eventually removes them                                                           |
+| `sabnzbd`                    | Downloads NZBs (Usenet)                                                                                                                                                                       |
+| `firefox`                    | A Firefox instance that is used for manually searching for torrents                                                                                                                           |
+| `portainer`                  | A WebGUI for managing all of the docker containers                                                                                                                                            |
+| `watchtower`                 | Automatically updates the containers to their latest versions. Runs on a cron schedule                                                                                                        |
+| `autoheal`                   | Automatically restarts any container that becomes unhealthy                                                                                                                                   |
+| `syncthing`                  | Add the ability to sync files with a remote server                                                                                                                                            |
 
 ## Post-Installation Configuration
 

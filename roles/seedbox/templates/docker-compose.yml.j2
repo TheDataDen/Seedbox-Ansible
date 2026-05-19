@@ -78,10 +78,6 @@ services:
       # Firefox
       - {{ firefox.port }}:3001
 {% endif %}
-{% if containers.huntarr %}
-      # Huntarr
-      - {{ huntarr.port }}:9705
-{% endif %}
 {% if containers.bindery %}
       # Bindery
       - {{ bindery.port }}:{{ bindery.port }}
@@ -440,55 +436,6 @@ services:
 {% endif %}
 {% if containers.prowlarr %}
       prowlarr:
-        condition: service_started
-{% endif %}
-{% endif %}
-{% if containers.huntarr %}
-  huntarr:
-    image: huntarr/huntarr:latest
-    container_name: huntarr
-    restart: unless-stopped
-    logging: *default-logging
-{% if containers.pia_vpn %}
-    network_mode: "service:vpn"
-{% endif %}
-{% if not containers.pia_vpn %}
-    ports:
-      - {{ huntarr.port }}:9705
-{% endif %}
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:{{ huntarr.port }} || exit 1"]
-      interval: {{ health_check.interval }}
-      timeout: {{ health_check.timeout }}
-      retries: {{ health_check.retries }}
-      start_period: {{ health_check.start_period }}
-    depends_on:
-{% if containers.pia_vpn %}
-      vpn:
-        condition: service_healthy
-{% endif %}
-{% if containers.sonarr %}
-      sonarr:
-        condition: service_started
-{% endif %}
-{% if containers.sonarr_2 %}
-      sonarr_2:
-        condition: service_started
-{% endif %}
-{% if containers.radarr %}
-      radarr:
-        condition: service_started
-{% endif %}
-{% if containers.radarr_2 %}
-      radarr_2:
-        condition: service_started
-{% endif %}
-{% if containers.readarr_audiobooks %}
-      readarr_audiobooks:
-        condition: service_started
-{% endif %}
-{% if containers.readarr_ebooks %}
-      readarr_ebooks:
         condition: service_started
 {% endif %}
 {% endif %}

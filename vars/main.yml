@@ -22,7 +22,6 @@ containers:
   radarr_2: false
   sonarr: true
   sonarr_2: false
-  huntarr: false
   # Disabled by default since notifiarr does everything recyclarr does, but recyclarr is an option if you want to use it
   recyclarr: false
   notifiarr: true
@@ -128,9 +127,6 @@ sonarr_2:
 
   # The name that will be displayed in the browser tab. Uncomment the line below to change the name
   # instance_name: Sonarr
-
-huntarr:
-  port: 9705
 
 recyclarr:
   # Should not use latest as when the major version changes there will be breaking changes
