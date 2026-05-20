@@ -805,12 +805,6 @@ services:
     volumes:
       - ./bindery/config:/config
       - /shares:/data
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:{{ bindery.port }} || exit 1"]
-      interval: {{ health_check.interval }}
-      timeout: {{ health_check.timeout }}
-      retries: {{ health_check.retries }}
-      start_period: {{ health_check.start_period }}
     depends_on:
 {% if containers.pia_vpn %}
       vpn:
