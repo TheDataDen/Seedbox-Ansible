@@ -248,6 +248,9 @@ syncthing:
   disable_autoupdate: false
   gui_port: 8384
 
+autoheal:
+  disable_autoupdate: false
+
 # Used for all of the health checks except for the pia_vpn health check
 health_check:
   interval: 60s
