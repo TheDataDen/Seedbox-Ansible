@@ -82,7 +82,7 @@ services:
       # Firefox
       - {{ firefox.port }}:3001
 {% endif %}
-{% if containers.bindery %}
+{% if containers.bindery and bindery.use_vpn %}
       # Bindery
       - {{ bindery.port }}:{{ bindery.port }}
 {% endif %}
@@ -779,7 +779,7 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
 {% endif %}
-{% if containers.pia_vpn %}
+{% if containers.pia_vpn and bindery.use_vpn %}
     network_mode: "service:vpn"
 {% endif %}
     user: "{{ puid }}:{{ pgid }}"
@@ -798,7 +798,7 @@ services:
       - BINDERY_LIBRARY_DIR=/data/{{ bindery.audiobookShareName }}
 {% endif %}
       - BINDERY_DOWNLOAD_DIR=/data/{{ bindery.downloadsShareName }}
-{% if not containers.pia_vpn %}
+{% if not containers.pia_vpn or not bindery.use_vpn %}
     ports:
       - {{ bindery.port }}:{{ bindery.port }}
 {% endif %}

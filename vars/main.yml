@@ -178,6 +178,8 @@ lazylibrarian:
 
 bindery:
   port: 8789
+  # Isnt used if the pia_vpn container is disabled
+  use_vpn: false
   disable_autoupdate: false
   logLevel: info
   downloadsShareName: downloads
