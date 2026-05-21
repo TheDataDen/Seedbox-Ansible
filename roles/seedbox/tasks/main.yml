@@ -216,7 +216,7 @@
 
 - name: Create Seedbox Docker stack
   ansible.builtin.command:
-    cmd: "docker compose -f /home/{{ docker_user }}/dockers/{{ docker_directory_name }}/docker-compose.yml up -d"
+    cmd: "docker compose pull && docker compose -f /home/{{ docker_user }}/dockers/{{ docker_directory_name }}/docker-compose.yml up -d"
   changed_when: true
   tags:
     - seedbox
