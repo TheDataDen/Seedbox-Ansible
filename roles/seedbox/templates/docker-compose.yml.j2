@@ -839,6 +839,8 @@ services:
 {% if not containers.pia_vpn %}
     ports:
       - {{ chaptarr.port }}:8789
+{% else %}
+    network_mode: "service:vpn"
 {% endif %}
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-check-certificate", "-q", "http://{{ host_ip }}:{{ chaptarr.port }}/"]
