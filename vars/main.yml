@@ -190,6 +190,7 @@ bindery:
   ebookShareName: books
 
 chaptarr:
+  # There is some additional configuration required for Chaptarr to work out of the box, check their Discord for more info: https://discord.gg/KTNegmvwgh
   port: 8789
   disable_autoupdate: false
   # I recommend making a new user for this, you will need to create the databases yourself before deploying
