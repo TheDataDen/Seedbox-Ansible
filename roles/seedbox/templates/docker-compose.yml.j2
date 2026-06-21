@@ -833,6 +833,15 @@ services:
       - PUID={{ puid }}
       - PGID={{ pgid }}
       - TZ={{ timezone }}
+{% if chaptarr.postgresql.enabled %}
+      - Chaptarr__Postgres__Host={{ chaptarr.postgresql.host }}
+      - Chaptarr__Postgres__Port={{ chaptarr.postgresql.port }}
+      - Chaptarr__Postgres__User={{ chaptarr.postgresql.user }}
+      - Chaptarr__Postgres__Password={{ chaptarr.postgresql.password }}
+      - Chaptarr__Postgres__MainDb={{ chaptarr.postgresql.databases.main }}
+      - Chaptarr__Postgres__LogDb={{ chaptarr.postgresql.databases.logs }}
+      - Chaptarr__Postgres__CacheDb={{ chaptarr.postgresql.databases.cache }}
+{% endif %}
     volumes:
       - ./chaptarr/config:/config
       - /shares:/data

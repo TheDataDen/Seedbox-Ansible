@@ -192,6 +192,17 @@ bindery:
 chaptarr:
   port: 8789
   disable_autoupdate: false
+  # I recommend making a new user for this, you will need to create the databases yourself before deploying
+  postgresql:
+    enabled: false
+    host: localhost
+    port: 5432
+    user: postgres
+    password: postgres
+    databases:
+      main: chaptarr-main
+      logs: chaptarr-log
+      cache: chaptarr-cache
 
 bookbounty:
   port: 5000

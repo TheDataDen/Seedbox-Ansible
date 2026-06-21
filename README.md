@@ -477,10 +477,18 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 
 #### Chaptarr
 
-| Variable Name        | Required | Description                                        |
-| -------------------- | -------- | -------------------------------------------------- |
-| `port`               | Yes      | The port that Chaptarr's webUI will be running on. |
-| `disable_autoupdate` | Yes      | Disables watchtower for this container.            |
+| Variable Name                | Required | Description                                                                                               |
+| ---------------------------- | -------- | --------------------------------------------------------------------------------------------------------- |
+| `port`                       | Yes      | The port that Chaptarr's webUI will be running on.                                                        |
+| `disable_autoupdate`         | Yes      | Disables watchtower for this container.                                                                   |
+| `postgresql.enabled`         | Yes      | If you want to use PostgreSQL for Chaptarr. If false, you don't have to delete the following PG settings. |
+| `postgresql.host`            | Yes      | The host of the PostgreSQL database.                                                                      |
+| `postgresql.port`            | Yes      | The port of the PostgreSQL database.                                                                      |
+| `postgresql.user`            | Yes      | The user of the PostgreSQL database.                                                                      |
+| `postgresql.password`        | Yes      | The password of the PostgreSQL database.                                                                  |
+| `postgresql.databases.main`  | Yes      | The name of the main database.                                                                            |
+| `postgresql.databases.logs`  | Yes      | The name of the logs database.                                                                            |
+| `postgresql.databases.cache` | Yes      | The name of the cache database.                                                                           |
 
 #### bookbounty
 
