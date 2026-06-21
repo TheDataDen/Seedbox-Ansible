@@ -22,26 +22,27 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
     - [Extras](#extras)
       - [MAM](#mam)
     - [Indiviual Container Settings](#indiviual-container-settings)
-      - [pia\_vpn](#pia_vpn)
+      - [pia_vpn](#pia_vpn)
       - [cleanuparr](#cleanuparr)
       - [radarr](#radarr)
-      - [radarr\_2](#radarr_2)
+      - [radarr_2](#radarr_2)
       - [sonarr](#sonarr)
-      - [sonarr\_2](#sonarr_2)
+      - [sonarr_2](#sonarr_2)
       - [recyclarr](#recyclarr)
       - [notifiarr](#notifiarr)
       - [prowlarr](#prowlarr)
       - [flaresolverr](#flaresolverr)
-      - [readarr\_audiobooks](#readarr_audiobooks)
-      - [readarr\_ebooks](#readarr_ebooks)
+      - [readarr_audiobooks](#readarr_audiobooks)
+      - [readarr_ebooks](#readarr_ebooks)
       - [lazylibrarian](#lazylibrarian)
       - [bindery](#bindery)
+      - [Chaptarr](#chaptarr)
       - [bookbounty](#bookbounty)
       - [bazarr](#bazarr)
       - [kapowarr](#kapowarr)
       - [qbittorrent](#qbittorrent)
-      - [qbittorrent\_porthelper](#qbittorrent_porthelper)
-      - [qbittorrent\_managetorrents](#qbittorrent_managetorrents)
+      - [qbittorrent_porthelper](#qbittorrent_porthelper)
+      - [qbittorrent_managetorrents](#qbittorrent_managetorrents)
       - [sabnzbd](#sabnzbd)
       - [firefox](#firefox)
       - [portainer](#portainer)
@@ -76,15 +77,17 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
 ### General UNRAID Setup
 
 There are really only two ways that I have seen people do this.
+
 1. Create a share for each of the media folders that you have. For example: downloads, anime, audiobooks, ebooks, movies, tv shows, etc.
-   -  This is the way I do it. I like having the separation
+   - This is the way I do it. I like having the separation
 2. Create a single media share and then create a sub-directory for each of the media folders that you have.
 
 > [!IMPORTANT]
 > **If you have a cache/buffer pool:**
->   - You should add a share called `Staging` and set it to only use your cache/buffer pool. This is the share that your downloads should be configured to use for their temporary storage while they are downloading. Their completed download location should be set to the `Downloads` share
->   - All of the other media shares should be set to use only the array
->   - This is because hardlinks only work when the files are on the same filesystem, they do not work between the array and the cache/buffer pool. This does mean that your write speeds will be slower but things will hardlink rather than copy (which uses more space)
+>
+> - You should add a share called `Staging` and set it to only use your cache/buffer pool. This is the share that your downloads should be configured to use for their temporary storage while they are downloading. Their completed download location should be set to the `Downloads` share
+> - All of the other media shares should be set to use only the array
+> - This is because hardlinks only work when the files are on the same filesystem, they do not work between the array and the cache/buffer pool. This does mean that your write speeds will be slower but things will hardlink rather than copy (which uses more space)
 
 #### UNRAID Permissions
 
@@ -231,7 +234,7 @@ sudo apt update
 sudo apt install git
 ```
 
-2. Clone this repo
+1. Clone this repo
 
 ```bash
 git clone https://github.com/TheDataDen/Seedbox-Ansible.git
@@ -242,7 +245,7 @@ cd Seedbox-Ansible
 > If you already have run this playbook before and are updating, you probably wouldn't be able to run `git pull` because of the changes you made to the `vars/main.yml` file.
 > To fix this, run `git stash` to stash your changes, then run `git pull` and then run `git stash pop` to restore your changes. There may be merge conflicts for the `vars/main.yml` file, make sure to scan through the file and fix any conflicts.
 
-3. Modify the [vars/main.yml](vars/main.yml) file to match your setup. Check out the [Configuration](#configuration) section for more information
+1. Modify the [vars/main.yml](vars/main.yml) file to match your setup. Check out the [Configuration](#configuration) section for more information
 
 ### Run the playbook
 
@@ -304,6 +307,7 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `readarr_ebooks`             | No       | Enable/Disable the readarr_ebooks container.             |
 | `lazylibrarian`              | No       | Enable/Disable the Lazylibrarian container.              |
 | `bindery`                    | No       | Enable/Disable the Bindery container.                    |
+| `chaptarr`                   | No       | Enable/Disable the Chaptarr container.                   |
 | `bookbounty`                 | No       | Enable/Disable the Bookbounty container.                 |
 | `bazarr`                     | No       | Enable/Disable the Bazarr container.                     |
 | `kapowarr`                   | No       | Enable/Disable the Kapowarr container.                   |
@@ -429,7 +433,6 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `port`               | Yes      | The port that Prowlarr's webUI will be running on. |
 | `disable_autoupdate` | Yes      | Disables watchtower for this container.            |
 
-
 #### flaresolverr
 
 | Variable Name        | Required | Description                                    |
@@ -471,6 +474,13 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `downloadsShareName` | Yes      | The name of the share that will be used for downloads.                                                   |
 | `ebookShareName`     | Yes      | The name of the share that will be used for ebooks. Comment out if not using Bindery for ebooks.         |
 | `audiobookShareName` | Yes      | The name of the share that will be used for audiobooks. Comment out if not using Bindery for audiobooks. |
+
+#### Chaptarr
+
+| Variable Name        | Required | Description                                        |
+| -------------------- | -------- | -------------------------------------------------- |
+| `port`               | Yes      | The port that Chaptarr's webUI will be running on. |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.            |
 
 #### bookbounty
 
@@ -532,7 +542,6 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `disable_autoupdate` | Yes      | Disables watchtower for this container.                                     |
 | `sub_dir_name`       | Yes      | The name of the sub directory that will be created under the staging share. |
 
-
 #### firefox
 
 | Variable Name        | Required | Description                                       |
@@ -592,6 +601,7 @@ Below is a list of all of the containers that are available to be enabled/disabl
 | `readarr_ebooks`             | For managing your ebooks                                                                                                                                                                      |
 | `lazylibrarian`              | For managing your ebooks and audiobooks. An alternative to readarr                                                                                                                            |
 | `bindery`                    | Since Readarr is dead, this is the newest thing. It is not enabled by default over Readarr.                                                                                                   |
+| `chaptarr`                   | Another fork of readarr. Not compatible with old readarr dbs. Project is also closed source right now, which I don't love.                                                                    |
 | `bookbounty`                 | For downloading ebooks that Readarr can't find                                                                                                                                                |
 | `bazarr`                     | Automatically downloads external subtitles for your movies, TV Shows, and Anime                                                                                                               |
 | `kapowarr`                   | For managing your comics                                                                                                                                                                      |

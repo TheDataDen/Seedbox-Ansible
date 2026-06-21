@@ -86,6 +86,10 @@ services:
       # Bindery
       - {{ bindery.port }}:{{ bindery.port }}
 {% endif %}
+{% if containers.chaptarr %}
+      # Chaptarr
+      - {{ chaptarr.port }}:8789
+{% endif %}
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -817,6 +821,43 @@ services:
 {% if containers.sabnzbd %}
       sabnzbd:
         condition: service_started
+{% endif %}
+{% if containers.chaptarr %}
+  chaptarr:
+    image: robertlordhood/chaptarr:latest
+    container_name: chaptarr
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+      - TZ={{ timezone }}
+    volumes:
+      - ./chaptarr/config:/config
+      - /shares:/data
+{% if not containers.pia_vpn %}
+    ports:
+      - {{ chaptarr.port }}:8789
+{% endif %}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:{{ chaptarr.port }} || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+{% if containers.pia_vpn %}
+      vpn:
+        condition: service_healthy
+{% endif %}
+{% if containers.qbittorrent %}
+      qbittorrent:
+        condition: service_started
+{% endif %}
+{% if containers.sabnzbd %}
+      sabnzbd:
+        condition: service_started
+{% endif %}
 {% endif %}
 {% endif %}
 {% if containers.readarr_ebooks and containers.bookbounty %}

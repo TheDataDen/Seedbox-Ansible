@@ -32,7 +32,8 @@ containers:
   # Available as an alternative to Readarr
   lazylibrarian: false
   # Available as an alternative to Readarr
-  bindery: true
+  bindery: false
+  chaptarr: false
   bookbounty: false
   bazarr: true
   kapowarr: false
@@ -187,6 +188,10 @@ bindery:
   audiobookShareName: audiobooks
   # Comment out the line below if you are not using Bindery for ebooks
   ebookShareName: books
+
+chaptarr:
+  port: 8789
+  disable_autoupdate: false
 
 bookbounty:
   port: 5000
