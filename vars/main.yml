@@ -45,6 +45,7 @@ containers:
   firefox: true
   watchtower: true
   autoheal: true
+  postgres: false
   syncthing: true
 
 downloaders:
@@ -269,6 +270,27 @@ syncthing:
 
 autoheal:
   disable_autoupdate: false
+
+postgres:
+  disable_autoupdate: false
+  port: 5432
+  user: postgres
+  password: REPLACEME
+
+  gui:
+    enabled: true
+    disable_autoupdate: false
+    port: 8792
+    default_email: REPLACEME
+    default_password: REPLACEME
+
+  backup:
+    enabled: true
+    disable_autoupdate: false
+    schedule: "@daily"
+    keep_days: 7
+    keep_weeks: 4
+    keep_months: 6
 
 # Used for all of the health checks except for the pia_vpn health check
 health_check:

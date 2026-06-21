@@ -47,6 +47,7 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
       - [firefox](#firefox)
       - [portainer](#portainer)
       - [watchtower](#watchtower)
+      - [postgres](#postgres)
       - [syncthing](#syncthing)
       - [Health Check Settings](#health-check-settings)
   - [Containers](#containers)
@@ -317,6 +318,7 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `portainer`                  | No       | Enable/Disable the Portainer container.                  |
 | `watchtower`                 | No       | Enable/Disable the Watchtower container.                 |
 | `autoheal`                   | No       | Enable/Disable the Autoheal container.                   |
+| `postgres`                   | No       | Enable/Disable the Postgres and accessory containers.    |
 | `syncthing`                  | No       | Enable/Disable the Syncthing container.                  |
 
 ### Downloader Settings
@@ -571,6 +573,26 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | --------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `cron_schedule` | Yes      | The cron schedule that Watchtower will use to check for updates. Use [Crontab.guru](https://crontab.guru/) for help creating a cron. Example: `0 5 * * *` |
 
+#### postgres
+
+| Variable Name               | Required | Description                                                                             |
+| --------------------------- | -------- | --------------------------------------------------------------------------------------- |
+| `disable_autoupdate`        | Yes      | Disables watchtower for this container.                                                 |
+| `port`                      | Yes      | The port that Postgres will be running on.                                              |
+| `user`                      | Yes      | The default root user that will be used to connect to Postgres.                         |
+| `password`                  | Yes      | The default root password that will be used to connect to Postgres. Please change this. |
+| `gui.enabled`               | Yes      | Enables the Postgres GUI container.                                                     |
+| `gui.disable_autoupdate`    | Yes      | Disables watchtower for the Postgres GUI container.                                     |
+| `gui.port`                  | Yes      | The port that the Postgres GUI will be running on.                                      |
+| `gui.default_email`         | Yes      | The default email that will be used to login to the Postgres GUI.                       |
+| `gui.default_password`      | Yes      | The default password that will be used to login to the Postgres GUI.                    |
+| `backup.enabled`            | Yes      | Enables the Postgres backup container.                                                  |
+| `backup.disable_autoupdate` | Yes      | Disables watchtower for the Postgres backup container.                                  |
+| `backup.schedule`           | Yes      | The cron schedule that controls how often the Postgres DB will be backed up             |
+| `backup.keep_days`          | Yes      | The number of days to keep the backups                                                  |
+| `backup.keep_weeks`         | Yes      | The number of weeks to keep the backups                                                 |
+| `backup.keep_months`        | Yes      | The number of months to keep the backups                                                |
+
 #### syncthing
 
 | Variable Name        | Required | Description                                         |
@@ -621,6 +643,7 @@ Below is a list of all of the containers that are available to be enabled/disabl
 | `portainer`                  | A WebGUI for managing all of the docker containers                                                                                                                                            |
 | `watchtower`                 | Automatically updates the containers to their latest versions. Runs on a cron schedule                                                                                                        |
 | `autoheal`                   | Automatically restarts any container that becomes unhealthy                                                                                                                                   |
+| `postgres`                   | A Postgres 18 instance that can be used by other containers that support it. Has accessory containers for a GUI and backups.                                                                  |
 | `syncthing`                  | Add the ability to sync files with a remote server                                                                                                                                            |
 
 ## Post-Installation Configuration

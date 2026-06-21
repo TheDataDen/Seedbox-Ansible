@@ -829,6 +829,10 @@ services:
     container_name: chaptarr
     restart: unless-stopped
     logging: *default-logging
+{% if chaptarr.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
     environment:
       - PUID={{ puid }}
       - PGID={{ pgid }}
@@ -1233,6 +1237,95 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 {% endif %}
+{% if postgres.enabled %}
+  postgres:
+    image: postgres:18-alpine
+    container_name: postgres
+    restart: unless-stopped
+    logging: *default-logging
+{% if postgres.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
+    environment:
+      - POSTGRES_USER={{ postgres.user }}
+      - POSTGRES_PASSWORD={{ postgres.password }}
+      - POSTGRES_DB=postgres
+    ports:
+      - {{ postgres.port }}:5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+{% if postgres.gui.enabled %}
+  postgres-gui:
+    image: dpage/pgadmin4:latest
+    container_name: postgres-gui
+    restart: unless-stopped
+    logging: *default-logging
+{% if postgres.gui.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
+    environment:
+      - PGADMIN_DEFAULT_EMAIL={{ postgres.gui.default_email }}
+      - PGADMIN_DEFAULT_PASSWORD={{ postgres.gui.default_password }}
+      - PGADMIN_LISTEN_ADDRESS=0.0.0.0
+    ports:
+      - {{ postgres.gui.port }}:80
+    volumes:
+      - ./pgadmin/config:/var/lib/pgadmin
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider --no-check-certificate -q http://{{ host_ip }}:{{ postgres.gui.port }}/"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+      postgres:
+        condition: service_healthy
+{% endif %}
+{% if postgres.backup.enabled %}
+  postgres-backup:
+    image: prodrigestivill/postgres-backup-local:18-alpine
+    container_name: postgres-backup
+    restart: unless-stopped
+    logging: *default-logging
+{% if postgres.backup.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER={{ postgres.user }}
+      - POSTGRES_PASSWORD={{ postgres.password }}
+      - POSTGRES_EXTRA_OPTS="-Z6 --schema=public --blobs"
+      - POSTGRES_CLUSTER=true
+      - TZ={{ timezone }}
+      - SCHEDULE={{ postgres.backup.schedule }}
+      - BACKUP_ON_START=true
+      - BACKUP_KEEP_DAYS={{ postgres.backup.keep_days }}
+      - BACKUP_KEEP_WEEKS={{ postgres.backup.keep_weeks }}
+      - BACKUP_KEEP_MONTHS={{ postgres.backup.keep_months }}
+      - HEALTHCHECK_PORT=8080
+    volumes:
+      - ./postgres-backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8080/ || exit 1"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+      postgres:
+        condition: service_healthy
+{% endif %}
+{% endif %}
 {% if containers.syncthing %}
   syncthing:
     image: syncthing/syncthing:latest
@@ -1265,4 +1358,7 @@ volumes:
 {% endif %}
 {% if containers.pia_vpn %}
   pia-dat:
+{% endif %}
+{% if postgres.enabled %}
+  postgres-data:
 {% endif %}
