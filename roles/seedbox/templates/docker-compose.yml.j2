@@ -837,14 +837,11 @@ services:
       - PUID={{ puid }}
       - PGID={{ pgid }}
       - TZ={{ timezone }}
-{% if chaptarr.postgresql.enabled %}
-      - Chaptarr__Postgres__Host={{ chaptarr.postgresql.host }}
-      - Chaptarr__Postgres__Port={{ chaptarr.postgresql.port }}
-      - Chaptarr__Postgres__User={{ chaptarr.postgresql.user }}
-      - Chaptarr__Postgres__Password={{ chaptarr.postgresql.password }}
-      - Chaptarr__Postgres__MainDb={{ chaptarr.postgresql.databases.main }}
-      - Chaptarr__Postgres__LogDb={{ chaptarr.postgresql.databases.logs }}
-      - Chaptarr__Postgres__CacheDb={{ chaptarr.postgresql.databases.cache }}
+{% if chaptarr.enable_postgres and containers.postgres %}
+      - Chaptarr__Postgres__Host={{ host_ip }}
+      - Chaptarr__Postgres__Port={{ postgres.port }}
+      - Chaptarr__Postgres__User={{ postgres.user }}
+      - Chaptarr__Postgres__Password={{ postgres.password }}
 {% endif %}
     volumes:
       - ./chaptarr/config:/config
@@ -1237,7 +1234,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 {% endif %}
-{% if postgres.enabled %}
+{% if containers.postgres %}
   postgres:
     image: postgres:18-alpine
     container_name: postgres

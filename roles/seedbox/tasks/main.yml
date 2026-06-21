@@ -168,6 +168,37 @@
   tags:
     - seedbox
 
+- name: Setup Postgres DBs and Users
+  when: postgres.enabled
+  tags: seedbox
+  block:
+    - name: Start Postgres container
+      ansible.builtin.command:
+        cmd: "docker compose -f /home/{{ docker_user }}/dockers/{{ docker_directory_name }}/docker-compose.yml up -d postgres"
+      changed_when: true
+
+    - name: Wait for Postgres container to be healthy
+      community.docker.docker_container_info:
+        name: postgres
+      register: seedbox_postgres_info
+      until: seedbox_postgres_info.container.State.Health.Status == "healthy"
+      retries: 30
+      delay: 5
+      tags:
+        - seedbox
+
+    - name: Setup Chaptarr DBs
+      when: containers.chaptarr
+      tags: seedbox
+      ansible.builtin.include_tasks: provisionUserDB.yml
+      vars:
+        db_username: "chaptarr"
+        db_password: "{{ postgres.password }}"
+        target_databases:
+          - chaptarr-main
+          - chaptarr-log
+          - chaptarr-cache
+
 - name: Create mam pia directory
   ansible.builtin.file:
     path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/pia/persist"

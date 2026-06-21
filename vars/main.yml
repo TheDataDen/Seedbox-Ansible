@@ -194,17 +194,9 @@ chaptarr:
   # There is some additional configuration required for Chaptarr to work out of the box, check their Discord for more info: https://discord.gg/KTNegmvwgh
   port: 8789
   disable_autoupdate: false
-  # I recommend making a new user for this, you will need to create the databases yourself before deploying
-  postgresql:
-    enabled: false
-    host: localhost
-    port: 5432
-    user: chaptarr
-    password: postgres
-    databases:
-      main: chaptarr-main
-      logs: chaptarr-log
-      cache: chaptarr-cache
+  # Requires postgres to be enabled
+  # If disabled it will use sqlite
+  enable_postgres: true
 
 bookbounty:
   port: 5000

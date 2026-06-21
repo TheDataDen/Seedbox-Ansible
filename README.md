@@ -36,7 +36,7 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
       - [readarr_ebooks](#readarr_ebooks)
       - [lazylibrarian](#lazylibrarian)
       - [bindery](#bindery)
-      - [Chaptarr](#chaptarr)
+      - [chaptarr](#chaptarr)
       - [bookbounty](#bookbounty)
       - [bazarr](#bazarr)
       - [kapowarr](#kapowarr)
@@ -72,6 +72,7 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
 - Watchtower for automatically updating containers
 - Portainer for a gui for managing all of the containers
 - Optional feature to automatically update your VPN IP in your MAM account
+- Optional Postgres instance for containers that support it
 
 ## Usage
 
@@ -477,20 +478,13 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `ebookShareName`     | Yes      | The name of the share that will be used for ebooks. Comment out if not using Bindery for ebooks.         |
 | `audiobookShareName` | Yes      | The name of the share that will be used for audiobooks. Comment out if not using Bindery for audiobooks. |
 
-#### Chaptarr
+#### chaptarr
 
-| Variable Name                | Required | Description                                                                                               |
-| ---------------------------- | -------- | --------------------------------------------------------------------------------------------------------- |
-| `port`                       | Yes      | The port that Chaptarr's webUI will be running on.                                                        |
-| `disable_autoupdate`         | Yes      | Disables watchtower for this container.                                                                   |
-| `postgresql.enabled`         | Yes      | If you want to use PostgreSQL for Chaptarr. If false, you don't have to delete the following PG settings. |
-| `postgresql.host`            | Yes      | The host of the PostgreSQL database.                                                                      |
-| `postgresql.port`            | Yes      | The port of the PostgreSQL database.                                                                      |
-| `postgresql.user`            | Yes      | The user of the PostgreSQL database.                                                                      |
-| `postgresql.password`        | Yes      | The password of the PostgreSQL database.                                                                  |
-| `postgresql.databases.main`  | Yes      | The name of the main database.                                                                            |
-| `postgresql.databases.logs`  | Yes      | The name of the logs database.                                                                            |
-| `postgresql.databases.cache` | Yes      | The name of the cache database.                                                                           |
+| Variable Name        | Required | Description                                                               |
+| -------------------- | -------- | ------------------------------------------------------------------------- |
+| `port`               | Yes      | The port that Chaptarr's webUI will be running on.                        |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.                                   |
+| `enable_postgres`    | Yes      | If you want to use PostgreSQL for Chaptarr. Otherwise it will use SQLite. |
 
 #### bookbounty
 

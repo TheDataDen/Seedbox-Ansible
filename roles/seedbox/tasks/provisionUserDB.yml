@@ -1,0 +1,41 @@
+---
+- name: Ensure the Postgres user exists
+  community.postgresql.postgresql_user:
+    name: "{{ db_username }}"
+    password: "{{ db_password }}"
+    role_attr_flags: NOSUPERUSER,NOCREATEDB,NOCREATEROLE
+    state: present
+
+- name: Ensure all of the databases exist
+  community.postgresql.postgresql_db:
+    name: "{{ item }}"
+    owner: "{{ db_username }}"
+    state: present
+  loop: "{{ target_databases }}"
+
+- name: Grant database-level permissions (CONNECT, CREATE)
+  community.postgresql.postgresql_privs:
+    db: "{{ item }}"
+    privs: CONNECT,CREATE
+    type: database
+    role: "{{ db_username }}"
+    state: present
+  loop: "{{ target_databases }}"
+
+- name: Grant schema-level permissions on public schema
+  community.postgresql.postgresql_privs:
+    db: "{{ item }}"
+    objs: public
+    privs: ALL
+    type: schema
+    role: "{{ db_username }}"
+    state: present
+  loop: "{{ target_databases }}"
+
+- name: Map default privileges for future database objects
+  community.postgresql.postgresql_membership:
+    db: "{{ item }}"
+    group: "{{ db_username }}"
+    target_roles: postgres
+    state: present
+  loop: "{{ target_databases }}"
