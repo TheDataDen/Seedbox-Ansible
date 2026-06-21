@@ -822,6 +822,7 @@ services:
       sabnzbd:
         condition: service_started
 {% endif %}
+{% endif %}
 {% if containers.chaptarr %}
   chaptarr:
     image: robertlordhood/chaptarr:latest
@@ -857,7 +858,6 @@ services:
 {% if containers.sabnzbd %}
       sabnzbd:
         condition: service_started
-{% endif %}
 {% endif %}
 {% endif %}
 {% if containers.readarr_ebooks and containers.bookbounty %}
