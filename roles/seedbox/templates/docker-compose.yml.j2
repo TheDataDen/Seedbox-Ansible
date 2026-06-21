@@ -841,7 +841,7 @@ services:
       - {{ chaptarr.port }}:8789
 {% endif %}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://{{ host_ip }}:{{ chaptarr.port }} || exit 1"]
+      test: ["CMD", "wget", "--spider", "--no-check-certificate", "-q", "http://{{ host_ip }}:{{ chaptarr.port }}/"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}
