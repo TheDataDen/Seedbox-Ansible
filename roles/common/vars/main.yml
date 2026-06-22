@@ -4,3 +4,4 @@ common_packages:
   - git
   - htop
   - openssh-server
+  - python3-psycopg2
