@@ -1264,6 +1264,7 @@ services:
     container_name: postgres-gui
     restart: unless-stopped
     logging: *default-logging
+    user: root
 {% if postgres.gui.disable_autoupdate %}
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
