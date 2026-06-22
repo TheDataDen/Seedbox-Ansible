@@ -188,7 +188,7 @@
         - seedbox
 
     - name: Setup Chaptarr DBs
-      when: containers.chaptarr
+      when: containers.chaptarr and chaptarr.enable_postgres
       tags: seedbox
       ansible.builtin.include_tasks: provisionUserDB.yml
       vars:
