@@ -169,7 +169,7 @@
     - seedbox
 
 - name: Setup Postgres DBs and Users
-  when: postgres.enabled
+  when: containers.postgres
   tags: seedbox
   block:
     - name: Start Postgres container
