@@ -1273,6 +1273,7 @@ services:
       - PGADMIN_DEFAULT_EMAIL={{ postgres.gui.default_email }}
       - PGADMIN_DEFAULT_PASSWORD={{ postgres.gui.default_password }}
       - PGADMIN_LISTEN_ADDRESS=0.0.0.0
+      - PGADMIN_SERVER_JSON_REPLACE=True
     ports:
       - {{ postgres.gui.port }}:80
     volumes:
