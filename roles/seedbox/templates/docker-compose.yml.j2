@@ -840,7 +840,7 @@ services:
 {% if chaptarr.enable_postgres and containers.postgres %}
       - Chaptarr__Postgres__Host={{ host_ip }}
       - Chaptarr__Postgres__Port={{ postgres.port }}
-      - Chaptarr__Postgres__User={{ postgres.user }}
+      - Chaptarr__Postgres__User=postgres
       - Chaptarr__Postgres__Password={{ postgres.password }}
 {% endif %}
     volumes:
@@ -1245,7 +1245,7 @@ services:
       - "com.centurylinklabs.watchtower.enable=false"
 {% endif %}
     environment:
-      - POSTGRES_USER={{ postgres.user }}
+      - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD={{ postgres.password }}
       - POSTGRES_DB=postgres
     ports:
@@ -1302,7 +1302,7 @@ services:
     environment:
       - POSTGRES_HOST=postgres
       - POSTGRES_DB=postgres
-      - POSTGRES_USER={{ postgres.user }}
+      - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD={{ postgres.password }}
       - POSTGRES_EXTRA_OPTS="-Z6 --schema=public --blobs"
       - POSTGRES_CLUSTER=true

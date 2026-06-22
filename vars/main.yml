@@ -266,7 +266,6 @@ autoheal:
 postgres:
   disable_autoupdate: false
   port: 5432
-  user: postgres
   password: REPLACEME
 
   gui:

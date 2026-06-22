@@ -7,7 +7,7 @@
     state: present
     login_host: localhost
     login_port: "{{ postgres.port }}"
-    login_user: "{{ postgres.user }}"
+    login_user: postgres
     login_password: "{{ postgres.password }}"
 
 - name: Ensure all of the databases exist
@@ -17,7 +17,7 @@
     state: present
     login_host: localhost
     login_port: "{{ postgres.port }}"
-    login_user: "{{ postgres.user }}"
+    login_user: postgres
     login_password: "{{ postgres.password }}"
   loop: "{{ target_databases }}"
 
@@ -30,7 +30,7 @@
     state: present
     login_host: localhost
     login_port: "{{ postgres.port }}"
-    login_user: "{{ postgres.user }}"
+    login_user: postgres
     login_password: "{{ postgres.password }}"
   loop: "{{ target_databases }}"
 
@@ -44,7 +44,7 @@
     state: present
     login_host: localhost
     login_port: "{{ postgres.port }}"
-    login_user: "{{ postgres.user }}"
+    login_user: postgres
     login_password: "{{ postgres.password }}"
   loop: "{{ target_databases }}"
 
@@ -56,6 +56,6 @@
     state: present
     login_host: localhost
     login_port: "{{ postgres.port }}"
-    login_user: "{{ postgres.user }}"
+    login_user: postgres
     login_password: "{{ postgres.password }}"
   loop: "{{ target_databases }}"

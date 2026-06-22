@@ -199,8 +199,8 @@
             mode: "0755"
 
         - name: Create servers.json file
-          ansible.builtin.template:
-            src: servers.json.j2
+          ansible.builtin.copy:
+            src: servers.json
             dest: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/pgadmin/servers.json"
             owner: "{{ docker_user }}"
             group: "{{ docker_user }}"
