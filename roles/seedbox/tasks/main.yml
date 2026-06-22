@@ -187,6 +187,25 @@
       tags:
         - seedbox
 
+    - name: Setup PGAdmin4
+      when: postgres.gui.enabled
+      block:
+        - name: Create pgadmin4 directory
+          ansible.builtin.file:
+            path: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/pgadmin"
+            state: directory
+            owner: "{{ docker_user }}"
+            group: "{{ docker_user }}"
+            mode: "0755"
+
+        - name: Create servers.json file
+          ansible.builtin.template:
+            src: servers.json.j2
+            dest: "/home/{{ docker_user }}/dockers/{{ docker_directory_name }}/pgadmin/servers.json"
+            owner: "{{ docker_user }}"
+            group: "{{ docker_user }}"
+            mode: "0644"
+
     - name: Setup Chaptarr DBs
       when: containers.chaptarr and chaptarr.enable_postgres
       tags: seedbox

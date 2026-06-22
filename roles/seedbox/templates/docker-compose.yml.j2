@@ -1277,6 +1277,7 @@ services:
       - {{ postgres.gui.port }}:80
     volumes:
       - ./pgadmin/config:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
     healthcheck:
       test: ["CMD-SHELL", "wget --spider --no-check-certificate -q http://{{ host_ip }}:{{ postgres.gui.port }}/"]
       interval: {{ health_check.interval }}
