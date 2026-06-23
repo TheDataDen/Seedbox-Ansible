@@ -298,7 +298,7 @@
         seconds: 15
 
 - name: MAM Cookies
-  when: containers.pia_vpn and extras.mam.enabled
+  when: containers.pia_vpn
   tags: seedbox
   block:
     - name: Remove the mam script (moved to Mousehole)
