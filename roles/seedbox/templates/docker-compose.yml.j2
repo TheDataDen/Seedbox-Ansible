@@ -139,7 +139,7 @@ services:
     environment:
       - TZ={{ timezone }}
       - MOUSEHOLE_AUTH_PASSWORD={{ mousehole.password }}
-      - MOUSEHOLE_ALLOWED_HOSTS="*"
+      - MOUSEHOLE_ALLOWED_HOSTS=*
       - MOUSEHOLE_PORT={{ mousehole.port }}
     volumes:
       - mousehole-data:/var/lib/mousehole
