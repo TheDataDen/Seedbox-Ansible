@@ -21,7 +21,7 @@ services:
     ports:
 {% if containers.mousehole %}
       # Mousehole
-      - {{ mousehole.port }}:5010
+      - {{ mousehole.port }}:{{ mousehole.port }}
 {% endif %}
 {% if containers.prowlarr %}
       # Prowlarr
@@ -139,6 +139,8 @@ services:
     environment:
       - TZ={{ timezone }}
       - MOUSEHOLE_AUTH_PASSWORD={{ mousehole.password }}
+      - MOUSEHOLE_ALLOWED_HOSTS="*"
+      - MOUSEHOLE_PORT={{ mousehole.port }}
     volumes:
       - mousehole-data:/var/lib/mousehole
     healthcheck:
