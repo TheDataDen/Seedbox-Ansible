@@ -21,7 +21,7 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
     - [Shares](#shares)
     - [Indiviual Container Settings](#indiviual-container-settings)
       - [pia_vpn](#pia_vpn)
-    - [mousehole](#mousehole)
+      - [mousehole](#mousehole)
       - [cleanuparr](#cleanuparr)
       - [radarr](#radarr)
       - [radarr_2](#radarr_2)
@@ -349,7 +349,7 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `port_fatal`         | No       | Enables the port_fatal option for the PIA VPN container. If the VPN port forward fails, the container will exit.   |
 | `port_persist`       | No       | Enables the port_persist option for the PIA VPN container. The container will try to use the same port every time. |
 
-### mousehole
+#### mousehole
 
 | Variable Name        | Required | Description                                           |
 | -------------------- | -------- | ----------------------------------------------------- |
