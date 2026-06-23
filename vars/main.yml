@@ -17,6 +17,7 @@ logging:
 
 containers:
   pia_vpn: true
+  mousehole: false
   cleanuparr: true
   radarr: true
   radarr_2: false
@@ -56,14 +57,6 @@ downloaders:
 shares:
   mount_tag: Shares
 
-extras:
-  # If you use MAM as one of your trackers and use the pia container. Runs a script that sets your IP in your MAM account when the VPN connects
-  mam:
-    enabled: false
-    # This only needs to be set on the first run, after that a cookie file will be used
-    # [USERNAME] -> Preferences -> Security -> View IP Locked Session Cookie
-    session_cookie: REPLACEME
-
 pia_vpn:
   disable_autoupdate: false
   username: REPLACEME
@@ -76,6 +69,11 @@ pia_vpn:
   # dip_token: REPLACEME
   port_fatal: true
   port_persist: false
+
+mousehole:
+  port: 5010
+  disable_autoupdate: false
+  password: REPLACEME
 
 cleanuparr:
   disable_autoupdate: false

@@ -19,10 +19,9 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
     - [Container Settings](#container-settings)
     - [Downloader Settings](#downloader-settings)
     - [Shares](#shares)
-    - [Extras](#extras)
-      - [MAM](#mam)
     - [Indiviual Container Settings](#indiviual-container-settings)
       - [pia_vpn](#pia_vpn)
+    - [mousehole](#mousehole)
       - [cleanuparr](#cleanuparr)
       - [radarr](#radarr)
       - [radarr_2](#radarr_2)
@@ -335,15 +334,6 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | ------------------ | -------- | ------------------------------------------------------------------ |
 | `shares.mount_tag` | Yes      | The tag that will be used for the UNRAID shares when passed to VM. |
 
-### Extras
-
-#### MAM
-
-| Variable Name    | Required | Description                                                                                                                             |
-| ---------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `enabled`        | Yes      | Enable/Disable the MAM script to run with the VPN comes up                                                                              |
-| `session_cookie` | Yes      | The MAM session cookie that will be used to login to MAM. Only needs to be set for the first run, after that a cookie file will be used |
-
 ### Indiviual Container Settings
 
 #### pia_vpn
@@ -358,6 +348,14 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `dip_token`          | No       | The DIP token of the PIA server. If NOT using Dedicated IP, this should be commented out with a `#`.               |
 | `port_fatal`         | No       | Enables the port_fatal option for the PIA VPN container. If the VPN port forward fails, the container will exit.   |
 | `port_persist`       | No       | Enables the port_persist option for the PIA VPN container. The container will try to use the same port every time. |
+
+### mousehole
+
+| Variable Name        | Required | Description                                           |
+| -------------------- | -------- | ----------------------------------------------------- |
+| `port`               | Yes      | The port that Mousehole's webUI will be running on.   |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.               |
+| `password`           | Yes      | The password that will be used to log into the webUI. |
 
 #### cleanuparr
 

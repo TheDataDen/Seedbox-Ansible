@@ -18,10 +18,11 @@ services:
     volumes:
       - pia-dat:/pia
       - ./pia/port:/pia-port
-{% if extras.mam.enabled %}
-      - ./pia/persist:/persist
-{% endif %}
     ports:
+{% if containers.mousehole %}
+      # Mousehole
+      - {{ mousehole.port }}:5010
+{% endif %}
 {% if containers.prowlarr %}
       # Prowlarr
       - {{ prowlarr.port }}:9696
@@ -111,9 +112,6 @@ services:
 {% if pia_vpn.port_persist %}
       - PORT_PERSIST=1
 {% endif %}
-{% if extras.mam.enabled %}
-      - POST_UP=/persist/mam.sh
-{% endif %}
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
       - net.ipv6.conf.default.disable_ipv6=1
@@ -126,6 +124,32 @@ services:
       retries: 3
       start_period: 30s
       start_interval: 3s
+{% endif %}
+{% if containers.mousehole and containers.pia_vpn %}
+  mousehole:
+    image: tmmrtn/mousehole:latest
+    container_name: mousehole
+    restart: unless-stopped
+    logging: *default-logging
+{% if cleanuparr.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
+    network_mode: "service:vpn"
+    environment:
+      - TZ={{ timezone }}
+      - MOUSEHOLE_AUTH_PASSWORD={{ mousehole.password }}
+    volumes:
+      - mousehole-data:/var/lib/mousehole
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--no-check-certificate", "-q", "http://{{ host_ip }}:{{ mousehole.port }}/"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+      vpn:
+        condition: service_healthy
 {% endif %}
 {% if containers.cleanuparr %}
   cleanuparr:
@@ -1350,7 +1374,7 @@ services:
       - ./:/dockers
 {% endif %}
 
-{% if containers.portainer or containers.pia_vpn %}
+{% if containers.portainer or containers.pia_vpn or containers.postgres or containers.mousehole %}
 volumes:
 {% endif %}
 {% if containers.portainer %}
@@ -1361,4 +1385,7 @@ volumes:
 {% endif %}
 {% if containers.postgres %}
   postgres-data:
+{% endif %}
+{% if containers.mousehole %}
+  mousehole-data:
 {% endif %}
