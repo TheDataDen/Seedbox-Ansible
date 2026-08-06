@@ -131,7 +131,7 @@ services:
     container_name: mousehole
     restart: unless-stopped
     logging: *default-logging
-{% if cleanuparr.disable_autoupdate %}
+{% if mousehole.disable_autoupdate %}
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
 {% endif %}
@@ -145,6 +145,33 @@ services:
       - mousehole-data:/var/lib/mousehole
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-check-certificate", "-q", "http://{{ host_ip }}:{{ mousehole.port }}/"]
+      interval: {{ health_check.interval }}
+      timeout: {{ health_check.timeout }}
+      retries: {{ health_check.retries }}
+      start_period: {{ health_check.start_period }}
+    depends_on:
+      vpn:
+        condition: service_healthy
+{% endif %}
+{% if containers.mousetrap and containers.pia_vpn %}
+  mousetrap:
+    image: ghcr.io/sirjmann92/mousetrap:latest
+    container_name: mousetrap
+    restart: unless-stopped
+    logging: *default-logging
+{% if mousetrap.disable_autoupdate %}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+{% endif %}
+    network_mode: "service:vpn"
+    environment:
+      - TZ={{ timezone }}
+      - PUID={{ puid }}
+      - PGID={{ pgid }}
+    volumes:
+      - ./mousetrap/config:/config
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--no-check-certificate", "-q", "http://{{ host_ip }}:{{ mousetrap.port }}/"]
       interval: {{ health_check.interval }}
       timeout: {{ health_check.timeout }}
       retries: {{ health_check.retries }}

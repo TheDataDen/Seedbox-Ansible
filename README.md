@@ -20,19 +20,20 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
     - [Downloader Settings](#downloader-settings)
     - [Shares](#shares)
     - [Indiviual Container Settings](#indiviual-container-settings)
-      - [pia_vpn](#pia_vpn)
+      - [pia\_vpn](#pia_vpn)
       - [mousehole](#mousehole)
+      - [mousetrap](#mousetrap)
       - [cleanuparr](#cleanuparr)
       - [radarr](#radarr)
-      - [radarr_2](#radarr_2)
+      - [radarr\_2](#radarr_2)
       - [sonarr](#sonarr)
-      - [sonarr_2](#sonarr_2)
+      - [sonarr\_2](#sonarr_2)
       - [recyclarr](#recyclarr)
       - [notifiarr](#notifiarr)
       - [prowlarr](#prowlarr)
       - [flaresolverr](#flaresolverr)
-      - [readarr_audiobooks](#readarr_audiobooks)
-      - [readarr_ebooks](#readarr_ebooks)
+      - [readarr\_audiobooks](#readarr_audiobooks)
+      - [readarr\_ebooks](#readarr_ebooks)
       - [lazylibrarian](#lazylibrarian)
       - [bindery](#bindery)
       - [chaptarr](#chaptarr)
@@ -40,8 +41,8 @@ This is an Ansible playbook designed to setup a fresh Ubuntu Virual Machine runn
       - [bazarr](#bazarr)
       - [kapowarr](#kapowarr)
       - [qbittorrent](#qbittorrent)
-      - [qbittorrent_porthelper](#qbittorrent_porthelper)
-      - [qbittorrent_managetorrents](#qbittorrent_managetorrents)
+      - [qbittorrent\_porthelper](#qbittorrent_porthelper)
+      - [qbittorrent\_managetorrents](#qbittorrent_managetorrents)
       - [sabnzbd](#sabnzbd)
       - [firefox](#firefox)
       - [portainer](#portainer)
@@ -295,6 +296,8 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | Variable Name                | Required | Description                                              |
 | ---------------------------- | -------- | -------------------------------------------------------- |
 | `pia_vpn`                    | No       | Enable/Disable the PIA VPN container.                    |
+| `mousehole`                  | No       | Enable/Disable the Mousehole container.                  |
+| `mousetrap`                  | No       | Enable/Disable the Mousetrap container.                  |
 | `cleanuparr`                 | No       | Enable/Disable the Cleanuperr container.                 |
 | `radarr`                     | No       | Enable/Disable the Radarr container.                     |
 | `radarr_2`                   | No       | Enable/Disable the Second Radarr container.              |
@@ -356,6 +359,13 @@ Make sure to replace all instances of `REPLACEME` with the appropriate values.
 | `port`               | Yes      | The port that Mousehole's webUI will be running on.   |
 | `disable_autoupdate` | Yes      | Disables watchtower for this container.               |
 | `password`           | Yes      | The password that will be used to log into the webUI. |
+
+#### mousetrap
+
+| Variable Name        | Required | Description                                         |
+| -------------------- | -------- | --------------------------------------------------- |
+| `port`               | Yes      | The port that Mousetrap's webUI will be running on. |
+| `disable_autoupdate` | Yes      | Disables watchtower for this container.             |
 
 #### cleanuparr
 
@@ -611,6 +621,7 @@ Below is a list of all of the containers that are available to be enabled/disabl
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `pia_vpn`                    | Runs a Private Internet Access VPN where all of the traffic for the neccessary containers are routed through the vpn. If the VPN loses connection, the containers lose access to the internet |
 | `mousehole`                  | For keeping your IP in sync with MAM when using a VPN                                                                                                                                         |
+| `mousetrap`                  | For syncing your mam id with prowlarr, chaptarr, etc. Supports automatically spending your MAM balance. Also supports the IP stuff that mousehole does                                        |
 | `cleanuparr`                 | Automatically cleans up files from your downloads and prevents downloads from clogging up the queue                                                                                           |
 | `radarr`                     | For managing your movies                                                                                                                                                                      |
 | `radarr_2`                   | For managing your movies. Second instance. Possible uses: 4K versions, IMAX versions, multiple editions, etc.                                                                                 |

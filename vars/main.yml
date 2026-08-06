@@ -18,6 +18,7 @@ logging:
 containers:
   pia_vpn: true
   mousehole: false
+  mousetrap: false
   cleanuparr: true
   radarr: true
   radarr_2: false
@@ -74,6 +75,10 @@ mousehole:
   port: 5010
   disable_autoupdate: false
   password: REPLACEME
+
+mousetrap:
+  port: 39842
+  disable_autoupdate: false
 
 cleanuparr:
   disable_autoupdate: false
