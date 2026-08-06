@@ -23,6 +23,10 @@ services:
       # Mousehole
       - {{ mousehole.port }}:{{ mousehole.port }}
 {% endif %}
+{% if containers.mousetrap %}
+      # Mousetrap
+      - {{ mousetrap.port }}:{{ mousetrap.port }}
+{% endif %}
 {% if containers.prowlarr %}
       # Prowlarr
       - {{ prowlarr.port }}:9696
