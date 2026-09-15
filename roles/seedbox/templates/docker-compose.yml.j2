@@ -882,7 +882,7 @@ services:
 {% endif %}
 {% if containers.chaptarr %}
   chaptarr:
-    image: robertlordhood/chaptarr:latest
+    image: chaptarr/chaptarr:latest
     container_name: chaptarr
     restart: unless-stopped
     logging: *default-logging
